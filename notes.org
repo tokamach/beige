@@ -1,0 +1,31 @@
+* Planning
+** TODO Which Architecture?
+- ARM
+- x86
+- other?
+** Toolchain
+*** Cross Compiler
+*** QEMU
+*** test machine??
+** OS Problems
+- reliability
+- security
+- power use
+- speed
+- multi core speed
+** Ideas
+*** declarative OS
+- declarative configuration
+- increased configurability
+- reliable and reproducible state  
+*** better multi core OS
+*** minimal side effects OS
+*** transactional OS
+* OS Concepts
+** Links
+- https://wiki.osdev.org/Expanded_Main_Page
+- https://github.com/littlekernel/lk
+
+* TODO Proposal
+  SCHEDULED: <2019-10-21 Mon>
+
