@@ -25,6 +25,7 @@
 ** Links
 - https://wiki.osdev.org/Expanded_Main_Page
 - https://github.com/littlekernel/lk
+- https://github.com/SerenityOS/serenity
 
 * TODO Proposal
   SCHEDULED: <2019-10-21 Mon>
