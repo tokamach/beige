@@ -6,6 +6,9 @@ export PATH="$PREFIX/bin:$PATH"
 
 brew install bison flex gmp libmpc mpfr libiconv
 
+if [ ! -f "$PREFIX/src" ] ; then
+    mkdir $PREFIX/src
+fi
 
 # binutils
 cd $PREFIX/src
