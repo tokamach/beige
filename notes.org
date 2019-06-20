@@ -3,6 +3,9 @@
 - ARM
 - x86
 - other?
+** Watch out for
+*** Paging
+*** Interrupts
 ** Toolchain
 *** Cross Compiler
 *** QEMU
@@ -21,6 +24,7 @@
 *** better multi core OS
 *** minimal side effects OS
 *** transactional OS
+
 * OS Concepts
 ** Links
 - https://wiki.osdev.org/Expanded_Main_Page
