@@ -1,0 +1,9 @@
+toolchain/bin
+toolchain/src
+toolchain/i686-elf
+toolchain/include
+toolchain/lib
+toolchain/libexec
+toolchain/share
+
+.DS_store
