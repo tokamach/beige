@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PREFIX="$HOME/os-project/toolchain/"
+export PREFIX="$HOME/os-project/toolchain"
 export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
 
@@ -22,6 +22,7 @@ if [ -f "binutils-2.32.tar.xz" ] ; then
     echo "building binutils"
 
     mkdir build-binutils
+    cd build-binutils
     ../binutils-2.32/configure --target=$TARGET --prefix="$PREFIX" --with-sysroot --disable-nls --disable-werror
     make
     make install
