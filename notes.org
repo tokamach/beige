@@ -1,4 +1,4 @@
-* Planning
+* Project Planning
 ** TODO Which Architecture?
 - ARM
 - x86
@@ -31,6 +31,29 @@
 - https://github.com/littlekernel/lk
 - https://github.com/SerenityOS/serenity
 
+* OS Planning
+** Scheduler
+*** Round robin
+** Memory Management
+*** Enter protected mode
+** Filesystem
+*** ext2
+** IO
+*** keyboard
+*** mouse
+** Display
+*** Terminal
+**** color management
+**** control chars
+**** high res terminal
+*** Graphics
+**** window system
+- see rio, early X wms
+- simple design
+**** screen setup
+- using VESA/VGA modes
+**** shape drawing library
+**** GUI library
 * TODO Proposal
   SCHEDULED: <2019-10-21 Mon>
 
