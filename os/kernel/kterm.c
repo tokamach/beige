@@ -16,7 +16,7 @@ size_t term_row;
 
 uint16_t *vga_buf;
 
-inline uint8_t vga_entry(unsigned char c)
+inline uint16_t vga_entry(unsigned char c)
 {
     return (uint16_t) c | (uint16_t) color << 8;
 }
@@ -39,14 +39,14 @@ void k_term_init()
     {
 	for(size_t j = 0; j < VGA_WIDTH; j++)
 	{
-	    vga_buf[(i * VGA_HEIGHT) + j] = vga_entry(' ');
+	    vga_buf[(i * VGA_WIDTH) + j] = vga_entry(' ');
 	}
     }
 }
 
 void k_term_put_char(const char c, size_t x, size_t y)
 {
-    vga_buf[(y * VGA_HEIGHT) + x] = vga_entry(c);
+    vga_buf[(y * VGA_WIDTH) + x] = vga_entry(c);
 }
 
 void k_term_print_char(const char c)
@@ -55,10 +55,16 @@ void k_term_print_char(const char c)
     k_term_put_char(c, term_col, term_row);
     term_col++;
     
-    if(term_col > VGA_WIDTH)
+    if(term_col >= VGA_WIDTH)
     {
 	term_row++;
 	term_col = 0;
+
+	if(term_row >= VGA_HEIGHT)
+	{
+	    term_row = 0;
+	    term_col = 0;
+	}
     }
 }
 
