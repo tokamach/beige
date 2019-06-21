@@ -10,5 +10,5 @@ static const size_t VGA_HEIGHT = 25;
 void kernel_main()
 {
     k_term_init();
-    k_print("Hello World!");
+    k_print("Hello World!\nHello Planet!");
 }

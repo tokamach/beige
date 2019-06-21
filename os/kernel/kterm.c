@@ -51,20 +51,29 @@ void k_term_put_char(const char c, size_t x, size_t y)
 
 void k_term_print_char(const char c)
 {
-    //TODO: newline detection
-    k_term_put_char(c, term_col, term_row);
-    term_col++;
+    //TODO: implement additional control characters
+    if(c == '\n')
+    {
+	term_row++;
+	term_col = 0;
+    }
+    else
+    {
+	//printing visible character
+	k_term_put_char(c, term_col, term_row);
+	term_col++;
+    }
     
     if(term_col >= VGA_WIDTH)
     {
 	term_row++;
 	term_col = 0;
+    }
 
-	if(term_row >= VGA_HEIGHT)
-	{
-	    term_row = 0;
-	    term_col = 0;
-	}
+    if(term_row >= VGA_HEIGHT)
+    {
+	term_row = 0;
+	term_col = 0;
     }
 }
 
