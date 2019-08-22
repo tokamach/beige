@@ -1,6 +1,6 @@
 CC     := ../toolchain/bin/i686-elf-gcc
 AS     := ../toolchain/bin/i686-elf-as
-CFLAGS := -ffreestanding -O2 -Wall -Wextra
+CFLAGS := -ffreestanding -Wall -Wextra
 
 all: os.bin
 
