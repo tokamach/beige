@@ -17,12 +17,12 @@ size_t term_row;
 
 uint16_t *vga_buf;
 
-inline uint8_t vga_color(uint8_t fg, uint8_t bg)
+uint8_t vga_color(uint8_t fg, uint8_t bg)
 {
     return (uint8_t) fg | bg << 4;
 }
 
-inline uint16_t vga_entry(unsigned char c, uint8_t color)
+uint16_t vga_entry(unsigned char c, uint8_t color)
 {
     return (uint16_t) c | (uint16_t) color << 8;
 }
@@ -82,3 +82,11 @@ void k_print(const char * s)
 	k_term_print_char(s[i]);
     }
 }
+
+void k_print_num(int i)
+{
+    char buf[21];
+    itoa(i, 10, buf);
+    k_print(buf);
+}
+
