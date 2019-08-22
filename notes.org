@@ -1,12 +1,12 @@
 * Project Planning
-** TODO Which Architecture?
+** DONE Which Architecture?
 - ARM
 - x86
 - other?
 ** Watch out for
 *** Paging
 *** Interrupts
-** Toolchain
+** DONE Toolchain
 *** Cross Compiler
 *** QEMU
 *** test machine??
@@ -32,28 +32,42 @@
 - https://github.com/SerenityOS/serenity
 
 * OS Planning
-** Scheduler
+** TODO Scheduler
+- calculate avg wait and turnaround time
 *** Round robin
-** Memory Management
-*** Enter protected mode
-** Filesystem
+** TODO Memory Management
+*** paging
+- track pages with AVL tree
+- page table
+- swap pages/page faults
+*** malloc
+- first fit/worst fit/best fit
+*** free
+** TODO Filesystem
 *** ext2
-** IO
+** TODO IO
 *** keyboard
+**** PS2 interface
 *** mouse
-** Display
+** TODO Display
 *** Terminal
+**** printf
 **** color management
 **** control chars
 **** high res terminal
 *** Graphics
 **** window system
-- see rio, early X wms
+- see rio, early X wms, blit terminal?
 - simple design
 **** screen setup
 - using VESA/VGA modes
 **** shape drawing library
 **** GUI library
+** TODO stdlib
+*** klib
+- itoa
+- sprintf
+*** outb/inb
 * TODO Proposal
   SCHEDULED: <2019-10-21 Mon>
 
