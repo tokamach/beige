@@ -31,7 +31,7 @@ _start:
 	/* TODO: initalize GDT, floating point, etc */
 
 	/* enter kernel */
-	call kernel_main
+	call k_main
 
 	/* loop */
 	cli
