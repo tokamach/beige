@@ -90,3 +90,9 @@ void k_print_num(int i)
     k_print(buf);
 }
 
+void k_print_hex(int i)
+{
+    char buf[21];
+    itoa(i, 16, buf);
+    k_print(buf);
+}

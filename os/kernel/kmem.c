@@ -27,19 +27,9 @@ size_t k_query_low_mem()
     return low_mem_size;
 }
 
-size_t k_query_mem_map(size_t seg, size_t offset)
+size_t k_query_mem_map(size_t loc)
 {
-    //TODO: first try check using multiboot memmap (grub)
-
-    //setup regs
-    // ax  = 0xE820
-    // ecx = sizeof MMapEntry_t
-    // edx = 'SMAP'
-    // ES:DI = seg:offset
-    
-    //call int
-    
-    //loop for entries (ebx != 0)
+    //TODO: check using multiboot memmap (grub)    
     
     return 0;
 }

@@ -28,6 +28,9 @@ _start:
 	/* setup stack */
 	mov $stack_top, %esp
 
+	/* setup multiboot info structure and magic number */
+	pushl %ebx
+	pushl %eax
 	/* TODO: initalize GDT, floating point, etc */
 
 	/* enter kernel */

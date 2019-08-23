@@ -17,10 +17,19 @@ int itoa(int num, int base, char* str)
     int digits = 0;
     char ret[21];
     
-    //modulo ten, add result to front of string, div by 10, loop again
+    //modulo base, add result to front of string, div by base, loop again
     do {
-    	ret[digits] = (num % base) + '0';
-    	num = num / 10;
+	
+	int n = num % base;
+	if(n > 9)
+	{
+	    num -= 10;
+	    ret[digits] = n + 'a';   
+	}
+	else if (n <= 9)
+	    ret[digits] = n + '0';
+	
+    	num = num / base;
     	digits++;
     } while (num > 0);
 
