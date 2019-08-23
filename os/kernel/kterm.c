@@ -94,5 +94,14 @@ void k_print_hex(int i)
 {
     char buf[21];
     itoa(i, 16, buf);
+    k_print("0x");
+    k_print(buf);
+}
+
+void k_print_bin(int i)
+{
+    char buf[21];
+    itoa(i, 2, buf);
+    k_print("0b");
     k_print(buf);
 }

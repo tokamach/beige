@@ -23,7 +23,7 @@ int itoa(int num, int base, char* str)
 	int n = num % base;
 	if(n > 9)
 	{
-	    num -= 10;
+	    n -= 10;
 	    ret[digits] = n + 'a';   
 	}
 	else if (n <= 9)
