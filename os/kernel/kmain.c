@@ -8,7 +8,7 @@
 
 // kernel entry point
 void k_main(multiboot_info_t* mbd)
-{
+{    
     k_term_init();
     k_print("kernel init\n");
 
@@ -24,10 +24,18 @@ void k_main(multiboot_info_t* mbd)
     k_print("\nupper memory: ");
     k_print_hex(mbd->mem_upper);
 
-    if(!((mbd->flags & 0b00100000) >> 5))
+    if(mbd->flags & MULTIBOOT_INFO_MEM_MAP)
     {
-	k_print("\nmultiboot location: ");
-	k_print_hex(mbd->mmap_addr);	
+	size_t mmap_addr = mbd->mmap_addr;
+	size_t mmap_size = mbd->mmap_length;
+	
+	k_print("\nmem map location: ");
+	k_print_hex(mmap_addr);
+	k_print("\nmem map length: ");
+	k_print_hex(mmap_size);
+
+	k_print("\n\nmem map:\n");
+	k_query_mem_map(mmap_addr, mmap_size);
     }
     
     //start scheduler
