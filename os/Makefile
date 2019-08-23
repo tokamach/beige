@@ -3,6 +3,7 @@ AS     := ../toolchain/bin/i686-elf-as
 CFLAGS := -ffreestanding -Wall -Wextra
 DEPS   := kernel/kmem.h kernel/kstd.h
 KOBJ   := kernel/boot.o kernel/kmain.o kernel/kterm.o kernel/kmem.o
+TESTS  := tests/atoi.o
 
 all: os.bin
 
@@ -16,6 +17,9 @@ kernel: $(KOBJ)
 
 os.bin: kernel
 	$(CC) -T linker.ld -o os.bin -ffreestanding -O2 -nostdlib $(KOBJ) -lgcc
+
+test: kernel $(TESTS)
+	./$(TESTS)
 
 clean:
 	rm kernel/*.o
