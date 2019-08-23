@@ -36,7 +36,11 @@
 - calculate avg wait and turnaround time
 *** Round robin
 ** TODO Memory Management
-*** paging
+- SDM vol3 3
+*** Segmentation
+- SDM vol3 3.2
+- add *segment descriptor* to GDT
+*** Paging
 - track pages with AVL tree
 - page table
 - swap pages/page faults
