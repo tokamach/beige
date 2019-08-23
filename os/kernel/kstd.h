@@ -36,7 +36,7 @@ int itoa(int num, int base, char* str)
     for(int i = 0; i < digits; i++)
     	str[i] = ret[digits - i - 1];
     
-    str[digits + 1] = '\0';
+    str[digits] = '\0';
     
     return 0;
 }
