@@ -72,6 +72,9 @@
 - itoa
 - sprintf
 *** outb/inb
+** TODO Tests
+- add test feature to Makefile
+- full coverage unit tests
 * TODO Proposal
   SCHEDULED: <2019-10-21 Mon>
 
