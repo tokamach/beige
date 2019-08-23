@@ -1,0 +1,1831 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><script src="//archive.org/includes/analytics.js?v=cf34f82" type="text/javascript"></script>
+<script type="text/javascript">window.addEventListener('DOMContentLoaded',function(){var v=archive_analytics.values;v.service='wb';v.server_name='wwwb-app31.us.archive.org';v.server_ms=351;archive_analytics.send_pageview({});});</script><script type="text/javascript" src="/_static/js/ait-client-rewrite.js" charset="utf-8"></script>
+<script type="text/javascript">
+WB_wombat_Init("http://web.archive.org/web/", "20140803112320", "i30www.ira.uka.de");
+</script>
+<script type="text/javascript" src="/_static/js/wbhack.js" charset="utf-8"></script>
+<script type="text/javascript">
+__wbhack.init('http://web.archive.org/web');
+</script>
+<link rel="stylesheet" type="text/css" href="/_static/css/banner-styles.css" />
+<link rel="stylesheet" type="text/css" href="/_static/css/iconochive.css" />
+<!-- End Wayback Rewrite JS Include -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15"/><title>Microkernel Construction Lecture Notes</title><link rel="stylesheet" href="/web/20140803112320cs_/http://i30www.ira.uka.de/~neider/edu/mkc/docbook-xsl.css" type="text/css"/><meta name="generator" content="DocBook XSL Stylesheets V1.73.2"/></head><body><div class="book" lang="en" xml:lang="en"><div class="titlepage"><div><div><h1 class="title"><a id="id2424249"></a>Microkernel Construction Lecture Notes</h1></div><div><div class="author"><h3 class="author"><span class="firstname">Raphael</span> <span class="surname">Neider</span></h3></div></div><div><div class="revhistory"><table border="1" width="100%" summary="Revision history"><tr><th align="left" valign="top" colspan="3"><b>Revision History</b></th></tr><tr><td align="left">Revision 0.3</td><td align="left">September 2008</td><td align="left">RN</td></tr></table></div></div></div><hr/></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="preface"><a href="#id2518049">Preface</a></span></dt><dt><span class="chapter"><a href="#id2518098">1. Overview</a></span></dt><dd><dl><dt><span class="section"><a href="#id2518103">Monolithic Kernels</a></span></dt><dt><span class="section"><a href="#id2477314">Microkernel-Based Systems</a></span></dt><dt><span class="section"><a href="#id2477367">Historic Attempts</a></span></dt><dt><span class="section"><a href="#id2477422">Basic Abstractions and Mechanisms</a></span></dt></dl></dd><dt><span class="chapter"><a href="#ch_threads">2. Threads and Thread Switching</a></span></dt><dd><dl><dt><span class="section"><a href="#id2513078">Threads</a></span></dt><dt><span class="section"><a href="#id2477810">Switching Threads</a></span></dt><dt><span class="section"><a href="#id2478313">Kernel Stack Models</a></span></dt><dd><dl><dt><span class="section"><a href="#id2478339">Per-Processor Kernel Stack</a></span></dt><dt><span class="section"><a href="#id2478374">Per-Thread Kernel Stack</a></span></dt></dl></dd><dt><span class="section"><a href="#id2478404">Sample Code</a></span></dt></dl></dd><dt><span class="chapter"><a href="#ch_systemCalls">3. System Calls</a></span></dt><dd><dl><dt><span class="section"><a href="#id2527793">Traditional System Calls on x86</a></span></dt><dt><span class="section"><a href="#id2528000">Fast System Calls on x86</a></span></dt><dt><span class="section"><a href="#id2528261">Reconciling Stack Layouts</a></span></dt><dt><span class="section"><a href="#id2528472">Returning From System Calls</a></span></dt></dl></dd><dt><span class="chapter"><a href="#ch_TCBs">4. TCBs</a></span></dt><dd><dl><dt><span class="section"><a href="#sec_locatingTCBs">Locating TCBs</a></span></dt><dd><dl><dt><span class="section"><a href="#id2476903">Locating the TCB of the Current Thread</a></span></dt><dt><span class="section"><a href="#id2529040">Locating the TCB of a Thread by Thread ID</a></span></dt><dt><span class="section"><a href="#id2529428">Locating the TCB of the Next Ready-to-Run Thread</a></span></dt></dl></dd><dt><span class="section"><a href="#id2529464">0-Mapping-Trick</a></span></dt><dt><span class="section"><a href="#id2529636">Address Space Layout</a></span></dt><dd><dl><dt><span class="section"><a href="#id2529664">Address Space Regions</a></span></dt><dt><span class="section"><a href="#id2529698">Regions in the Kernel Address Space</a></span></dt><dt><span class="section"><a href="#sec_synchronization">Synchronization of the Kernel Address Space</a></span></dt><dt><span class="section"><a href="#id2529846">Processor-Specific Data</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#ch_IPCFunctionality">5. IPC Functionality and Interface</a></span></dt><dd><dl><dt><span class="section"><a href="#synchronousCommunication">Synchronous Communication</a></span></dt><dt><span class="section"><a href="#id2529997">Communication Primitives</a></span></dt><dt><span class="section"><a href="#id2530281">Message Types</a></span></dt><dt><span class="section"><a href="#id2530380">Timeouts</a></span></dt><dd><dl><dt><span class="section"><a href="#id2530402">Send Timeout</a></span></dt><dt><span class="section"><a href="#id2530429">Receive Timeout</a></span></dt><dt><span class="section"><a href="#id2530453">Transfer Timeout</a></span></dt><dt><span class="section"><a href="#id2530569">Timeout Encoding</a></span></dt></dl></dd><dt><span class="section"><a href="#id2530761">Encoding of IPC Parameters</a></span></dt><dd><dl><dt><span class="section"><a href="#sec_operationAndAddresses">Operation and Addresses</a></span></dt><dt><span class="section"><a href="#id2530933">Deceiving IPC and Proxies</a></span></dt><dt><span class="section"><a href="#id2530944">Timeouts</a></span></dt><dt><span class="section"><a href="#id2531054">Message Content</a></span></dt><dt><span class="section"><a href="#receivebuffers">Receive Buffers</a></span></dt><dt><span class="section"><a href="#id2531854">IPC Result</a></span></dt><dt><span class="section"><a href="#utcb">Virtual Registers and the UTCB</a></span></dt></dl></dd></dl></dd><dt><span class="chapter"><a href="#ch_IPCImplementation">6. IPC Implementation</a></span></dt><dd><dl><dt><span class="section"><a href="#id2531985">IPC and Scheduling</a></span></dt><dt><span class="section"><a href="#id2532336">General Implementation of Short IPC</a></span></dt><dt><span class="section"><a href="#sec_fastpathIPC">Fast Path IPC</a></span></dt><dd><dl><dt><span class="section"><a href="#id2532712">Performance Considerations</a></span></dt><dt><span class="section"><a href="#id2532820">Combining Fast and Slow Paths</a></span></dt></dl></dd><dt><span class="section"><a href="#sec_longIPC">Long IPC</a></span></dt><dt><span class="section"><a href="#id2533168">String IPC</a></span></dt><dd><dl><dt><span class="section"><a href="#id2533199">Copy In/Copy Out</a></span></dt><dt><span class="section"><a href="#sec_tempMapping">Temporary Mapping Area</a></span></dt><dt><span class="section"><a href="#id2533614">Management of the Temporary Mapping Area</a></span></dt></dl></dd><dt><span class="section"><a href="#id2533810">Temporary Mapping Area on Multi-Processor Machines</a></span></dt></dl></dd><dt><span class="chapter"><a href="#ch_dispatching">7. Dispatching</a></span></dt><dd><dl><dt><span class="section"><a href="#sec_scheduling">Scheduling in L4</a></span></dt><dt><span class="section"><a href="#id2534140">Optimizations</a></span></dt><dt><span class="section"><a href="#id2534220">Dispatching Mechanism</a></span></dt><dt><span class="section"><a href="#sec_lazyDispatching">Lazy Dispatching</a></span></dt><dt><span class="section"><a href="#sec_timeouts">Timeouts</a></span></dt></dl></dd><dt><span class="chapter"><a href="#ch_virtualMemoryMapping">8. Virtual Memory Mapping</a></span></dt><dt><span class="chapter"><a href="#ch_smallspaces">9. Small Spaces</a></span></dt><dt><span class="chapter"><a href="#ch_localIPC">10. Local IPC</a></span></dt><dt><span class="chapter"><a href="#ch_interruptAndExceptionHandling">11. Interrupt and Exception Handling</a></span></dt><dt><span class="chapter"><a href="#ch_security">12. Security</a></span></dt><dt><span class="index"><a href="#id2534827">Index</a></span></dt><dt><span class="appendix"><a href="#id2534833">A. Communication Spaces</a></span></dt></dl></div><div class="list-of-examples"><p><b>List of Examples</b></p><dl><dt>3.1. <a href="#id2528326">Emulate effects of <code class="literal">int</code> after <code class="literal">sysenter</code></a></dt><dt>3.2. <a href="#id2528525">Emulate <code class="literal">iret</code> using <code class="literal">sysexit</code></a></dt><dt>4.1. <a href="#id2529196">Locating a TCB by its thread ID by masking out a split version field</a></dt><dt>4.2. <a href="#id2529279">Locating a TCB by its thread ID by shifting and masking the thread ID</a></dt><dt>4.3. <a href="#id2529352">Locating a TCB by its thread ID using a lookup table</a></dt></dl></div><div class="preface" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="id2518049"></a>Preface</h2></div></div></div><p>This is work in progress.
+When finished, this document will contain most of the material presented
+in the lecture on Microkernel Construction at the University of Karlsruhe
+in summer 2008.
+It is intended as a learning aid to be used in conjunction with the
+lecture slides (available from
+<a class="ulink" href="http://web.archive.org/web/20140803112320/http://i30www.ira.uka.de/teaching/courses/lecture.php?courseid=167" target="_top">http://i30www.ira.uka.de/teaching/courses/lecture.php?courseid=167</a>).</p><p>The material on which this document is based has been developed by
+Prof. Jochen Liedtke in 1999,
+with contributions and additions by
+Uwe Dannowski,
+Kevin Elphinstone,
+Joshua LeVasseur,
+Espen Skoglund,
+Jan Stoess,
+and
+Volkmar Uhlig.</p><p>May this document help in understanding the design of microkernels in general
+and the L4 microkernel in particular.</p><p>... Raphael Neider (September 2008)</p></div><div class="chapter" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="id2518098"></a>Chapter 1. Overview</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#id2518103">Monolithic Kernels</a></span></dt><dt><span class="section"><a href="#id2477314">Microkernel-Based Systems</a></span></dt><dt><span class="section"><a href="#id2477367">Historic Attempts</a></span></dt><dt><span class="section"><a href="#id2477422">Basic Abstractions and Mechanisms</a></span></dt></dl></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2518103"></a>Monolithic Kernels</h2></div></div></div><p>Monolithic operating system kernels abstract from the hardware and
+offer more convenient services such as threads, address spaces, files,
+synchronization primitives, ... to applications.
+New features are added by adding code to the kernel, which leads to code
+size explosion, e.g. in the Linux kernel.
+In order to fulfill physical memory management tasks, fair scheduling,
+and hardware management tasks, monolithic kernels have all their code
+execute in the privileged processor mode.
+Hence each subsystem (file system, networking stack, ...) and each driver
+must be fully trusted, as malicious or faulty code can affect the whole
+system.</p><p>Another problem with monolithic kernels is their poor maintainability:
+As all subsystems share the same binary, it is easy to take shortcuts
+and directly access data structures of other subsystems from anywhere.
+As a consequence, changing the structures can require changes throughout
+the kernel and thus hampers development.</p><p>If the subsystems had clean interfaces, whose use would be enforced by
+the compiler (layered, modular, or object-oriented kernels), at least
+the second problem (maintenance) could be solved, but the first one
+(robustness) still remains as long as all submodules share the same
+address space.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2477314"></a>Microkernel-Based Systems</h2></div></div></div><p>The goal of microkernel-based operating systems is to minimize the amount
+of code that is executed in the privileged processor mode.
+For this purpose, each driver and each convenience OS subsystem is moved
+into an unprivileged user-level application, a so called server.
+Only a slim layer beneath the servers executes in privileged mode and
+only deals with safety critical tasks such as granting access to physical
+memory/devices, routing interrupts to the appropriate driver, and
+communication between the threads/address spaces.</p><p>Such a scheme would allow to execute multiple operating systems on top
+of the microkernel at the same time (virtualization), run special services
+directly on top of the microkernel (no high-level OS involved), or provide
+real-time services next to general purpose services without having to port
+the latter to a real time-capable OS.</p><p>Due to the separation of the subsystems and drivers into different address
+spaces, clean interfaces are required and enforced by offering only a limited
+communication API.
+As a consequence, both the robustness of the resulting system as well as its
+maintainability should improve compared with the monolithic approach.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2477367"></a>Historic Attempts</h2></div></div></div><p>However, early microkernel-based OSes such as IBM's Workplace OS and early
+microkernels such as Mach uncovered a significant performance penalty due
+to the dramatically increased number of context switches:
+Instead of referencing data structures in some submodule, microkernel-based
+systems need to issue a request-IPC to the server, switch to its address
+space, probably copy the requested data into kernel buffers and/or the
+client's address space, switch back to the client's address space, and
+finally access the data.</p><p>Two lessons are to be learned from these projects:
+Communication across address space boundaries is the most frequently used
+service in microkernel-based systems and, consequently, this operation
+must be as fast as possible.
+The whole microkernel must be designed to allow for really fast IPC.
+To achieve this, the target architecture must be carefully analyzed for
+possible performance features (e.g., <code class="literal">sysenter</code>/<code class="literal">sysexit</code> on x86) and
+bottlenecks (avoid slow DRAM accesses, obey cache structure during layout
+of the central data structures, avoid mandatory TLB flush on context
+switch if possible, minimize kernel impact on branch prediction logic, ...).</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2477422"></a>Basic Abstractions and Mechanisms</h2></div></div></div><p>The L4 microkernel, which is the basis for this lecture, was designed from
+scratch (rather than stripping existing systems down) and implemented to
+provide fast IPC.
+It offers two abstractions: <span class="strong"><strong>Threads</strong></span> <a id="id2477440" class="indexterm"></a> to abstract from the
+CPU, and <span class="strong"><strong>address spaces</strong></span> <a id="id2477455" class="indexterm"></a> to protect threads against
+each other.
+In order to be able to manipulate these abstractions, the L4 kernel also
+provides two mechanisms: inter-process communication (<span class="strong"><strong>IPC</strong></span>) <a id="id2477475" class="indexterm"></a> allows
+threads to communicate and to synchronize, whereas <span class="strong"><strong>mapping</strong></span> <a id="id2477491" class="indexterm"></a>
+allows to recursively populate address spaces.</p><p>The kernel maps all hardware properties to these abstractions:
+All activities (including I/O devices) are represented in threads,
+interrupts are transformed into an IPC from the device thread to
+the driver thread.
+Pagefaults are wrapped into a pagefault IPC from the faulting thread to
+another thread that is responsible for providing memory (a so-called pager),
+and (physical) memory is given to an address space by mapping memory from
+the pager (the pager itself requests the memory from its respective pager,
+the root pager idempotently maps physical memory to its clients on demand).</p><p>These two abstractions (threads and address spaces) are just one of
+potentially many valid choices.
+However, the provided abstractions should be chosen so that everything that
+needs to be managed in privileged mode for reasons of</p><div class="itemizedlist"><ul type="disc"><li>
+hardware requirements (loading <code class="literal">%cr3</code> on x86 is a privileged instruction) or
+</li><li>
+safety/security considerations (a user-level solution could compromise the
+  functionality of the microkernel and thus the whole system, e.g. physical
+  memory management and access to hardware-read page tables)
+</li></ul></div><p>is managed by the microkernel (in privileged mode), and everything else is
+delegated to unprivileged user-mode tasks.</p><p>An additional criterion is to avoid duplicated functionality in the kernel:
+There should always be exactly one way to do a job, no more and no less.
+As a consequence, all abstractions and mechanisms must be general enough to
+allow all desired uses.
+On the other hand, all abstractions and mechanisms must be orthogonal, so that
+none can be emulated using the others (no superfluous abstractions or
+mechanisms are allowed inside the microkernel
+<sup>[<a id="id2477629" href="#ftn.id2477629" class="footnote">1</a>]</sup>).</p></div><div class="footnotes"><br/><hr width="100" align="left"/><div class="footnote"><p><sup>[<a id="ftn.id2477629" href="#id2477629" class="simpara">1</a>] </sup>This is not true for large kernels such as Linux:
+Files can be manipulated using either the <code class="literal">open()</code>, <code class="literal">read()</code>, <code class="literal">write()</code>,
+and <code class="literal">close()</code> syscalls or via <code class="literal">mmap()</code>/<code class="literal">munmap()</code>.</p></div></div></div><div class="chapter" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="ch_threads"></a>Chapter 2. Threads and Thread Switching</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#id2513078">Threads</a></span></dt><dt><span class="section"><a href="#id2477810">Switching Threads</a></span></dt><dt><span class="section"><a href="#id2478313">Kernel Stack Models</a></span></dt><dd><dl><dt><span class="section"><a href="#id2478339">Per-Processor Kernel Stack</a></span></dt><dt><span class="section"><a href="#id2478374">Per-Thread Kernel Stack</a></span></dt></dl></dd><dt><span class="section"><a href="#id2478404">Sample Code</a></span></dt></dl></div><p>Threads are one of the abstractions offered by the L4 microkernel.
+They abstract from the CPU and thus allow to share a single CPU among
+multiple activities (tasks, programs, jobs, ...).
+The thread abstraction enables multi-programming systems by switching
+between threads whenever another activity is to be executed on the CPU.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2513078"></a>Threads</h2></div></div></div><p>To this end, threads must be represented by a data structure that can
+hold all the CPU state, including the current instruction pointer,
+the stack pointer, the contents of general purpose registers and special
+purpose registers (e.g., floating point or status registers) contents.
+Additionally, to enable controlled switching between threads (scheduling),
+scheduling parameters such as thread priorities, time slice lengths, and
+thread status (e.g., running, ready, blocked, invalid) are also required.
+All this information is stored in so-called TCBs, which will be discussed
+in more detail in <a class="xref" href="#ch_TCBs" title="Chapter 4. TCBs">Chapter 4, <i>TCBs</i></a>.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2477810"></a>Switching Threads</h2></div></div></div><p>Switching threads is conceptually easy:</p><div class="itemizedlist"><ul type="disc"><li>
+Store the CPU state of the currently running thread in its TCB
+</li><li>
+Load the CPU state of the thread to resume from its TCB into the CPU
+</li></ul></div><p>However, two problems arise:
+First, TCBs must be protected kernel objects, so that no thread on user-level
+can manipulate other threads' states.
+Furthermore, threads must not be allowed to modify even their own TCB,
+if/as the TCBs contain scheduling information (e.g., the remaining timeslice
+length).</p><p>As a consequence, thread switches must (most of the time, see <a class="xref" href="#ch_localIPC" title="Chapter 10. Local IPC">Chapter 10, <i>Local IPC</i></a>)
+be performed by the kernel,
+which means that the kernel must run in order to do so.
+If the kernel is running, the user-level state of the thread must be
+preserved somewhere in order to be able to correctly resume it.
+For this second problem, some hardware support on entering the kernel
+is required:
+On kernel entry, the user-level CPU state could be saved on a stack (x86),
+or the kernel can use a different set of CPU state (register banks, found
+in MIPS or Itanium machines).</p><p>On stack-based machines (x86), a thread switch thus requires the following
+steps:</p><div class="itemizedlist"><ul type="disc"><li>
+A thread executes in user mode
+</li><li>
+Some event triggers a thread switch (interrupt, exception, syscall, ...)
+</li><li><p>
+The system enters kernel mode
+</p><div class="itemizedlist"><ul type="circle"><li>
+The hardware automatically stores the user-level stack pointer ...
+</li><li>
+... loads a kernel stack pointer
+</li><li>
+and saves the user-level instruction pointer and stack pointer on
+      the kernel stack
+</li><li>
+The hardware loads a kernel instruction pointer based on the cause
+      of the kernel entry (interrupt, exception, syscall, ...)
+</li></ul></div></li><li>
+The kernel code saves the remaining CPU state into the current thread's
+  TCB before overwriting it
+</li><li>
+The kernel loads the CPU state of the next thread from its TCB ...
+</li><li><p>
+... and returns to user-mode, causing the hardware to
+</p><div class="itemizedlist"><ul type="circle"><li>
+load the user-level instruction pointer and
+</li><li>
+the user-level stack pointer from the current stack
+</li></ul></div></li></ul></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2478313"></a>Kernel Stack Models</h2></div></div></div><p>Concerning the stack being used in kernel mode, different models are possible.
+The kernel stack should always be different from the user-level stack for
+security reasons:
+First, the user can set up an invalid stack pointer before entering kernel
+mode, loading a well-known, valid stack pointer on kernel entry is likely to
+be easier than validating the current value.
+Secondly, the kernel entry might be caused by a page fault on the user-level
+stack.
+Storing user-level state on this stack in order to handle the page fault
+will thus raise further page faults (accesses the same non-mapped memory)
+which can never be handled.</p><p>The presented models differ in the number of kernel-level stacks.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2478339"></a>Per-Processor Kernel Stack</h3></div></div></div><p>All threads executing on one CPU can use the same kernel stack.
+<sup>[<a id="id2478349" href="#ftn.id2478349" class="footnote">2</a>]</sup>
+As a consequence, either only one thread can execute in kernel mode at any
+time (i.e., threads executing in kernel mode cannot be preempted), or
+unusual approaches such as continuations must be used.</p><p>This model is efficient with respect to cache lines used during a context
+switch (only one stack), but uncomfortable from the kernel developer's point
+of view.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2478374"></a>Per-Thread Kernel Stack</h3></div></div></div><p>Alternatively, each thread can have its own kernel-level stack.
+This model resembles user-level code and makes kernel mode nothing special
+from the kernel developer's point of view.
+However, this model is more costly both with respect to virtual memory use
+(only one stack must be addressable in the previous model, whereas this model
+requires (number of threads) stacks to be present in virtual memory) and
+with respect to cache line use on thread switch:
+Both the stacks of the current thread an the stack of the next thread are
+accessed, effectively doubling the number of cache lines used for them.</p><p>Due to its simplicity, L4 employs the per-thread stack model and integrates
+the kernel stacks into the TCBs.
+(TCB plus stack fit into a single page to avoid additional TLB misses.)</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2478404"></a>Sample Code</h2></div></div></div><p>Code to cooperatively switch threads in kernel mode on x86:</p><pre class="screen">/* save all registers on the stack */
+pusha
+
+/* compute TCB address of current thread
+ * (esp already points to the end of the TCB,
+ * i.e., the top of the kernel stack)
+ */
+mov     esp, ebp
+and     -sizeof_tcb, ebp
+
+/* assume: edi = address of TCB of B */
+mov     esp, TCB_Off_esp(ebp)
+mov     TCB_Off_esp(edi), esp
+
+/* setup kernel stack for next kernel entry */
+add     sizeof_tcb, edi
+mov     edi, 0(esp0_ptr)
+
+/* restore all registers from the stack */
+popa</pre><div class="itemizedlist"><p class="title"><b>Note:</b></p><ul type="disc"><li>
+TCBs comprise 2<sup>k</sup> bytes (k in [9..12]) and are naturally aligned
+</li><li>
+-2<sup>k</sup> can be used to mask out the offset inside a TCB and compute its start
+  address: (any address inside a TCB) AND -2<sup>k</sup> results in the 2<sup>k</sup>-aligned
+  base address of the TCB
+</li><li>
+On kernel entry, the hardware loads the stack pointer from esp0
+</li><li>
+Stack on x86 grow downwards, hence on leaving the kernel, esp0 is set to
+  the end of the TCB
+</li></ul></div></div><div class="footnotes"><br/><hr width="100" align="left"/><div class="footnote"><p><sup>[<a id="ftn.id2478349" href="#id2478349" class="simpara">2</a>] </sup>Threads on different CPUs should always have separate kernel stacks
+in order to exploit possible parallelism and to avoid synchronization issues
+among the CPUs on kernel entries.</p></div></div></div><div class="chapter" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="ch_systemCalls"></a>Chapter 3. System Calls</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#id2527793">Traditional System Calls on x86</a></span></dt><dt><span class="section"><a href="#id2528000">Fast System Calls on x86</a></span></dt><dt><span class="section"><a href="#id2528261">Reconciling Stack Layouts</a></span></dt><dt><span class="section"><a href="#id2528472">Returning From System Calls</a></span></dt></dl></div><p>Manipulation of the microkernel abstractions thread and address space is
+exposed to the user-level applications via system calls.
+System calls are provided to create threads (potentially inside a new
+address space), manipulate their scheduling parameters (in L4: priority,
+processor affinity) in a controlled way, and for IPC (to bridge address
+space boundaries and to allow for synchronization among threads).</p><p>In order to use one of these services, the user-level application must
+be able to</p><div class="itemizedlist"><ul type="disc"><li>
+enter the kernel,
+</li><li>
+pass parameters and the ID of the desired service to kernel-level,
+</li><li>
+and receive results (success/failure, data received via IPC, ...).
+</li></ul></div><p>Due to the separate kernel stacks, passing parameters on the stack is no
+viable option.
+For this reason (and for performance reasons, i.e., to avoid memory accesses),
+user- and kernel level exchange data solely in registers.
+<sup>[<a id="id2527776" href="#ftn.id2527776" class="footnote">3</a>]</sup></p><p>For kernel entry/exit, hardware support is required to atomically exchange
+the user-level and the kernel-level state (at least stack pointer and
+instruction pointer).
+Most architectures offer a special instruction for the single purpose of
+entering/leaving the kernel.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2527793"></a>Traditional System Calls on x86</h2></div></div></div><p>Intel traditionally offered the <code class="literal">int <span class="emphasis"><em>n</em></span></code> instruction to allow software
+interrupts, which are handled exactly like hardware interrupts:
+When the user executes the <code class="literal">int</code> instruction, the hardware</p><div class="itemizedlist"><ul type="disc"><li>
+loads the kernel stack pointer <code class="literal">%esp0</code> (<code class="literal">%esp</code> for privilege ring 0, i.e.,
+  kernel mode) for the current thread from a known memory location into
+  <code class="literal">%esp</code> and its segment into <code class="literal">%ss</code>,
+</li><li>
+stores the user-level stack pointer (both segment <code class="literal">%ss</code> and offset <code class="literal">%esp</code>),
+  flags, instruction pointer (<code class="literal">%eip</code> and its code segment <code class="literal">%cs</code>),
+  and (potentially) an error code (used in case of exceptions rather than
+  interrupts, e.g., to indicate page faults, division by zero, ...) on the
+  kernel stack,
+</li><li>
+turns off interrupts to guarantee atomicity of these operations,
+</li><li>
+enters kernel mode (privilege ring 0),
+</li><li>
+consults a table (in kernel space) in order to find the address of the
+  handler for the given interrupt number (<code class="literal"><span class="emphasis"><em>n</em></span></code>),
+</li><li>
+and jumps to the handler (usually a hand-coded assembly function in the
+  microkernel), updating both <code class="literal">%eip</code> and <code class="literal">%cs</code>.
+</li></ul></div><p>After this, the handler function can store the remaining registers on the
+kernel-level stack and call a C-function to implement the requested service.
+Having completed the request, the kernel restores the user-level registers
+(or stores results in there, depending on the API/ABI), and returns to
+user-mode using the <code class="literal">iret</code> (return from interrupt) instruction, which
+atomically pops the user-level <code class="literal">%eip</code>/<code class="literal">%cs</code> and the <code class="literal">%esp</code>/<code class="literal">%ss</code> pairs as well
+as the flags from the kernel stack and enables interrupts again.</p><p>The <code class="literal">int</code> instruction is easy to use, as the kernel needs to handle interrupts
+anyways (at least timer interrupts for time-sliced, round robin scheduling and
+inter-processor interrupts for inter-processor IPC), so the infrastructure is
+there already.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2528000"></a>Fast System Calls on x86</h2></div></div></div><p>On the other hand, using <code class="literal">int</code> is quite slow, especially due to the memory
+lookup of both the kernel stack pointer (<code class="literal">%esp0</code>) and the entry point of the
+handler routine in the interrupt descriptor table (IDT).
+As kernel entries/syscalls are frequent (especially in microkernel-based
+systems), Intel introduced a less costly alternative kernel entry facility
+via the <code class="literal">sysenter</code>/<code class="literal">sysexit</code> instructions.
+<sup>[<a id="id2528040" href="#ftn.id2528040" class="footnote">4</a>]</sup></p><p>These new instructions avoid memory lookups by providing CPU-internal special
+purpose registers (model-specific registers, MSRs) to store a single entry
+point into the kernel as well as a single kernel stack pointer to load on
+kernel entry via <code class="literal">sysenter</code>.
+Furthermore these instructions effectively disable segmentation by setting up
+flat segments (full 4 GB segments starting at linear/virtual address 0),
+which allows to skip additional costly segmentation-related checks on mode
+changes between kernel-mode and user-mode.
+As most of today's operating systems (including L4) ignore segmentation and
+use flat segments already (using only paging for access control and physical
+memory management), this is usually not a problem (but see <a class="xref" href="#ch_smallspaces" title="Chapter 9. Small Spaces">Chapter 9, <i>Small Spaces</i></a>).</p><p>As <code class="literal">sysenter</code> always jumps to the same handler routine in the kernel,
+an argument (a register) would be required to select one of the
+syscalls offered by the kernel.
+Instead of sacrificing a register for this purpose, L4 implements only
+the most frequently used system call, namely IPC, via <code class="literal">sysenter</code>,
+all other system calls use the traditional kernel entry method via <code class="literal">int</code>
+and either have an explicit argument denoting the system call number or
+use different interrupt vectors (<code class="literal">int 0x80</code>, <code class="literal">int 0x81</code>, ...) for the
+different system calls.</p><p>As L4 aims not only at maximum speed but also at portability, systems
+without the (relatively) new <code class="literal">sysenter</code> instruction shall also be
+supported and the optimal method of entering the kernel shall be
+selected at runtime.
+A problem here is that the stack layout after kernel entry via <code class="literal">sysenter</code>
+differs from the layout after using <code class="literal">int</code>:
+Using <code class="literal">sysenter</code>, the hardware only</p><div class="itemizedlist"><ul type="disc"><li>
+loads <code class="literal">%eip</code> from a MSR and forces <code class="literal">%cs</code> to the flat segment (0..4 GB),
+</li><li>
+loads <code class="literal">%esp</code> from a MSR and forces <code class="literal">%ss</code> to the flat segment (0..4 GB),
+</li><li>
+turns off interrupts,
+</li><li>
+and enters kernel mode.
+</li></ul></div><p>Nothing is stored on the stack, the user-level instruction pointer and
+stack pointer to use when returning to user-level must be passed in
+registers (by convention and because <code class="literal">sysexit</code> expects them there,
+<code class="literal">%eip</code> is passed in <code class="literal">%edx</code> and <code class="literal">%esp</code> in <code class="literal">%ecx</code>).</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2528261"></a>Reconciling Stack Layouts</h2></div></div></div><p>In order to obtain a stack layout that matches the <code class="literal">int</code> entry path,
+the <code class="literal">sysenter</code> handler (in the kernel) first stores the user <code class="literal">%eip</code>
+(passed from user-level in the register <code class="literal">%edx</code>) and the user <code class="literal">%esp</code>
+(from <code class="literal">%ecx</code>) as well as the error code ("IPC syscall") on the stack
+at the "correct" locations.
+The segment registers (<code class="literal">%cs</code>, <code class="literal">%ss</code>) are always flat and thus need not
+be stored (they are still correct and in place since thread creation),
+and the flags are undefined after the IPC syscall as per the microkernel
+API and thus need not be stored as well.</p><div class="example"><a id="id2528326"></a><p class="title"><b>Example 3.1. Emulate effects of <code class="literal">int</code> after <code class="literal">sysenter</code></b></p><div class="example-contents"><pre class="screen">mov     (esp), esp              /* load esp from TSS.esp0 */
+sub     $20, esp                /* create interrupt frame */
+mov     ecx, 16(esp)      /* store %esp and %eip where... */
+mov     edx, 4(esp)         /* ... the HW would have done */
+mov     $5, (esp)                 /* indicate IPC syscall */</pre></div></div><br class="example-break"/><p>Having set up this stack frame, the <code class="literal">sysenter</code> handler can jump right
+to the <code class="literal">int</code> entry code to handle the rest, thus enabling faster
+kernel entry and compatibility without any code duplication.</p><div class="sidebar"><p class="title"><b></b></p><p>One problem remains: <code class="literal">sysenter</code> always loads the kernel stack pointer
+from the MSR, whereas <code class="literal">int</code> loads the kernel stack pointer from the
+memory location <code class="literal">%esp0</code>.
+For consistency, both locations would have to be kept in sync; at each
+thread switch, both the MSR and <code class="literal">%esp0</code> would have to be modified.
+As writing the MSR is quite costly, we make it point to <code class="literal">%esp0</code> and
+load the kernel stack pointer from the memory location.
+This re-introduces one of the memory accesses saved by <code class="literal">sysenter</code>,
+but is still much better than always using <code class="literal">int</code>.</p></div><p>A similar problem arises for threads that execute in virtual x86 mode (real
+mode):
+Whenever they cause a kernel entry/exception, all segment registers are
+pushed onto the kernel stack before setting up the regular exception frame.
+To accommodate for this, L4 makes <code class="literal">%esp0</code> point to the real top-of-stack only
+before switching to a virtual x86-mode thread; in all other (the usual) cases,
+<code class="literal">%esp0</code> points to 4 words before the top-of-stack, effectively pretending the
+next kernel entry would have pushed 4 nonsense words before its stack frame.
+This allows to address, e.g. the user-level return address (<code class="literal">%eip</code>) at a fixed
+offset in the kernel stack under all circumstances and thus simplifies the
+kernel code by avoiding special cases.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2528472"></a>Returning From System Calls</h2></div></div></div><p>The return path via <code class="literal">sysexit</code> has to load the user-level <code class="literal">%eip</code> and <code class="literal">%esp</code>
+(from the stack) into <code class="literal">%edx</code> and <code class="literal">%ecx</code> respectively and must enable
+interrupts prior to issuing the <code class="literal">sysexit</code> instruction.
+All of this plus segment register reloading and checking would also be
+done by the <code class="literal">iret</code> instruction on the traditional exit path, but much
+slower.</p><div class="example"><a id="id2528525"></a><p class="title"><b>Example 3.2. Emulate <code class="literal">iret</code> using <code class="literal">sysexit</code></b></p><div class="example-contents"><pre class="screen">mov     16(esp), ecx    /* load %esp and %eip from where iret would */
+mov     4(esp), edx
+sti                              /* enable interrupts as iret would */
+sysexit                                      /* return to user mode */</pre></div></div><br class="example-break"/></div><div class="footnotes"><br/><hr width="100" align="left"/><div class="footnote"><p><sup>[<a id="ftn.id2527776" href="#id2527776" class="simpara">3</a>] </sup>These might be virtual registers, see <a class="xref" href="#utcb" title="Virtual Registers and the UTCB">the section called "Virtual Registers and the UTCB"</a>.</p></div><div class="footnote"><p><sup>[<a id="ftn.id2528040" href="#id2528040" class="simpara">4</a>] </sup>AMD introduced similar instructions, <code class="literal">syscall</code> and <code class="literal">sysret</code>,
+which implement the same ideas and shall thus not be discussed in more detail
+here.</p></div></div></div><div class="chapter" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="ch_TCBs"></a>Chapter 4. TCBs</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#sec_locatingTCBs">Locating TCBs</a></span></dt><dd><dl><dt><span class="section"><a href="#id2476903">Locating the TCB of the Current Thread</a></span></dt><dt><span class="section"><a href="#id2529040">Locating the TCB of a Thread by Thread ID</a></span></dt><dt><span class="section"><a href="#id2529428">Locating the TCB of the Next Ready-to-Run Thread</a></span></dt></dl></dd><dt><span class="section"><a href="#id2529464">0-Mapping-Trick</a></span></dt><dt><span class="section"><a href="#id2529636">Address Space Layout</a></span></dt><dd><dl><dt><span class="section"><a href="#id2529664">Address Space Regions</a></span></dt><dt><span class="section"><a href="#id2529698">Regions in the Kernel Address Space</a></span></dt><dt><span class="section"><a href="#sec_synchronization">Synchronization of the Kernel Address Space</a></span></dt><dt><span class="section"><a href="#id2529846">Processor-Specific Data</a></span></dt></dl></dd></dl></div><p>TCBs <a id="id2528565" class="indexterm"></a> <a id="id2528573" class="indexterm"></a> implement threads.
+Most important, a thread's TCB stores the thread's CPU state (at least a stack
+pointer, the remaining state such as registers, instruction pointer, and flags
+can be stored on the kernel stack) while the thread is not executing on a CPU.
+Besides the state, also thread-local management data is stored in the TCB:</p><div class="itemizedlist"><ul type="disc"><li>
+the global thread ID (due to the way TCBs are mapped to threads,
+  see <a class="xref" href="#sec_locatingTCBs" title="Locating TCBs">the section called "Locating TCBs"</a>
+</li><li>
+the local thread ID (in order to access the UTCB from inside the kernel,
+  see <a class="xref" href="#utcb" title="Virtual Registers and the UTCB">the section called "Virtual Registers and the UTCB"</a>
+</li><li>
+resources (such as the floating point unit or the temporary mapping area,
+  see <a class="xref" href="#sec_tempMapping" title="Temporary Mapping Area">the section called "Temporary Mapping Area"</a>) currently used by the thread as these are relevant
+  during scheduling/thread switching
+</li><li>
+a thread state designator (ready, waiting, locked running, ...)
+</li><li>
+various scheduling parameters such as priority, total and remaining
+  timeslice length, total quantum (maximum total CPU time allowed for the
+  thread, currently unused)
+</li><li>
+doubly linked list pointers linking all threads in the same state (ready
+  list per priority, waiting list, ...)
+</li><li>
+a pointer to the list of timeouts for the thread
+</li><li>
+a pointer to the structure that describes the thread's address space
+  (e.g., a pointer to the top level page directory)
+</li><li>
+a reference to the hardware address space identifier (physical address of
+  the top level page directory (<code class="literal">%cr3</code>) for Intel or ASID/TLB tag for
+  architectures with tagged TLBs)
+</li></ul></div><p>The resources bitfield indicates whether the fast (hand assembled) IPC path
+can be used or whether the (slower) C path must be used:
+If any resources are in use (indicated by at least one set bit in the
+resources bitfield), the C path must be used to additionally save the state of
+the resources in use (see <a class="xref" href="#sec_fastpathIPC" title="Fast Path IPC">the section called "Fast Path IPC"</a>).</p><p>The thread state and the list pointers are redundant, but speed up access
+in various situations:
+When deciding which thread to run next, lists of ready threads per priority
+level are useful, as with these simply the successor of the current thread
+can be chosen (round robin, assuming no higher priority thread is ready, see
+<a class="xref" href="#ch_dispatching" title="Chapter 7. Dispatching">Chapter 7, <i>Dispatching</i></a>).
+As list manipulations are rather costly (the current and both its predecessor
+and its successor TCB must be updated to insert or remove a thread into/from
+a list, probably causing cache and costly TLB misses), having an additional
+thread state field in the TCB allows lazy list handling (see
+<a class="xref" href="#sec_lazyDispatching" title="Lazy Dispatching">the section called "Lazy Dispatching"</a>).</p><p>Also note that the per-state lists are embedded into the TCBs; no additional
+list items have to be allocated/released.
+This simplifies the kernel's memory management (no <code class="literal">malloc</code>/<code class="literal">free</code> required)
+and avoids having to locate free memory on demand (increases performance).
+Furthermore, embedding the list into the TCB guarantees that the list pointers
+and the other items in the TCB reside in the same memory page:
+All thread-related data (including the kernel stack, which is "appended" to
+the TCB) thus share a single TLB entry, avoiding superfluous TLB misses where
+possible.</p><p>A further note on performance:
+The layout of the TCB structure is performance critical.
+All items that need to be accessed during IPC (at least global ID, state, and
+space) should reside in the same cache line/in as few cache lines as possible.
+Each cache line used by the microkernel introduces a likely cache miss on first
+access and probably evicts data from user-level from the cache, adding another
+cache miss on the next access.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec_locatingTCBs"></a>Locating TCBs</h2></div></div></div><p>In normal (i.e., expected) use, TCBs have to be located for three reasons:</p><div class="itemizedlist"><ul type="disc"><li>
+the TCB of the current thread must be accessed
+</li><li>
+the TCB of an IPC partner thread, identified by its global thread ID,
+  must be accessed
+</li><li>
+the TCB of the next ready-to-run thread must be accessed
+</li></ul></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2476903"></a>Locating the TCB of the Current Thread</h3></div></div></div><p>The first task could be accomplished by using a kernel global variable to
+always store a pointer to the current thread's TCB.
+However, each access would then require a memory access to read this pointer
+in addition to accessing the TCB itself.
+L4 instead makes use of the design decision of integrating the kernel stack
+into the TCB:
+Defining TCBs (including the stack) to be <code class="literal">2<sup>k</sup></code> bytes in size (<code class="literal">k</code> in [9..12])
+and forcing them to be naturally aligned (i.e., the least significant k bits
+of the start address of the TCB are all 0) guarantees that any address within
+the TCB masked with <code class="literal">((1 &lt;&lt; k) - 1)</code> yields the start address of the TCB.
+Given the fact that the kernel stack pointer points somewhere into the TCB of
+the current thread and is immediately loaded into the <code class="literal">%esp</code> register upon
+kernel entry, the L4 kernel can efficiently locate the current TCB by simply
+masking <code class="literal">%esp</code> with a constant mask.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2529040"></a>Locating the TCB of a Thread by Thread ID</h3></div></div></div><p>To motivate the scheme used to locate TCBs by thread ID, let us first look at
+how TCBs are to be stored.
+As mentioned previously, a microkernel should not rely on fine grained memory
+allocation/heap management a la <code class="literal">malloc</code>/<code class="literal">free</code>, but rather use preallocated
+data structures whenever possible.
+This approach avoids the management overheads (both (memory) space and
+runtime) as well as certain types of errors (out of memory).
+As a consequence, L4 allocates virtual address space regions for all TCBs on
+startup.</p><p>To further simplify TCB management, all TCBs are allocated <span class="emphasis"><em>en bloc</em></span>, that is
+in a single large virtual array, indexed by the thread number.
+As a consequence, the number of threads that can be active in an L4-based
+system is limited by the number of TCBs allocated at startup.
+Given a 32-bit system and 2 kByte per TCB (typical for x86 systems),
+this approach requires 21 bit thread numbers (up to 2 M threads).
+However, in this constellation, the TCB array would fill the complete 4 GB
+address space, leaving no space for other kernel data structures or even code
+in the same address space.
+Consequently, L4 limits the number of threads to (an arbitrarily chosen)
+256 k (18 bit thread numbers) and thus dedicates 512 MB of virtual memory
+to the TCB array.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="id2529098"></a>Structure of Thread IDs</h4></div></div></div><p>The simplest choice for thread IDs would now be to use the address of the TCB
+as its thread's ID.
+This choice is bad because thread IDs are passed from the user to the kernel
+(e.g., to denote the partner thread of an IPC operation), and using pointers
+would require sanity checks on the IDs.
+A better choice would be to use the 18 bit thread number as thread ID,
+which can efficiently be masked to produce a valid index into the TCB array.
+However, this approach would waste 14 bits of the 32 bit per word used to hold
+a thread ID.</p><p>Thinking of the thread number as a distinction of threads in space (different
+thread numbers denote different TCBs), leads to the idea of using the
+yet unused 14 bits as a distinction of threads in time (the same thread number
+might (have to) be reused during the uptime of the system).
+Following this scheme, L4 thread IDs are in fact split into a thread number
+field (index into the TCB array) and a version field, the use of which is
+not prescribed by the microkernel but rather left to the user-level thread
+or task manager on top.</p><div class="sidebar"><p class="title"><b></b></p><p>In fact, the version field is ignored by the microkernel in nearly all cases.
+The notable exception is comparing thread IDs for equality, e.g., checking
+for the special thread IDs <code class="literal">nilthread</code> and <code class="literal">anythread</code>.
+Additionally, certain version field values (0 and/or 1) are used by the
+microkernel to denote kernel-provided interrupt threads (see
+<a class="xref" href="#ch_interruptAndExceptionHandling" title="Chapter 11. Interrupt and Exception Handling">Chapter 11, <i>Interrupt and Exception Handling</i></a>).</p></div><p>The version field is also the reason for why the global thread ID is stored in
+the TCB:
+Any thread ID with the same thread number would resolve to the same TCB, but
+only a specific version of the thread is currently active.
+Mismatches in the version field indicate stale thread IDs (e.g., the intended
+thread has terminated and its TCB reused by another thread) and should thus
+cause, e.g., IPC operations to fail.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="id2529175"></a>Direct with Split Version Field</h4></div></div></div><p>Given the above constraints (32 bit thread IDs, 18 bit thread number, 14 bit
+version number, 2 kByte TCBs), the most efficient way to encode the thread
+IDs is to split the version field and place it around the thread number field,
+so that a single mask operation suffices to compute the byte offset of the
+desired TCB in the TCB array.
+By using the least significant 11 bits and the most significant 3 bits of the
+thread ID for the version field, the thread number field an bits 12..29
+directly encodes the byte offset in the TCB array.</p><div class="example"><a id="id2529196"></a><p class="title"><b>Example 4.1. Locating a TCB by its thread ID by masking out a split version field</b></p><div class="example-contents"><pre class="screen">mov     thread_id, eax
+mov     eax, ebp
+and     mask_thread_no, eax
+add     offset, eax
+
+cmp     TCB_Off_Myself(eax), ebp
+jne     invalid_thread_id</pre></div></div><br class="example-break"/><p>Masking out the version field and adding the base address of the TCB array
+(<code class="literal">offset</code> in the sample code) yields a pointer to the addressed TCB iff the
+versions match.
+This is checked by the <code class="literal">cmp</code> instruction, which compares the given thread ID
+with the one stored in the TCB.
+The CPU <span class="strong"><strong>j</strong></span>umps to the error handling code at <code class="literal">invalid_thread_id</code> if the two
+thread IDs are <span class="strong"><strong>n</strong></span>ot <span class="strong"><strong>e</strong></span>qual, otherwise it simply continues.</p><p>This approach is efficient (no superfluous memory/cache/TLB accesses), but the
+split version field is a bit awkward.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="id2529265"></a>Direct with Shifting</h4></div></div></div><p>With just a single register-internal shift-instruction more, the version field
+can be left intact and be placed entirely before (or after) the thread number
+field.</p><div class="example"><a id="id2529279"></a><p class="title"><b>Example 4.2. Locating a TCB by its thread ID by shifting and masking the thread ID</b></p><div class="example-contents"><pre class="screen">mov     thread_id, eax
+mov     eax, ebp
+and     mask_thread_no, eax
+shr     threadno_shift, eax
+add     offset, eax
+
+cmp     TCB_Off_Myself(eax), ebp
+jne     invalid_thread_id</pre></div></div><br class="example-break"/><p>Both approaches take the thread number directly as an index into the TCB array.
+If thread numbers are not assigned sequentially (or if many threads have
+terminated but their TCB not yet reused), the TCBs of active threads will be
+spread over the whole TCB array.
+As a consequence, the TCBs must be backed by standard (e.g., 4 kByte) pages in
+order to avoid allocating much physical memory (a superpage, e.g., 4 MB) of
+which only a small fraction is used.
+This leads to a situation in which it is likely for operations that involve two
+or more TCBs (e.g., IPC) to require two TLB entries (one per TLB).
+If the active TCBs could be migrated to/clustered in few superpages, only one
+TLB entry might be required covering both TCBs in IPC operations.
+With the fixed relation between thread number and TCB location above, migration
+would also change the thread ID, which is not feasible (all references to the
+previous thread ID would have to be identified and updated).</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="id2529327"></a>Indirect via Table</h4></div></div></div><p>Introducing a level of indirection in the form of lookup table solves this
+problem:
+The thread number is just an index into a table (<code class="literal">thread_table</code> in the sample
+code), which holds in each entry a pointers to the associated TCB.
+By placing the version field into bits 18..31 of the thread ID and making use
+of Intel's advanced addressing modes (scaling the offset by the word/pointer
+size of 4 bytes), this boils down to following piece of code:</p><div class="example"><a id="id2529352"></a><p class="title"><b>Example 4.3. Locating a TCB by its thread ID using a lookup table</b></p><div class="example-contents"><pre class="screen">mov     thread_id, eax
+mov     eax, ebp
+and     mask_thread_no, eax
+mov     thread_table(4*eax), eax
+
+cmp     TCB_Off_Myself(eax), ebp
+jne     invalid_thread_id</pre></div></div><br class="example-break"/><p>When a thread terminates, the released TCB can be reused by the next created
+thread (or even another active thread's TCB can be moved into the gap, updating
+only the table pointer).
+With 2 kByte TCBs and 4 MB superpages (typical for x86), the TCBs of 2048
+active threads would fit into a single superpage and thus reduces the TLB
+footprint (and TLB misses) of the kernel.</p><p>On the downside, the lookup table itself requires 256 k x 4 B = 1 MB of memory,
+and accesses to it also require it to be mapped in the TLB.
+A clever scheme could integrate the lookup table into the first 1 MB of the
+superpage that also covers the active TCBs, so that table and TCBs usually
+share a single TCB entry.
+This approach would leave the TCBs of 3 MB / 2 kB = 1536 active threads in the
+first superpage together with the lookup table; still sufficient for many
+scenarios.
+Since more threads only introduce another TLB entry per 2048 TCBs, this
+approach scales even better than the direct approaches with respect to
+TLB utilization.</p><p>Another drawback of this indirect approach is the added memory access to
+read the table.
+This might (probably will) cause a cache miss and thus increases the cost
+again slightly, but probably not as much as the additional TLB misses in
+the direct approaches.</p><p>The indirect approach has probably not been evaluated well enough in the
+implementation of the L4/x86 kernel, but has proven its feasibility with
+the introduction of communication spaces (see <a class="xref" href="#ch_security" title="Chapter 12. Security">Chapter 12, <i>Security</i></a>).
+L4 currently employs the direct scheme with shifting and masking and
+the version field kept intact.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2529428"></a>Locating the TCB of the Next Ready-to-Run Thread</h3></div></div></div><p>The next ready-to-run thread is neither known by its ID nor is it (usually)
+the current thread.
+Locating it highly depends on the scheduler implemented and shall thus be
+discussed in more detail later (see <a class="xref" href="#ch_dispatching" title="Chapter 7. Dispatching">Chapter 7, <i>Dispatching</i></a>).</p><p>The basic idea is to have a linked list of ready threads, with the current
+thread being the list head.
+The next ready thread is then simply the next thread in the list (this
+description ignores priorities for brevity), which is reachable via the
+list pointers in the current thread's TCB.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2529464"></a>0-Mapping-Trick</h2></div></div></div><p>The TCB array with its 256k entries of 2 kByte each requires 512 MB of
+memory.
+For obvious reasons, the microkernel should not claim 512 MB of physical
+memory from the start on but should rather grow only on demand.
+Thus the TCB array is allocated only in virtual memory.
+The first access to a page in the TCB array will cause a pagefault,
+which is handled specially by the kernel:</p><div class="itemizedlist"><ul type="disc"><li>
+on reads, a shared 0-filled page (the so-called "0-page") <a id="id2529488" class="indexterm"></a>
+  <a id="id2529496" class="indexterm"></a> <a id="id2529505" class="indexterm"></a> is mapped read-only;
+  this allows the access to complete after pagefault resolution and
+  guarantees that the mandatory thread ID validation fails (thread ID
+  0 is reserved by the kernel and represents no thread at all
+  (the <code class="literal">nilthread</code> ID))
+</li><li>
+on writes, a newly allocated 0-filled page is mapped writable;
+  this guarantees that all TCBs on the page are initialized with an
+  invalid thread ID (0), so that future access still correctly report
+  them as invalid while allowing to fill in TCB data should a new thread
+  be created
+</li></ul></div><p>This is a variant of the copy-on-write scheme, which saves memory even if
+a malicious user-level thread probes every thread ID in the system; there
+will only be a single physical frame mapped multiple times into the TCB
+array.
+The initial pagefaults can be avoided by premapping the 0-filled page
+to back the whole TCB array.
+Afterwards, only the first TCB modification on each page will cause a
+pagefault.</p><div class="note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="/web/20140803112320im_/http://i30www.ira.uka.de/~neider/edu/mkc/images/icons/note.png"/></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>This scheme works both for standard (4 kB) pages and for superpages.
+If the TCB array should be backed with superpages, still a small
+0-filled page can be used to back the unused parts.
+However, simplicity dictates that the first write requires a
+superpage to be mapped (otherwise physical memory management, which
+aims at allowing later promotion to superpages, becomes veeeery
+difficult)!</p></td></tr></table></div><div class="note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="/web/20140803112320im_/http://i30www.ira.uka.de/~neider/edu/mkc/images/icons/note.png"/></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>In the indirect TCB addressing scheme, the lookup table should <span class="strong"><strong>not</strong></span> be
+backed by a shared 0-filled read-only frame, but rather by a dedicated,
+<span class="strong"><strong>writable</strong></span> frame containing the virtual address of the first TCB in
+every word:
+As long as the first TCB is read-only mapped to the 0-page, all accesses
+to any TCB will fail at the validation of the thread ID.
+Once the first TCB is allocated (and thus mapped to a writeable page),
+all invalid acceses will still fail the validation procedure (the
+requested thread ID does not match the thread ID in the first TCB).</p><p>This guarantees that reading from the lookup table always yields a valid
+pointer into the TCB array, thus avoiding additional checks (the 0-page
+would yield NULL-pointers, which would have to be checked for).
+If the lookup table is integrated into the superpage that also
+stores the initial portion of the TCB array, <span class="strong"><strong>this</strong></span> page must still be
+allocated exclusively and writable from the beginning; only the
+remaining parts of the TCB array can/should use the 0-mapping trick as
+described earlier.</p></td></tr></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2529636"></a>Address Space Layout</h2></div></div></div><p>Having proposed to dedicate 512 MB of virtual address space to TCBs, this is
+the right time to look at the address space layout to show how this fits in.
+Generally, there are two possible approaches to store the kernel code and data:
+One can use an address space dedicated to the kernel, which would require
+an address space switch whenever a user-level thread invokes a system call,
+or one can split the 32 bit (4 GB) virtual address space into a user region
+and a kernel region.
+As address space switches are comparatively expensive on the main target
+platform (x86) due to untagged TLBs (also see <a class="xref" href="#ch_smallspaces" title="Chapter 9. Small Spaces">Chapter 9, <i>Small Spaces</i></a>), logically
+splitting the address space is the preferred way to go.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2529664"></a>Address Space Regions</h3></div></div></div><p>With 512 MB virtual memory being required for the TCBs, a split into 3 GB for
+the user-level and 1 GB for the kernel seems reasonable (though debatable).
+L4 reserves the upper 1 GB (0xC0000000..0xFFFFFFFF) of each address space for
+its own purposes, the lower 3 GB can (nearly) freely be used by the user-level
+thread (for limitations see <a class="xref" href="#utcb" title="Virtual Registers and the UTCB">the section called "Virtual Registers and the UTCB"</a>).
+While the lower 3 GB are (naturally) potentially different in each address
+space, the kernel's GB is synchronized across all address spaces so that the
+kernel has a consistent view on its memory irrespective of in which address
+space it currently executes (exceptions to this rule are processor-local
+memory and per-space regions in kernel memory).</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2529698"></a>Regions in the Kernel Address Space</h3></div></div></div><p>The kernel's 1 GB is further split into the aforementioned per-space region of
+(maybe) 128 MB, the TCB array (512 MB), and 128 MB for kernel code and data
+(such as the mapping database, see <a class="xref" href="#ch_virtualMemoryMapping" title="Chapter 8. Virtual Memory Mapping">Chapter 8, <i>Virtual Memory Mapping</i></a>).</p><p>The last 256 MB are used as a window to the first 256 MB of physical memory to
+allow for efficient manipulation of objects that are either not mapped into
+virtual memory or are only known by their physical address (this is handy,
+e.g., when walking multi-level hardware-pagetables (x86) in software because
+these reference the next level by its physical address).</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="sec_synchronization"></a>Synchronization of the Kernel Address Space</h3></div></div></div><p>While most of the kernel's address space is rather static (code, data,
+window to physmem) or intentionally not synchronized across address spaces
+(per-space region), the TCB region is highly dynamic and must be kept
+consistent across all address spaces.</p><p>Imagine thread A creates a new thread N, whose TCB resides in a yet unused
+page.
+The kernel would create the mapping for the TCB array page in the kernel
+region within A's address space and continue executing A.
+At the end of A's timeslice, the kernel decides to run thread B in a different
+address space.
+B also wants to talk to N, checks if it exists and gets back the NULL mapping
+from the TCB array in B's kernel region and falsely concludes that the thread
+does not exist.
+Even worse, B might now try to and succeed in creating another thread N,
+which is probably different from the one A created before (B's N might, e.g.,
+execute different code than A's N).
+Now the kernel has an inconsistent view (two TCBs for the same thread number),
+the global IDs are no longer global.</p><p>To circumvent this problem, all mappings in the TCB array are first added into
+a master page table (e.g., the page table of the first user-level task to run).
+Initially, all TCBs are mapped read-only to the 0-page in this master table.
+On pagefaults in the TCB array, the mapping in the master table is read and
+copied to the faulting page table entry.
+This already suffices to resolve read pagefaults:
+The faulting thread will now retry the memory access and read either the
+correct TCB or the 0-page (and thus detect invalid accesses).
+For pagefaults on write accesses, the master mapping is copied only if it
+does not map to the 0-page.
+In the latter case, the faulting thread was trying to create a new thread
+(using a previously unused TCB).
+To allow for this operation to succeed, instead of duplicating the 0-page
+mapping, a new frame is allocated, cleared, and mapped writeable into the
+master page table (replacing the read-only mapping to the 0-page).
+Only after this is the new (writeable) mapping copied to the page table of
+the faulting address space.</p><p>This ensures consistency across all address spaces without having to update
+all page tables at every change (i.e., we update/synchronize lazily).
+A potential problem could be invalidated mappings; these would have to be
+propagated to all page tables immediately.
+For two reasons this is not a problem:</p><div class="itemizedlist"><ul type="disc"><li>
+L4 never releases frames allocated to the TCB array, so no invalidations
+  occur.
+</li><li>
+With Intel's 2-level pagetables, we would synchronize only the top level
+  page directory entries so that all address spaces would use the same
+  page tables (or superpages) for the TCB array.
+  Invalidating individual pagetable entries (standard pages) would thus
+  be propagated to all address spaces instantaneously (by reference to the
+  same page table).
+  Page directory entries (or superpage entries) must neither be invalidated
+  nor changed, as this would again require an eager update of all page tables
+  in the system.
+</li></ul></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2529846"></a>Processor-Specific Data</h3></div></div></div><p>Some data such as the pointers to the heads of the ready lists per priority
+level should be CPU-local to avoid conflicts in the caches (ping-pong) and
+remove the requirement to serialize concurrent access to the data structures
+from different CPUs.
+CPU-local data can be implemented either by using an array for each structure,
+which is indexed by the number of the accessing CPU or by consolidating all
+CPU-local data structures in few pages and back the virtual addresses with
+different physical frames depending on the accessing CPU.
+The latter approach is "cleaner" as the source code does not need to be
+cluttered with artificial array accesses but rather accesses all data
+structures an all CPUs at the same virtual address, which is transparently
+mapped to different memory locations and is thus favored by L4.
+On the downside, this approach requires a top-level page directory per address
+space and per CPU in order to selectively replace some mappings to point off
+to CPU-local data.
+These additional page directories must be kept in synch, which is implemented
+on the page directory entry level as with the TCB array (see
+<a class="xref" href="#sec_synchronization" title="Synchronization of the Kernel Address Space">the section called "Synchronization of the Kernel Address Space"</a>).</p></div></div></div><div class="chapter" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="ch_IPCFunctionality"></a>Chapter 5. IPC Functionality and Interface</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#synchronousCommunication">Synchronous Communication</a></span></dt><dt><span class="section"><a href="#id2529997">Communication Primitives</a></span></dt><dt><span class="section"><a href="#id2530281">Message Types</a></span></dt><dt><span class="section"><a href="#id2530380">Timeouts</a></span></dt><dd><dl><dt><span class="section"><a href="#id2530402">Send Timeout</a></span></dt><dt><span class="section"><a href="#id2530429">Receive Timeout</a></span></dt><dt><span class="section"><a href="#id2530453">Transfer Timeout</a></span></dt><dt><span class="section"><a href="#id2530569">Timeout Encoding</a></span></dt></dl></dd><dt><span class="section"><a href="#id2530761">Encoding of IPC Parameters</a></span></dt><dd><dl><dt><span class="section"><a href="#sec_operationAndAddresses">Operation and Addresses</a></span></dt><dt><span class="section"><a href="#id2530933">Deceiving IPC and Proxies</a></span></dt><dt><span class="section"><a href="#id2530944">Timeouts</a></span></dt><dt><span class="section"><a href="#id2531054">Message Content</a></span></dt><dt><span class="section"><a href="#receivebuffers">Receive Buffers</a></span></dt><dt><span class="section"><a href="#id2531854">IPC Result</a></span></dt><dt><span class="section"><a href="#utcb">Virtual Registers and the UTCB</a></span></dt></dl></dd></dl></div><p>The introduction of address spaces isolates threads in different address spaces
+from each other, so that they cannot interfere with each other.
+On the downside, threads in different address spaces can also no longer work
+together, as there can be no communication between them.
+To overcome this (micro)kernel-imposed limitation, the kernel provides
+inter-process communication (IPC) primitives.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="synchronousCommunication"></a>Synchronous Communication</h2></div></div></div><p>When implementing communication primitives, one fundamental design decision has
+to be made:
+Shall the sender block until the IPC operation returns (successfully or not) or
+shall the sending thread continue immediately and let the kernel deal with the
+actual message transfer?</p><p>The latter case (asynchronous send) usually requires</p><div class="itemizedlist"><ul type="disc"><li>
+a message buffer in the kernel,
+</li><li>
+some kind of notification for failed operations,
+</li><li>
+two copies of the message (first into the kernel buffer and then into the
+  receiver's user-land buffer).
+</li></ul></div><p>Buffering messages in the kernel makes the kernel vulnerable for
+denial-of-service attacks (e.g., by letting threads send messages that will
+never be received).
+Furthermore, copying the messages twice not only wastes processor cycles,
+but also increases the kernel's cache (and probably TLB) footprint.</p><p>Assuming that IPC is the most frequently invoked microkernel service,
+L4 implements only synchronous IPC, which allows to keep the message in the
+sender's address space until it can be copied to the receiver.
+This scheme avoids both the in-kernel buffers and a second copy of the
+message plus the sender can be informed about success or failure when the
+IPC operation returns.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2529997"></a>Communication Primitives</h2></div></div></div><p>For message-based communication, at least two primitives are required:</p><div class="itemizedlist"><ul type="disc"><li>
+<a id="id2530013" class="indexterm"></a>
+send to (specified thread)
+</li><li>
+<a id="id2530029" class="indexterm"></a>
+receive from (specified thread)
+</li></ul></div><p>These operations allow for two threads to communicate with each other
+and prevent interference from other threads:
+The receiver only accepts messages from the intended sender,
+aka <a id="id2530048" class="indexterm"></a>
+<span class="emphasis"><em>closed receive</em></span>).
+Other threads must wait until the receiver accepts messages from them.
+However, servers that offer their services to all threads are difficult to
+implement using the closed receive primitive for two reasons:</p><div class="itemizedlist"><ul type="disc"><li>
+The server must know all potential client thread IDs.
+</li><li><p>
+As the thread blocks during receive (assuming the client has not yet
+  issued a request),
+</p><div class="itemizedlist"><ul type="circle"><li>
+the server either has to provide one receiver thread per client, or
+</li><li>
+the server must poll all clients for unhandled requests.
+</li></ul></div></li></ul></div><p>Avoiding these problems, the kernel should offer an additional primitive
+(known as an <a id="id2530116" class="indexterm"></a>
+<span class="emphasis"><em>open receive</em></span>):</p><div class="itemizedlist"><ul type="disc"><li>
+<a id="id2530136" class="indexterm"></a>
+receive (from any thread)
+</li></ul></div><p>Looking at the (expected) common interaction patterns in a multi-server system,
+clients will typically send requests to servers and then wait for the answer
+(cf. RPC).
+If in such a scenario the client is preempted after having sent the request
+but before having issued the accompanying receive, the server might try to
+deliver the result (answer message) to the client before the client is
+receiving.
+As a consequence, the server would block and thus be prevented from servicing
+other requests.
+To solve this problem, two approaches can be considered:</p><div class="itemizedlist"><ul type="disc"><li>
+The server could check whether the client is ready to receive and store the
+  answer message in some queue if it is not.
+  As this would consume server resources, this approach would enable
+  denial-of-service attacks against the server.
+  Worse, the server cannot avoid having to store some answers, as even
+  well-behaving, non-malicious clients could be preempted between their
+  send request and receive response calls.
+</li><li>
+The better solution provides another IPC primitive to let the clients
+  express the send and receive phases atomically.
+  Such a primitive would guarantee that the client is ready to receive as
+  soon as the request message has been delivered to the server.
+  As a consequence, the server could assume that well-behaving clients use
+  the atomic send-and-receive primitive and discard answers if the client
+  turns out not to be ready to receive it.
+</li></ul></div><p>Combined send-and-receive primitives could be:</p><div class="itemizedlist"><ul type="disc"><li>
+<a id="id2530213" class="indexterm"></a>
+call (send to specific thread and receive from same)
+</li><li>
+<a id="id2530229" class="indexterm"></a>
+reply-and-wait (send to specific thread and receive from any)
+</li><li>
+reply-and-wait for other (send to specific thread and wait for message
+  from other specific thread)
+</li></ul></div><div class="note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="/web/20140803112320im_/http://i30www.ira.uka.de/~neider/edu/mkc/images/icons/note.png"/></td><th align="left"></th></tr><tr><td align="left" valign="top"><p><code class="literal">call</code> is the typical client-side primitive when requesting a service,
+whereas <code class="literal">reply-and-wait</code> would be the primitive most suitable for the
+server (send answer to client A and wait for requests from any client).
+The third combination has yet to proof its worth, but comes for free
+(see <a class="xref" href="#sec_operationAndAddresses" title="Operation and Addresses">the section called "Operation and Addresses"</a>).</p></td></tr></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2530281"></a>Message Types</h2></div></div></div><p>Depending on the size of the messages to be transferred, we can distinguish
+three message types:</p><div class="variablelist"><dl><dt><span class="term">
+Registers
+</span></dt><dd>
+Short messages can be transferred in (virtual) registers.
+Such message transfers avoid memory accesses wherever possible, thus
+avoiding cache and TLB misses as well as user-level pagefaults.
+</dd><dt><span class="term">
+Strings
+</span></dt><dd>
+Contiguous data can be copied from the sender address space to the receiver
+address space via string IPC.
+This is the most general form of messages, but also the slowest (the
+message has to be copied at least once).
+</dd><dt><span class="term">
+Pages
+</span></dt><dd>
+If large amounts of data are to be transferred, the virtual memory mechanism
+can be used to establish shared memory between the sender and the receiver.
+This allows to easily make data available to multiple address spaces without
+ever copying the data.
+Unlike the other two message types, this type offers call-by-reference
+semantics (rather than call-by-value), i.e., changes to the data in the
+receiver's address space are visible in the sender's address space as well.
+Should this not be desired, this form of communication should allow
+restricting the access rights for the receiver.
+</dd></dl></div><div class="note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="/web/20140803112320im_/http://i30www.ira.uka.de/~neider/edu/mkc/images/icons/note.png"/></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>Besides memory pages, other resources can be mapped as well (e.g.,
+      access to I/O ports on IA32).</p></td></tr></table></div><p>The distinction becomes important when implementing the IPC primitives, as
+we shall discuss in <a class="xref" href="#ch_IPCImplementation" title="Chapter 6. IPC Implementation">Chapter 6, <i>IPC Implementation</i></a>.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2530380"></a>Timeouts</h2></div></div></div><p>In order to enable threads to recover from a (blocking) communication attempt
+with an unresponsive (malicious, faulty, or uncooperative) partner, the
+duration of each IPC operation can be bounded with a number of <a id="id2530392" class="indexterm"></a>
+timeouts.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2530402"></a>Send Timeout</h3></div></div></div><p>The time a sender waits for the receiver to call the corresponding <code class="literal">recv</code>
+can be limited using the <a id="id2530415" class="indexterm"></a>
+send timeout.
+A 0-timeout enables polling/sending the message only if the receiver is ready.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2530429"></a>Receive Timeout</h3></div></div></div><p>The time a receiver waits for a sender to arrive can be bounded using
+a <a id="id2530439" class="indexterm"></a>
+receive timeout.
+A 0-timeout enables polling/receiving messages only if a sender is waiting
+to deliver.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2530453"></a>Transfer Timeout</h3></div></div></div><p>Using <a id="id2530460" class="indexterm"></a>
+transfer timeouts (also knows as <a id="id2530469" class="indexterm"></a>
+<span class="emphasis"><em>xfer timeout</em></span>) both
+the sender and the receiver can limit the duration of the actual message
+transfer.
+Transfer timeouts are only considered for string IPCs, because all other
+types are guaranteed to be free of user-level pagefaults <span class="strong"><strong>during</strong></span> message
+delivery.
+Since strings need to be copied from the sender's address space to the
+receiver, pagefaults can arise both in the sender's address space (while
+reading the message) and in the receiver's address space (while writing
+the message).
+Since pagefaults are resolved by user-level pagers (see
+<a class="xref" href="#ch_virtualMemoryMapping" title="Chapter 8. Virtual Memory Mapping">Chapter 8, <i>Virtual Memory Mapping</i></a>), which
+are under the control of the user and thus not trustworthy, the sender can
+specify a xfer timeout to limit the total time available to the receiver's
+pager to resolve all occurring pagefaults.
+Conversely, the receiver can specify a xfer timeout to limit the total time
+available for the sender's pager.
+Both xfer timeouts are combined and the minimum determines the effective
+xfer timeout that bounds the duration of the message transfer.</p><div class="sidebar"><p class="title"><b>Historic Remark</b></p><p>In previous L4 versions (v2, vX.0), xfer timeouts were approximated by
+send and receive pagefault timeouts.
+<a id="id2530538" class="indexterm"></a>
+<a id="id2530546" class="indexterm"></a>
+These limited the duration of each individual pagefault resolution in the
+sender's respectively in the receiver's address space.
+This approach, however, still allows for nearly unbounded message delivery
+times, because many pagefaults can occur (depending on the number and length
+of the strings).
+The new transfer timeouts provide better control over the maximum message
+delivery time for both threads involved and have thus replaced the send and
+receive pagefault timeouts.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2530569"></a>Timeout Encoding</h3></div></div></div><p>Concerning the encoding of timeouts, there are a number of constraints to
+consider:</p><div class="variablelist"><dl><dt><span class="term">
+Precision
+</span></dt><dd>
+Users must be able to precisely timeouts in the near future (microseconds)
+but should also be able to set timeouts in the distant future (hours, days).
+Distant timeouts, however, do not need to be precise, as longer, precise
+timeouts can easily be constructed using a number of short term timeouts.
+</dd><dt><span class="term">
+Reference
+</span></dt><dd>
+Users should be able to specify both <span class="emphasis"><em>relative</em></span> timeouts ("(with)in two
+minutes") and <span class="emphasis"><em>absolute</em></span> timeouts ("today at 13:00").
+</dd><dt><span class="term">
+Size
+</span></dt><dd>
+As multiple timeouts could be passed to each IPC operation (send/recv and
+xfer timeouts), the encoding must be compact.
+64 bit values at (constant) microsecond granularity are unacceptable.
+</dd></dl></div><p>As a consequence, L4 employs 16 bit wide, logarithmic timeouts with 10 bit
+mantissa <code class="literal">m</code> (in microseconds) and 5 bits exponent <code class="literal">e</code> (for relative timeouts,
+the 16<sup>th</sup> bit discerns relative and absolute timeouts), allowing relative
+timeouts be specified as <code class="literal">m*2<sup>e</sup></code> between 0 and 1023*2<sup>31</sup> microseconds
+(about 610 hours).</p><p>For absolute timeouts, L4 similarly uses 16 bit: 4 bit exponent <code class="literal">e</code>,
+1 bit epoch designator <code class="literal">d</code>, and 10 bit mantissa <code class="literal">m</code> (in microseconds);
+the 16<sup>th</sup> bit again distinguishes absolute from relative timeouts.
+Computing absolute timeouts from 16 bit relies on a reference clock <code class="literal">R</code>,
+which is an L4 provided 64 bit monotonically increasing microsecond counter
+(though the update rate of the counter is architecture dependent).
+The absolute timeout triggers as soon as the least significant <code class="literal">10+e</code> bits of
+<code class="literal">R</code> equal <code class="literal">m &lt;&lt; e</code> and bit <code class="literal">10+e</code> of <code class="literal">R</code> equals <code class="literal">d</code> (or C-like, when
+<code class="literal">(R &amp; ((1ULL &lt;&lt; (11+e)) - 1)) == ((d &lt;&lt; (10+e)) | (m &lt;&lt; e))</code>).</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2530761"></a>Encoding of IPC Parameters</h2></div></div></div><p>For every IPC operation, a number of parameters such as the intended receiver,
+the type and contents of the message and the desired operation (send, receive,
+call, ...), or the desired timeouts (if any) must be specified.
+Clever encoding of these can avoid superfluous memory accesses and thus help
+to make IPC fast.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="sec_operationAndAddresses"></a>Operation and Addresses</h3></div></div></div><p>To avoid code duplication, L4 only implements a single IPC system call,
+which implements the atomic <code class="literal">send-and-receive</code> operation between threads.
+As a consequence, the system call requires two addresses:</p><div class="variablelist"><dl><dt><span class="term">
+destination thread ID
+</span></dt><dd>
+The ID of the thread that is to receive the message
+that is sent by this invocation of the IPC syscall.
+If no send phase is desired, a special <a id="id2530819" class="indexterm"></a>
+NIL thread ID (0) can be
+specified.
+</dd><dt><span class="term">
+receive specifier
+</span></dt><dd><p>
+If not NIL, this thread ID specifies the thread that is expected to send
+a message to the invoking (i.e., the current) thread.
+The receive phase always follows the send phase (if any):
+Typically, having received a message requires some sort of processing
+before a meaningful answer can be sent.
+An exception to this rule would be a simple "ACK", which is implicitly
+passed to the originator as the return code of the send operation:
+If the <code class="literal">send</code> returns without errors, the message has been delivered
+(see <a class="xref" href="#synchronousCommunication" title="Synchronous Communication">the section called "Synchronous Communication"</a>).
+</p><p>If the receive specifier is NIL, no receive phase is initiated and the
+syscall returns right after the send phase (if any).</p><p>For an open receive, which would allow the current thread to receive
+a message from any thread, another special thread ID can be used: the
+<a id="id2530880" class="indexterm"></a>
+wildcard thread ID (-1).</p></dd></dl></div><p>This scheme allows to encode the desired operation (<code class="literal">send to</code>,
+<code class="literal">receive from</code>, <code class="literal">receive from any</code>, <code class="literal">call</code>, or <code class="literal">reply and wait</code>) and all
+relevant threads in only two words.</p><p>As both addresses must be inspected in all IPC calls, these should be
+passed in registers rather than memory to the kernel.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2530933"></a>Deceiving IPC and Proxies</h3></div></div></div><p>TODO (Not really relevant for the examinations, though.)</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2530944"></a>Timeouts</h3></div></div></div><p>Four timeouts accompany each IPC:</p><div class="variablelist"><dl><dt><span class="term">
+send timeout
+</span></dt><dd>
+The send timeout bounds the period of time for which the thread may
+block waiting to start sending its message to the intended receiver
+(!= nilthread).
+</dd><dt><span class="term">
+send xfer timeout
+</span></dt><dd>
+The send xfer timeout bounds the duration of the actual message transfer
+and is used solely during string IPC to prevent the receiver's pager from
+delaying the message transfer indefinitely (by not or only slowly
+resolving pagefaults in the receiver's address space).
+</dd><dt><span class="term">
+receive timeout
+</span></dt><dd>
+The receive timeout bounds the period of time for which the thread may
+block waiting for the partner (!= nilthread) to start sending a message.
+</dd><dt><span class="term">
+receive xfer timeout
+</span></dt><dd>
+The recv timeout bounds the duration of the actual message transfer
+and is used solely during string IPC to prevent the sender's pager from
+delaying the message transfer indefinitely.
+</dd></dl></div><p>With all timeout values being 16 bit wide, (at least) two timeouts can
+be stored in a single word.
+As the send and/or receive timeouts are always required whereas the xfer
+timeouts are only required for string IPC operations, we combine send and
+receive timeout in one 32 bit word, which should be passed to the kernel
+in a register to avoid a memory access.
+The xfer timeouts are combined in a second word, which can be passed in
+memory: we only access them for string IPCs, which touch a lot of memory
+anyway, so that the (relative) overhead will be small.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2531054"></a>Message Content</h3></div></div></div><p>The message itself is stored in 64 word-wide virtual message registers
+(MR<sub>0</sub> .. MR<sub>63</sub>), each of which is realized either in a physical processor
+register or in a thread-local region of memory (see <a class="xref" href="#utcb" title="Virtual Registers and the UTCB">the section called "Virtual Registers and the UTCB"</a>).</p><p>The message itself consists of a <a id="id2531083" class="indexterm"></a>
+message tag in MR<sub>0</sub>, followed by 0..63
+untyped words (which are simply copied during an IPC), followed by 0..63
+typed words.
+<a id="id2531098" class="indexterm"></a>
+Typed words (or <a id="id2531106" class="indexterm"></a>
+typed items) are interpreted by the kernel
+and serve to encode strings and mappings.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="id2531118"></a>String Items</h4></div></div></div><p><a id="id2531125" class="indexterm"></a>
+String items instruct the kernel to copy a contiguous region of memory
+(a "string")
+from the sender's address space to the receiver's address space.
+To this end, string items must convey</p><div class="itemizedlist"><ul type="disc"><li>
+the length of the string (in bytes) and
+</li><li>
+the start address of the string in the sender's address space.
+</li></ul></div><p>The first word in a string item (<a id="id2531164" class="indexterm"></a>
+string specifier) consists of
+the following fields:</p><div class="variablelist"><dl><dt><span class="term">
+continue bit (<code class="literal">C</code>, bit 0)
+</span></dt><dd>
+The least significant bit is set to indicate that another typed item
+follows after the string item.
+</dd><dt><span class="term">
+cacheability hints (<code class="literal">hh</code>, bits 1..2)
+</span></dt><dd>
+The next two bits can be used to instruct the kernel to bypass the L2 and or
+L1 cache when copying (if supported by the hardware).
+</dd><dt><span class="term">
+type bit (bit 3)
+</span></dt><dd>
+The next bit is 0 to indicate that this is a string item (map and grant items
+set this bit to 1).
+</dd><dt><span class="term">
+number of substrings - 1 (<code class="literal">N</code>, bits 4..8)
+</span></dt><dd>
+Each string item can specify up to 64 start positions of substrings of the
+same size.
+Together with the same property of receive string items, this allows to
+efficiently encode scatter/gather string IPC.
+</dd><dt><span class="term">
+compound string bit (<code class="literal">c</code>, bit 9)
+</span></dt><dd>
+Indicates that another string item follows and is to be considered to be part
+of the same string (allows scatter/gather strings with substrings of
+different sizes).
+</dd><dt><span class="term">
+length of substrings - 1 (bits 10..31/63)
+</span></dt><dd>
+The remaining bits in the string specifier specify the length of the
+substrings in bytes.
+As 0 byte long strings would be useless, the "length - 1" is stored,
+allowing up to 4 MB of data per substring (on 32 bit systems).
+</dd></dl></div><p>The <code class="literal">N+1</code> words that follow the string specifier denote the start addresses
+of the substrings, which need not be aligned and thus require a full word
+each.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="id2531325"></a>Map Items</h4></div></div></div><p>Map items enable the sending thread to establish a region of shared memory
+with the receiver.
+In order to allow the mapper the restrict access from the "mappee" to the
+memory (e.g., read only), map items must specify</p><div class="itemizedlist"><ul type="disc"><li>
+the start address and length of the virtual address region to share and
+</li><li>
+the rights to be granted to the receiver (e.g., read-only).
+</li></ul></div><p>Since multiple map items should be allowed in each message,
+but only a single receive window can be specified by the receiver
+(arbitrarily large, but only one, see <a class="xref" href="#receivebuffers" title="Receive Buffers">the section called "Receive Buffers"</a>),
+each map item also specifies an offset within the receive window.</p><p>All this is encoded in two words.
+The first word of a map item consists of:</p><div class="variablelist"><dl><dt><span class="term">
+continue bit (<code class="literal">C</code>, bit 0)
+</span></dt><dd>
+The least significant bit is set to indicate that another typed item
+follows after the string item.
+</dd><dt><span class="term">
+type bits (bits 1..3)
+</span></dt><dd>
+Map items are identified by the value 4 (0b100) here.
+(Grant items require a value of 5 (0b101), string items use 0b<span class="strong"><strong>0</strong></span><code class="literal">hh</code>.)
+</dd><dt><span class="term">
+reserved bits (bits 4..9)
+</span></dt><dd>
+Must be 0 for now.
+</dd><dt><span class="term">
+send base address (bits 10..31/63)
+</span></dt><dd>
+The remaining bits specify the 22 or 54 (on 64 bit systems) most significant
+bits of the offset in the receive window (see <a class="xref" href="#ch_virtualMemoryMapping" title="Chapter 8. Virtual Memory Mapping">Chapter 8, <i>Virtual Memory Mapping</i></a>).
+As fpages cover at least 1024 = 2<sup>10</sup> byte and must be naturally aligned,
+the unspecified least significant 10 bits must be 0 and need not be stored.
+</dd></dl></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="id2531481"></a>Grant Items</h4></div></div></div><p>Grant items allow to map an fpage and to remove it from the sender's address
+space, the fpage is effectively moved to the receiver's address space.</p><p>In their encoding, grant items differ from map items only in the first bit of
+the type field (bit 1 of the send base):
+Map items set this bit to 0, grant items set it to 1.</p><div class="note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="/web/20140803112320im_/http://i30www.ira.uka.de/~neider/edu/mkc/images/icons/note.png"/></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>The effect of the grant operation cannot be achieved with any series
+    of map and unmap operations and is thus a required additional,
+    not a redundant operation (also see <a class="xref" href="#ch_virtualMemoryMapping" title="Chapter 8. Virtual Memory Mapping">Chapter 8, <i>Virtual Memory Mapping</i></a> for the
+    effects of grant on derived mappings and the mapping database).</p></td></tr></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="id2531518"></a>Message Format</h4></div></div></div><p>In order to properly decode the message,
+the first message register (the <a id="id2531528" class="indexterm"></a>
+message tag) always
+provides some meta-information about the remaining message:</p><div class="variablelist"><dl><dt><span class="term">
+number of untyped words (<code class="literal">u</code>, bits 0..5)
+</span></dt><dd>
+The number of untyped words following the tag.
+These are copied during IPC but not interpreted by the kernel.
+</dd><dt><span class="term">
+number of typed words (<code class="literal">t</code>, bits 6..11)
+</span></dt><dd>
+The number of typed words (not items), that (always) follow the untyped words.
+These are interpreted by the kernel and trigger string copy, map, or grant
+operations.
+</dd><dt><span class="term">
+flags (bits 12..15)
+</span></dt><dd><p>
+The flags in the message tag are used to signal the use of a
+kernel-based IPC control mechanism (IPC propagation or IPC redirection),
+indicate inter-processor IPCs, and to store the error indicator after the
+IPC.
+</p><p>The flags are typically set by the kernel for inspection by the receiver and
+the sender (error bit).</p></dd><dt><span class="term">
+label (bits 16..31/63)
+</span></dt><dd>
+The remaining bits in the message tag can be used to transport the first bits
+of data to the receiver.
+The kernel uses the label to label synthesized messages (page fault IPC,
+exception IPC, ...), so that a single thread can be both the pager and the
+exception handler of another thread.
+</dd></dl></div><p>As the message tag describes the message, it must be inspected on every IPC
+and should thus be passed to the kernel in a register rather than via memory.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="receivebuffers"></a>Receive Buffers</h3></div></div></div><p>Whenever an IPC operation includes a receive phase, the receiver must specify</p><div class="itemizedlist"><ul type="disc"><li>
+whether to accept strings,
+</li><li>
+where to put them (if at all),
+</li><li>
+whether to accept mappings, and
+</li><li>
+where mapped pages should appear in the receiver's address space.
+</li></ul></div><p>Untyped words are simply copied into the receiver's message registers,
+so nothing needs to be specified here (the number of message registers
+is the same for all threads, so no overflow can occur).</p><p>For strings, string items as in the send case are employed to denote the
+buffers into which the strings shall be received (overly long send strings
+are truncated to the length of the according receive string).</p><p>In order to accept mappings, the receiver can specify a single contiguous
+virtual address region (an fpage, see <a class="xref" href="#ch_virtualMemoryMapping" title="Chapter 8. Virtual Memory Mapping">Chapter 8, <i>Virtual Memory Mapping</i></a>);
+all incoming map items must fit into this region or an error is signaled.</p><p>The receive window is given as part of the <a id="id2531728" class="indexterm"></a>
+acceptor in BR<sub>0</sub>:</p><div class="variablelist"><dl><dt><span class="term">
+continue (<code class="literal">C</code>, bit 0)
+</span></dt><dd>
+If set, receive string items follow. Otherwise no string items are accepted.
+</dd><dt><span class="term">
+unused (bits 1..3)
+</span></dt><dd>
+Always 0.
+</dd><dt><span class="term">
+receive window size (<code class="literal">s</code>, bits 4..9)
+, </span><span class="term">
+base address (bits 10..31/63)
+</span></dt><dd><p>
+The size of the receive is actually 2<sup>s</sup> byte.
+Due to encoding and portability problems, <code class="literal">s</code> must be at least 10
+and the base address must be naturally aligned (its last <code class="literal">s</code> are
+forced to 0 by the kernel).
+Disallowing <code class="literal">s&lt;10</code> guarantees that all valid base addresses can be
+stored in the upper 22/54 bits.
+</p><p>As an exception, the special nilpage (0) can be used to refuse all
+mappings.</p></dd></dl></div><p>The remaining 33 (virtual) buffer registers BR<sub>1</sub>..BR<sub>33</sub> provide a
+list of receive string items, its end being indicated by the first
+string specifier with a clear <code class="literal">C</code> bit.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2531854"></a>IPC Result</h3></div></div></div><p>Finally, the completion status of an IPC operation (successful, aborted
+after timeout, partner thread invalid, mappings rejected, ...) should
+be reported to the caller.
+Assuming success as the common case, L4 reports the outcome in only one
+bit (error flag in the message tag, MR<sub>0</sub>).
+Details about the error (if any) are given in a predefined, thread-local
+memory location (see <a class="xref" href="#utcb" title="Virtual Registers and the UTCB">the section called "Virtual Registers and the UTCB"</a>).</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="utcb"></a>Virtual Registers and the UTCB</h3></div></div></div><p>In order to set up an architecture independent API without limiting
+all architectures to the greatest common divisor of them all,
+L4 bases its IPC API on a set of virtual registers to store the
+IPC arguments (MRs, BRs, xfer timeouts, error details).
+Virtual registers are mapped either to physical registers or to a
+kernel provided, user accessible, thread local, unpaged memory
+location, which is called the user-level tread control block (UTCB),
+Accesses to this memory never raise pagefaults, the kernel guarantees
+that the UTCB is always present in physical memory.</p><p>The kernel can locate the UTCB easily because the local thread ID,
+which is stored next to the global thread ID in the kernel TCB,
+is defined as the address of the thread's UTCB.</p><p>The user, however, needs a different way to locate the UTCBs:
+On IA32, L4 employs an otherwise unused segment register (<code class="literal">%gs</code>)
+to grant access to a segment that contains as its first (and only)
+word a pointer to the UTCB of the currently running thread.</p><p>Using a pointer in a user-accessible but fixed segment has several
+advantages over other schemes:
+The pointer can easily and safely be manipulated by both the kernel
+and the user (see <a class="xref" href="#ch_localIPC" title="Chapter 10. Local IPC">Chapter 10, <i>Local IPC</i></a>), thus allowing cheap thread
+switching purely at user-level (among threads in the same address space).
+If the segment was set up to directly give access to the UTCB,</p><div class="orderedlist"><ol type="a"><li>
+the user could not easily change it to access a different UTCB (due to
+   security considerations; allowing this would grant full control over
+   physical memory to the user-level applications) and
+</li><li>
+the kernel would have to spend more time on each thread switch updating
+   the segment (which is by far more costly than writing a single pointer
+   to memory).
+</li></ol></div></div></div></div><div class="chapter" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="ch_IPCImplementation"></a>Chapter 6. IPC Implementation</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#id2531985">IPC and Scheduling</a></span></dt><dt><span class="section"><a href="#id2532336">General Implementation of Short IPC</a></span></dt><dt><span class="section"><a href="#sec_fastpathIPC">Fast Path IPC</a></span></dt><dd><dl><dt><span class="section"><a href="#id2532712">Performance Considerations</a></span></dt><dt><span class="section"><a href="#id2532820">Combining Fast and Slow Paths</a></span></dt></dl></dd><dt><span class="section"><a href="#sec_longIPC">Long IPC</a></span></dt><dt><span class="section"><a href="#id2533168">String IPC</a></span></dt><dd><dl><dt><span class="section"><a href="#id2533199">Copy In/Copy Out</a></span></dt><dt><span class="section"><a href="#sec_tempMapping">Temporary Mapping Area</a></span></dt><dt><span class="section"><a href="#id2533614">Management of the Temporary Mapping Area</a></span></dt></dl></dd><dt><span class="section"><a href="#id2533810">Temporary Mapping Area on Multi-Processor Machines</a></span></dt></dl></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2531985"></a>IPC and Scheduling</h2></div></div></div><div class="note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="/web/20140803112320im_/http://i30www.ira.uka.de/~neider/edu/mkc/images/icons/note.png"/></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>The following elaboration mainly focuses on single-processor systems,
+i.e., only one thread executes on the CPU at any time.</p><p>Furthermore, we assume a strict priority-based scheduling strategy with
+fixed priorities and round-robin per priority level as provided by L4
+(see <a class="xref" href="#ch_dispatching" title="Chapter 7. Dispatching">Chapter 7, <i>Dispatching</i></a>), though the ideas presented should apply more
+generally as well.</p></td></tr></table></div><p>The implementation of synchronous IPC primitives (send, receive, and combined
+operations such as call or reply-and-wait) are tightly related to scheduling:
+Whenever a thread waits for an IPC partner (trying to send to a thread that
+is currently not accepting messages, or trying to receive a message while none
+is pending), the thread is blocked and another thread needs to be scheduled.</p><p>Conversely, if the send phase of a call operation completes, the sender will
+wait for the response of the receiver.
+This (common!) case can be improved by avoiding to go through the scheduler
+and instead dispatch the receiver thread directly, allowing it to use the
+remainder of the sender's timeslice to start fulfilling its request.
+Executing the receiver in the sender's timeslice is called ((timeslice
+donation));
+the sender would block anyway (after the <code class="literal">call</code>), but instead of losing its
+assigned CPU time, the sender passes it on the receiver so that the latter
+can do some work on the sender's behalf.</p><p>This approach is fair in all respects if the sender used the <code class="literal">call</code> primitive:</p><div class="itemizedlist"><ul type="disc"><li>
+The sender cannot continue execution, but wants the receiver to do some
+  work; donating processor time can only speed things up for the sender.
+</li><li>
+The receiver gets extra CPU time; the remainder of the sender's timeslice
+  is accounted for by the sender (not by the receiver) and does not affect
+  later scheduling decisions for (or against) the receiver thread.
+</li><li>
+The receiver effectively inherits the priority of the sender for the donated
+  timeslice, so that the receiver may run even if it has a low priority.
+  This never leads to threads with a high(er) priority being delayed longer
+  than till the end of the sender's timeslice, which would also have to be
+  tolerated if the sender had not sent a message to the receiver, and thus
+  does not violate scheduling guarantees for threads other than the sender
+  (who donated some processor time to the receiver, thus is slightly
+  penalized).
+</li></ul></div><p>Besides a <code class="literal">call</code> to a waiting receiver, other (attempted) IPC operations also
+require dispatching/scheduling actions:</p><div class="variablelist"><dl><dt><span class="term">
+<code class="literal">send</code>, <code class="literal">receive</code>, or <code class="literal">call</code> while the partner is not waiting
+</span></dt><dd>
+    This is the most obvious and easiest case, as the only "choice" is to
+    block the current thread (set it to <span class="emphasis"><em>waiting</em></span>) and schedule another one
+    (either according to the scheduling policy or (if possible) the missing
+    partner thread so as to allow the IPC to complete as soon as possible).
+</dd><dt><span class="term">
+<code class="literal">receive</code> from a partner that has previously <code class="literal">call</code>ed us
+</span></dt><dd>
+    In this case, the transfer can complete immediately and the receiver
+    continues (the partner thread is now waiting for the receiver's reply).
+</dd><dt><span class="term">
+<code class="literal">call</code> a partner that is waiting for us
+</span></dt><dd>
+    As described before, the receiver is dispatched and allowed to use the
+    remainder of the sender's timeslice (timeslice donation).
+</dd><dt><span class="term">
+<code class="literal">receive</code> from a partner that has previously invoked a <code class="literal">send</code> for us
+</span></dt><dd></dd><dt><span class="term">
+<code class="literal">send</code> to a partner that has previously invoked a <code class="literal">recv</code> or <code class="literal">call</code>ed us
+</span></dt><dd><p>
+    These cases are different from the previous ones: Before, either the
+    sender or the receiver (or none of them) was ready to run after the
+    invocation of the IPC primitive; the other thread blocked.
+    If (as in these cases) both threads are ready to run after the IPC,
+    a true scheduling decision must be made:
+</p><div class="itemizedlist"><ul type="disc"><li>
+Does the awakened/unblocked thread have a higher priority than the
+      currently running thread? If so, we must switch threads (the unblocked
+      thread will be the only ready-to-run thread in the highest ready
+      priority level, otherwise the currently running thread could not have
+      been running (priority too low!)).
+</li><li>
+If the unblocked thread has a lower priority that the current thread,
+      continue executing the current thread.
+</li><li><p>
+If the two threads have the same priority, a policy decision is required:
+      Continue to execute the current thread until the end of its timeslice
+      (lazy IPC operation) or immediately switch to the partner (eager)?
+</p><p>[The author of this document believes that the eager approach
+unjustifiably penalizes the current thread (cutting short its timeslice
+though it has work to do) and thus favors the lazy approach, which
+additionally avoids the overhead of a thread switch.
+L4 implements the lazy approach.]</p></li></ul></div></dd></dl></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2532336"></a>General Implementation of Short IPC</h2></div></div></div><p>IPC operations that only transfer messages in the message registers
+(no strings, no mappings) are called <a id="id2532347" class="indexterm"></a>
+short IPC.
+Under the assumption that <code class="literal">call</code> style IPC is prevalent in microkernel-based
+systems and that the receiver (often a server) is waiting, such a short IPC
+can on uni-processor machines be implemented via a (simplified) thread switch,
+carrying at least part of the message in the register file as follows</p><div class="orderedlist"><ol type="1"><li>
+The sender executes and loads (part of) the message into its physical
+   register file (and the remainder into its virtual MRs).
+</li><li><p>
+The sender perform the <code class="literal">call</code> system call, thus entering kernel mode and
+   switching to the kernel stack of the sender thread.
+   All registers except the stack pointer are preserved.
+</p><p>(The x86 segment registers <code class="literal">%cs</code>, <code class="literal">%ss</code>, <code class="literal">%ds</code>, <code class="literal">%es</code>, <code class="literal">%fs</code>, and <code class="literal">%gs</code>,
+the (<span class="strong"><strong>e</strong></span>xtended) FLAGS and instruction pointer are overwritten or kernel
+entry and cannot be used to transfer messages.)</p></li><li>
+The kernel locates the destination thread (its TCB), verifies its validity,
+   and state (waiting for IPC), and prepares to switch to it (on x86: update
+   <code class="literal">esp0</code>).
+   Some (x86: 2) additional registers are required for locating and verifying
+   the dest. TCB, all others are preserved.
+</li><li>
+The kernel switches to the kernel stack of the dest. thread, preserving
+   all other registers.
+</li><li>
+Then the kernel switches to the dest. address space (if different from the
+   sender's), still preserving most registers.
+</li><li>
+Finally, the kernel causes a return to the user-level of the dest. thread,
+   <span class="strong"><strong>without</strong></span> loading the physical register file of the dest. thread from its
+   stack (hence the above mentioned <span class="emphasis"><em>simplified</em></span> thread switch).
+   This allows some (x86: 5) registers to survive from the sender's user-level
+   up to the receiver's user-level, so they can be used to transfer a message.
+</li></ol></div><div class="sidebar"><p class="title"><b></b></p><p>As additional information is required to implement the IPC (see
+<a class="xref" href="#ch_IPCFunctionality" title="Chapter 5. IPC Functionality and Interface">Chapter 5, <i>IPC Functionality and Interface</i></a>), not all surviving registers should be used for the
+message.
+All IPC parameters that <span class="strong"><strong>must</strong></span> be available to the kernel (at least receiver's
+thread ID, possibly timeouts) should be passed to the kernel in registers to
+avoid memory accesses.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec_fastpathIPC"></a>Fast Path IPC</h2></div></div></div><p>Short IPC, meaning IPC with its message solely contained in untyped message
+registers without strings or mappings, is (assumed to be) the most frequent
+kernel operation in microkernel-based systems.
+This justifies taking special care on its implementation to avoid most of the
+possible performance problems (cache misses, TLB misses, memory references in
+general, down to microarchitectural effects such as pipeline stalls and flushes
+or instruction scheduling; the latter shall not be discussed here in more
+detail).</p><p>In order to retain in full control over these effects, L4 features two IPC
+paths:</p><div class="orderedlist"><ol type="1"><li><p>
+The <a id="id2532580" class="indexterm"></a>
+fast path is implemented in hand-crafted assembler, but handles
+  <span class="strong"><strong>only</strong></span> the easy (hopefully common) case:
+</p><div class="itemizedlist"><ul type="disc"><li>
+short IPC (only untyped message words)
+</li><li><p>
+<code class="literal">call</code> or <code class="literal">reply-and-wait</code> semantics, so that no scheduling decision is
+      required
+</p><div class="itemizedlist"><ul type="circle"><li>
+the sender blocks after sending (waits for reply or next request)
+</li><li>
+the receiver is waiting and dispatched after sending
+</li></ul></div></li><li><p>
+no effective timeouts
+</p><div class="itemizedlist"><ul type="circle"><li>
+send timeout: irrelevant as the receiver must be waiting
+</li><li>
+xfer timeouts: irrelevant due to the required absence of string
+          items
+</li><li>
+recv timeout: must be infinite (only effective timeout)
+</li></ul></div></li></ul></div></li><li>
+The general purpose, fully fledged implementation to handle all (other)
+  cases is implemented in C, but still with good performance in mind
+</li></ol></div><p>The selection between the two IPC paths is made at the beginning of the IPC
+entry point by checking the above criteria.
+If any criterion for the fast path is violated, the code branches off to
+(calls) the C code, otherwise the fast path is used.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2532712"></a>Performance Considerations</h3></div></div></div><p>In order to retain good performance, the target architecture must be inspected
+and searched for possible problems.
+On x86, these boil down to</p><div class="itemizedlist"><ul type="disc"><li>
+cache line length; all fields in the TCB that are relevant for (short) IPC
+  should be accumulated into as few cache lines as possible, e.g., by
+  clustering them at the beginning of the TCB (which is at naturally aligned
+  at 1k or 2k boundaries and thus surely aligned at cache line boundaries;
+  placing IPC critical words later would require knowledge of the cache
+  line lengths to guarantee matching alignment)
+</li><li>
+TLB coverage of the TLBs; ideally both sender and receiver TCB should be
+  covered by the same TLB entry (using superpages and a table-based lookup
+  mechanism this could be achieved at the expense of an additional cache
+  line (entry in the lookup table) plus in-kernel bookkeeping of free TCBs).
+  The current approach just makes sure that each TCB fits into a single,
+  standard page-sized TLB entry.
+</li><li>
+memory locality (related to cache lines and TLBs); scheduling would require
+  up to two remove and two insert/append operations on the doubly-linked
+  per-state lists (ready list, waiting list) embedded in the TCBs (move sender
+  from ready to wait list, move receiver from waiting to ready list), each of
+  which would require touching three TCBs (the predecessor and successor in
+  addition to the one to be removed or inserted), thus requiring up to 12 TLB
+  entries (one per TCB).
+  Using lazy scheduling (see <a class="xref" href="#sec_lazyDispatching" title="Lazy Dispatching">the section called "Lazy Dispatching"</a> for details), especially
+  on the (fast) IPC paths, avoids this overhead.
+</li><li>
+branch prediction logic; each conditional branch is recorded by the hardware
+  to predict the outcome (branch to be taken or not) the next time, so L4
+  combines all fast-path-tests into a single result and uses a single
+  conditional branch to split the fast path from the C path.
+  To this end, all criteria that lead off the fast path are <code class="literal">or</code>ed together;
+  if the resulting value is 0, no criterion required the slow path and we
+  remain on the fast path; if the result is not 0, we use the C path instead.
+</li></ul></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2532820"></a>Combining Fast and Slow Paths</h3></div></div></div><p>Attention is required to make the two paths compatible:
+If one thread enters the <code class="literal">wait</code> state on the slow path (e.g., because it used
+<code class="literal">recv</code> rather than <code class="literal">call</code>) and this thread is to be resumed by a thread that
+sends to it using the fast path (via a <code class="literal">call</code>), the receiver must be in a
+state that allows proper resumption on this path.
+Conversely, the reply might come in on the slow path, reactivating a thread
+that entered the <code class="literal">wait</code> state on the fast path.</p><p>Luckily this turns out to be no problem in practice, because both the fast and
+the slow IPC path leave the waiting thread in a consistent state (same thread
+state, same stack layout for the top few items).
+Exclusively cooperative switching of threads inside the kernel (the kernel is
+not preemptible, except during string IPC) avoids race conditions <span class="strong"><strong>while</strong></span> the
+state of a thread is changed, i.e., during the thread switch.</p><p>However, with the fast path leading up to a <code class="literal">sysexit</code> (to activate the
+receiver), the fast path cannot be used to activate kernel threads such as
+interrupt threads, which <span class="strong"><strong>never</strong></span> execute in user mode and not even have a
+surrounding address space.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec_longIPC"></a>Long IPC</h2></div></div></div><p><a id="id2532923" class="indexterm"></a>
+Long IPC denotes all IPC that includes string items or map/grant items,
+i.e., typed items.
+The complexity of these operations in conjunction with accessing the
+required data structures makes an assembly "fast path" implementation
+infeasible.
+Additionally, due to the string copy or pagetable manipulation, the cost
+of long IPC are generally so high that such a fast path would not pay that
+much and is thus not provided (also saves maintenance overhead).</p><p>Long IPC requires the following steps:</p><div class="itemizedlist"><ul type="disc"><li>
+thread A uses the IPC syscall to communicate with thread B
+</li><li>
+we enter kernel mode, the hardware disables interrupts
+</li><li>
+we check whether the fast path is possible; for long IPC, it is not
+</li><li><p>
+validate partner thread and its state
+</p><div class="itemizedlist"><ul type="circle"><li>
+block if partner is not ready
+</li></ul></div></li><li><p>
+analyze and transfer the message
+</p><div class="itemizedlist"><ul type="circle"><li>
+lock both partners' TCBs
+</li><li>
+enable interrupts
+</li><li>
+actually perform mapping/string copy operations
+</li><li>
+disable interrupts
+</li><li>
+unlock both TCBs
+</li></ul></div></li><li>
+switch to the receiver's address space (if != current)
+</li><li>
+return to user-mode of the receiver
+</li></ul></div><p>We <span class="strong"><strong>want</strong></span> to enable interrupts during string copy operations in order
+to keep the interrupt latency low:
+Each string can be up to 4 MB in size, the pure copy time approaches
+the length of a timer tick (order of milliseconds).
+We <span class="strong"><strong>must</strong></span> disable interrupts afterwards as the thread switch and
+other kernel code assumes atomicity.</p><p>We <span class="strong"><strong>must</strong></span> allow for pagefaults to be handled during string IPC, which
+requires that we prevent the reactivation of any of the partners.
+Otherwise another thread might concurrently be allowed to send a message
+to the receiver, partly overwriting its message registers and wreaking
+havoc.
+The sender must not continue before having sent the message so that it
+cannot mess with its message registers (besides other reasons).</p><p>The approach taken by L4 to avoid such problems is to lock both
+partners' TCBs while the interrupts are still disabled.
+Locking simply means to set their thread states to <code class="literal">locked_running</code> (sender)
+and <code class="literal">locked_waiting</code> (receiver), which are different from both
+<code class="literal">ready</code>/<code class="literal">running</code> and <code class="literal">waiting</code> and thus prevent anyone from communicating
+with or dispatching these threads.</p><p>We defer a detailed description on mapping IPC until
+<a class="xref" href="#ch_virtualMemoryMapping" title="Chapter 8. Virtual Memory Mapping">Chapter 8, <i>Virtual Memory Mapping</i></a> to present it in its natural context,
+so that the remainder of this chapter will focus on string IPC.
+Also keep in mind that this description of the IPC operations disregards
+the multi-processor case and thus ignores the additional SMP-safe locking
+requirements on accessing TCBs and such.
+The L4 implementation is SMP safe.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2533168"></a>String IPC</h2></div></div></div><p>String IPC provides a means to safely (guarded by the kernel) copy large
+amounts of data between address spaces.
+Though not strictly required (short IPC would suffice), providing string
+IPC offers a much more comfortable and more efficient solution to this
+task than short IPC could do while still keeping many of the IPC
+properties: synchronous, atomic message transfer (the sender continues only
+after the message has been transferred completely) from sender defined data
+into memory locations that are designated as such by the receiver.
+Furthermore, kernel-mediated string IPC guarantees that the originator of
+the accepted string data is known, as the sender's true identity (thread ID)
+is conveyed to the receiver during the IPC (a matter of trust).</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2533199"></a>Copy In/Copy Out</h3></div></div></div><p>The problem with inter-address-space string copies (or memory copies in
+general) is that neither sender nor receiver have to have access to both
+the original data (source buffer) and destination buffers; if both
+buffers reside in private memory (not shared between the sender and the
+receiver address spaces), no single page table exists that contains
+mappings to make both buffers' physical frames accessible.
+In this case, not even the kernel can copy the data directly.</p><p>The traditional approach to copying data from one address space to another
+is to use an intermediate buffer in the kernel's address space (which is
+mapped into all address spaces (top 1 GB) and is synchronized to map to
+the same physical frames in all address spaces).
+First, running in the sender's address space, the kernel copies the
+strings <span class="strong"><strong>in</strong></span>to the intermediate buffer in kernel space, then it switches
+to the receiver's address space and copies the data <span class="strong"><strong>out</strong></span> of the kernel
+buffer into the receiver's buffers.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="id2533251"></a>Evaluation</h4></div></div></div><p>Though this approach works well, it requires two copies of the message and
+(for long messages) trashes many cache lines (source buffer, intermediate
+buffer and destination buffer will occupy cache lines, probably evicting
+each other).</p><p>Assuming 4 byte words, 32 byte (8 word) cache lines, and an <code class="literal">n</code> word string
+to copy, copying the string from source to intermediate and from intermediate
+to destination buffer each requires <code class="literal">n</code> word-wide read operations and
+<code class="literal">n</code> word-wide write operations, thus <code class="literal">4n</code> (cached) memory accesses in total.</p><p>Assuming further that the sender has just written the message into the
+source buffer and that the receiver will immediately read the complete
+string after reception, small messages will still be in the cache when
+copied into the kernel buffer (only <code class="literal">n/8</code> cache misses on the kernel
+buffer). With the same argument, short strings will still be in the
+cache when copied from the kernel buffer into the destination buffer.
+The cache misses on the receive buffer are not considered here as the
+receiver will read the message immediately; if the kernel writes the
+messages there (suffering cache misses), the receiver will not suffer
+cache misses.
+Conversely, if the message was not in the cache, the receiver would
+suffer cache misses; the kernel generated cache misses on the buffer
+are no avoidable overhead.
+The total <span class="strong"><strong>overhead</strong></span> of this approach is <code class="literal">n/8</code> cache misses when
+writing to the kernel buffer, all other cache misses are due to the
+sender writing and the receiver reading the message and thus "desired"
+(at least, not to be avoided).</p><p>For large <code class="literal">n</code> (<code class="literal">n</code> &gt; size of the cache in words), the assumption of the
+message still residing in the cache before each copy does not hold:
+The later part of the string will evict the earlier part from the cache,
+thus this approach yields <code class="literal">n/8</code> cache misses when reading the source
+buffer, <code class="literal">n/8</code> cache misses when writing the kernel buffer,
+<code class="literal">n/8</code> cache misses when reading the kernel buffer
+<sup>[<a id="id2533386" href="#ftn.id2533386" class="footnote">5</a>]</sup>,
+and <code class="literal">n/8</code> cache misses when writing the receive buffer.
+All of these are overhead (both the sender and the receiver will suffer
+additional cache misses when accessing their buffer), so for large
+<code class="literal">n</code> the overhead is <code class="literal">4n/8</code> (or <code class="literal">n/2</code>) cache misses.</p><p>Compare this to the alternative approach to be discussed next.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="sec_tempMapping"></a>Temporary Mapping Area</h3></div></div></div><p>The traditional copy-in/copy-out-scheme works well for small <code class="literal">n</code>,
+but even then involves complex buffer management schemes in the
+kernel (pagefaults on the receiver buffer might cause a pager to
+page in memory from disk, in the meantime other threads might
+also perform string IPC; the size of the kernel buffer is not/cannot be
+fixed nor known in advance).</p><p>To overcome these problems, L4 uses temporary mappings to make both the
+sender's (source) buffer and the receive buffer accessible in one address
+space at the same time.
+<sup>[<a id="id2533457" href="#ftn.id2533457" class="footnote">6</a>]</sup>
+For this purpose, the kernel reserves in its address space region a
+mapping area (the size of two consecutive superpages, 8 MB on x86),
+and maps the receive buffer (at most 4 MB, but not necessarily aligned;
+only guaranteed to fit into an 8 MB region!) into it.
+Afterwards, the sender can access the source buffer at its natural (virtual)
+address <span class="strong"><strong>and</strong></span> the receive buffer via the (virtual) address of the mapping
+region in the kernel memory.</p><p>Having set this up, we can copy directly from source buffer to destination
+buffer (using the virtual addresses of the mapping region), without
+requiring a kernel buffer and without having to copy the string twice.</p><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h4 class="title"><a id="id2533492"></a>Evaluation</h4></div></div></div><p>With the assumptions from the copy-in/copy-out-scheme, this approach
+only requires <code class="literal">2n</code> memory operations (instead of <code class="literal">4n</code>), <code class="literal">2n/8</code> cache
+lines (instead of <code class="literal">3n/8</code>, no cache lines are required for the
+temp. mapping area if the cache is physically indexed, as the temp.
+mapping maps to the same physical frame as the receive buffer),
+avoids all overhead cache misses for small <code class="literal">n</code> (the message is only
+copied in the cache (given it fits), possible cache misses on the
+receive buffer are attributed to the receiver as above and thus not
+counted as overhead), and incurs only <code class="literal">2n/8</code> (instead of <code class="literal">5n/8</code>; also
+<code class="literal">3n/8</code> as stated in the table in the lecture slides seems wrong)
+overhead cache misses for large <code class="literal">n</code> (<code class="literal">n/8</code> when reading the source
+buffer and <code class="literal">n/8</code> when writing the receive buffer; the receiver will
+suffer additional cache misses when accessing the buffer so these
+are true overhead (avoidable) misses).</p><p>On the downside, the temporary mapping also has a number of drawbacks:
+The setup cost is higher (set up the kernel mapping to the receive buffer),
+and more needs to be done should the copy operation be interrupted:
+The mapping area is a shared resource, whose state must be preserved across
+thread switches, but in contrast to the kernel <span class="strong"><strong>buffer</strong></span> above, the mapping
+area <span class="emphasis"><em>can</em></span> quite easily be shared, as detailed next.</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h3 class="title"><a id="id2533614"></a>Management of the Temporary Mapping Area</h3></div></div></div><p>Setting up the temporary mapping area only requires copying the (up to 1024)
+receiver's pagetable entries that cover the receive buffer to the pagetable
+entries that cover the temporary mapping area in the sender's pagetable.
+Due to the two-level pagetable scheme employed by Intel x86, copying the
+up to two top-level pagetable entries suffices to make the complete receiver
+accessible.
+This effectively integrates one of the receiver's second level pagetables
+into the sender's address space.</p><p>Since we made long IPC preemptible (interrupts enabled during the message
+transfer), other threads might be scheduled while the temporary mapping is
+set up.
+These threads might</p><div class="orderedlist"><ol type="a"><li>
+also want to perform string IPC, thus also occupying the temporary
+   mapping region (there is only one in the kernel!),
+</li><li>
+cause the underlying mappings of the source or receive buffer to
+   change (e.g., revoke mappings due to memory pressure).
+</li></ol></div><p>Even worse would be a scenario in which thread A is preempted in a string
+copy to thread B, and the preempting thread C is resumed in the middle of
+its (previously started and preempted) string copy to thread D:
+Without care, C would now write into the receive buffer of B, as that's the
+way the temp. mapping area is (still) set up when C resumes.</p><p>To avoid such problems, L4 always invalidates the temp. mapping area
+on a thread switch.
+As the mappings might already be in the TLB, we also have to flush the TLB,
+as always after revoking mappings.
+Flushing the TLB is costly (not the flush itself, but restoring the TLB
+entries afterwards requires a pagetable walk (two memory accesses) per
+TLB entry), and is implicitly performed on x86 whenever the address space
+is switched (by loading the address of the top-level pagetable into <code class="literal">%cr3</code>).
+So, we need only explicitly flush the TLB if we switch to a thread in the
+same address space as the (preempted) sender of the string IPC.</p><p>If now thread C resumes and writes to the temp. mapping area, it will raise
+a pagefault (A's/B's mappings there have been invalidated), which will be
+handled as a special case in the L4 kernel to reestablish C's temp. mapping
+area:</p><div class="itemizedlist"><ul type="disc"><li><p>
+If the pagetable entry of mapping area matches receivers pagetable entry,
+  we have a pagefault on the receive buffer (the second-level pagetable entry
+  is invalid or read-only), so that the receiver's pager is notified to
+  handle the pagefault via <sup>[<a id="id2533737" href="#ftn.id2533737" class="footnote">7</a>]</sup>
+</p><div class="itemizedlist"><ul type="circle"><li>
+switching to the receiver thread
+</li><li>
+touching the receive buffer (causes pagefault, resolved by the pager)
+</li><li>
+switching back to the sender thread
+</li></ul></div></li><li>
+Then the top-level pagetable entry is copied (again) from the receiver's
+  pagetable to the sender's one (it might have changed during pagefault
+  resolution by the receiver's pager or it might have been invalid, e.g.,
+  when C resumes its preempted string copy).
+</li></ul></div><p>In order to be able to restore the temp. mapping after preemption, we need to
+store the thread ID of the receiver and the location of the receive buffer
+in the sender's TCB (done when the temp. mapping is set up before starting
+to copy).</p></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2533810"></a>Temporary Mapping Area on Multi-Processor Machines</h2></div></div></div><p>On multi-processor machines, each CPU should be able to perform a string
+IPC in parallel with all other CPUs.
+A single temp. mapping area in the kernel, however, would prohibit such
+parallelism and instead require locking and synchronization on the shared
+resource "mapping area".</p><p>As a workaround, each CPU can be given a private temp. mapping area in a
+distinct region within the kernel memory space.
+In effect, this approach allocates not one but <code class="literal">N</code> (the number of CPUs in
+the system) mapping areas in the kernel, each one being used exclusively
+by one CPU; no additional locking to access the mapping area is required.
+However, this approach requires to limit the max. number of CPUs at
+compile time so that the kernel memory regions can be reserved.
+If the kernel is compiled for up to 32 CPUs but only 2 are present,
+30 x 8 MB of virtual kernel memory are wasted.
+What's more, this approach does not scale well to larger, many-core systems
+with 100s or CPUs: one cannot dedicate 100 x 8 MB of the 1 GB of kernel memory
+to mapping areas!</p><p>As an alternative, L4 uses CPU-local memory:
+Each CPU has its own copy of the top-level pagetables and can thus establish
+its own temporary mapping area without disturbing the other CPU's mapping
+areas.
+This approach not only scales better (you just need to duplicate the top-level
+pagetable (4 kB) instead of the mapping area (8 MB)), but also restricts the
+mapping area to the same virtual addresses on all CPUs, which makes
+programming easier (instead of using <code class="literal">map_area[get_current_cpu()]</code> you can
+now simply access <code class="literal">map_area</code> from all CPUs and still have it map to different
+receive buffers on each CPU).</p></div><div class="footnotes"><br/><hr width="100" align="left"/><div class="footnote"><p><sup>[<a id="ftn.id2533386" href="#id2533386" class="simpara">5</a>] </sup>When copying the string backwards out of the kernel buffer,
+the later part (copied first) is still in the cache, reducing the
+number of cache misses; this is neglected here assuming that the string
+is always copied in order of ascending addresses.</p></div><div class="footnote"><p><sup>[<a id="ftn.id2533457" href="#id2533457" class="simpara">6</a>] </sup>The mappings are temporary as they vanish at each thread switch.</p></div><div class="footnote"><p><sup>[<a id="ftn.id2533737" href="#id2533737" class="simpara">7</a>] </sup>The sender thread is running, but the
+  pagefault occurs in the receiver thread's address space (although none of
+  the threads there might be running).
+  Activating the pager of a thread that is not even running is called
+  <a id="id2533744" class="indexterm"></a>
+page fault tunneling.</p></div></div></div><div class="chapter" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="ch_dispatching"></a>Chapter 7. Dispatching</h2></div></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt><span class="section"><a href="#sec_scheduling">Scheduling in L4</a></span></dt><dt><span class="section"><a href="#id2534140">Optimizations</a></span></dt><dt><span class="section"><a href="#id2534220">Dispatching Mechanism</a></span></dt><dt><span class="section"><a href="#sec_lazyDispatching">Lazy Dispatching</a></span></dt><dt><span class="section"><a href="#sec_timeouts">Timeouts</a></span></dt></dl></div><p>L4 offers threads as one of its (few) abstractions.
+As a consequence, a mechanism to dispatch (i.e., switch to and execute) a
+thread is required as well.</p><div class="note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="/web/20140803112320im_/http://i30www.ira.uka.de/~neider/edu/mkc/images/icons/note.png"/></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>The dispatching mechanism described here is only used if the next thread to
+run is not indicated by the user and thus a thread has to be selected
+according to some scheduling policy.
+The IPC paths, e.g., often imply a thread switch to the receiver; this path
+bypasses the dispatcher.
+Similarly, a <code class="literal">yield(next_tread_id)</code> operation can be used to switch to another
+thread without going through the complete dispatching mechanism.
+On the other hand, should the current thread be preempted due to end of
+timeslice or because a high priority thread (e.g., an interrupt handler)
+becomes runnable, the dispatcher machinery is invoked.</p></td></tr></table></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec_scheduling"></a>Scheduling in L4</h2></div></div></div><p>Whenever L4 must choose the next thread to run, it consults its built in
+<a id="id2533951" class="indexterm"></a>
+scheduler.
+The scheduler uses</p><div class="variablelist"><dl><dt><span class="term">
+<a id="id2533968" class="indexterm"></a>
+fixed priorities (0..255) per thread
+</span></dt><dd>
+    Although the threads' priorities can be changed at runtime by the user,
+    the kernel does not change them as, e.g., earliest-deadline-first-based
+    schedulers might; 255 signifying the highest priority)
+</dd><dt><span class="term">
+<a id="id2533996" class="indexterm"></a>
+hard priorities
+</span></dt><dd>
+    That the scheduler always chooses one of the ready threads with the
+    highest priority, low priority threads can starve.
+</dd><dt><span class="term">
+<a id="id2534022" class="indexterm"></a>
+round robin per priority
+</span></dt><dd><p>
+    Threads of the same priority are scheduled in round-robin fashion for
+    a given timeslice; at the end of the timeslice, the thread is preempted
+    and another thread is dispatched.
+    For this purpose, the L4 scheduler maintains
+</p><div class="orderedlist"><ol type="a"><li>
+a doubly linked, circular list of all ready TCBs per priority level
+       (list pointers are embedded in the TCBs to avoid allocation and
+       deallocation overhead and to increase locality:
+       the list node and the TCB share the same TLB entry),
+       and
+</li><li>
+an array of 256 pointers to the TCB of the currently running/next
+       thread per priority level.
+</li></ol></div></dd></dl></div><p>In principle, the scheduler starts at the array entry for the highest priority
+and checks if there is a thread ready to run (array entry is not <code class="literal">nil</code>).
+In this case, the thread is selected for dispatch, otherwise, the array is
+searched in order of decreasing priorities.
+If no thread is ready to run, a special idle thread is dispatched.</p><p>When the current thread blocks, <code class="literal">yield</code>s, or exhausts its timeslice,
+the next thread in that priority class is dispatched and given a new
+<a id="id2534109" class="indexterm"></a>
+timeslice.
+Additionally, the pointer to the currently running thread in the array is
+updated to point to the selected thread.</p><div class="note" style="margin-left: 0; margin-right: 10%;"><table border="0" summary="Note"><tr><td rowspan="2" align="center" valign="top" width="25"><img alt="[Note]" src="/web/20140803112320im_/http://i30www.ira.uka.de/~neider/edu/mkc/images/icons/note.png"/></td><th align="left"></th></tr><tr><td align="left" valign="top"><p>Timeslice accounting is slightly inaccurate as it happens in the
+handler of the periodic timer interrupt by subtracting the length of
+the timer period from the remaining timeslice length.
+If the remaining timeslice becomes zero or negative, it is said to
+be exhausted, causing an immediate scheduling process.
+If the thread blocks in between two timer ticks, the next thread
+will start with only half a timer period till the next timer tick.
+Whether it is billed a whole timer period or whether this case is
+correctly accounted for is beyond the author's knowledge.</p></td></tr></table></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2534140"></a>Optimizations</h2></div></div></div><p>Usually, threads have priorities around 100 on L4.
+To avoid checking the priority levels 255..101 for runnable threads,
+L4 remembers the highest priority with a runnable thread and only
+checks at and below that level during scheduling.</p><p>This so-called "highest active priority" <a id="id2534157" class="indexterm"></a>
+<span class="strong"><strong>must</strong></span> be updated whenever a thread with a higher priority becomes ready
+to run,
+and <span class="strong"><strong>should</strong></span> be updated whenever the currently highest active priority
+level becomes empty (because the last thread on that level blocks).
+Both events can easily be registered in the kernel.</p><p>On x86, further optimizations are possible for sparsely populated priority
+arrays:
+x86 offers a <code class="literal">bsr</code> (bit scan reverse) instruction, which can be used to
+locate the index of the most significant set (1) bit in a word.
+If we maintain an bitfield of 256 bits (8 32-bit words),
+i.e., one "active" bit per priority level, we can use this instruction
+to locate the highest active priority without searching the array at all.</p><p>The current implementation always folds 16 priority levels into one bit,
+reducing the length of the bitfield to search to 16 bits.
+This approach requires to scan up to 15 (empty) arrays entries in
+the order of decreasing priorities to identify the real highest active
+priority and complicates the conditions under which a bit can be cleared.
+The reasons for not using 32 bits are unclear, there is even no apparent
+benefit of using only one word instead of 8:
+Both cache utilisation and TLB coverage would favor the 256 bit bitfield,
+no difference with respect to branch prediction logic is obvious.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="id2534220"></a>Dispatching Mechanism</h2></div></div></div><p>Finding the next thread to run can be quite time consuming (esp. if no
+<code class="literal">bsr</code> instruction can be used) and should thus be preemptible itself,
+in order to achieve a low interrupt latency.
+If the scheduler were to execute in the context of the current thread
+(the one that is to be replaced), this goal would be hard to achieve:
+On interrupts, the current state of the interrupted thread would be saved,
+the (in-kernel) interrupt handler would still execute on the stack of the
+current thread and possibly invoke the scheduler again.
+When the current thread is scheduled again, it would resume its preempted
+scheduling activity, although the thread itself should continue!
+Additionally, the interrupt handler and nested scheduler consume space
+on the threads kernel stack, which, being included in the TCB, is quite
+limited.</p><p>Solving all these problems, L4 uses a dedicated thread for the scheduling
+decisions.
+This thread is never resumed after preemption but rather started anew,
+discarding its previous state (the scheduling-relevant data structures
+have possibly changed since the scheduler has been preempted, so a fresh
+start is recommended).
+This property also removes the requirement for an exceptionally large
+kernel stack; except for a single interrupt handler, nothing will be
+nested on top of the scheduler.</p><p>The consequences of this model are that dispatching via the scheduler
+requires two thread switches: first from the current to the dispatcher
+thread, and then from dispatcher to the next thread.
+However, as the dispatcher never executes in user mode, it does not have
+an associated address space, so that switching there is cheap (no address
+space switch, no TLB flush).
+As it is never referenced from user mode, it can even do without
+a thread ID, which further allows to freely place (and size) its stack;
+it need not be included in any TCB.</p></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec_lazyDispatching"></a>Lazy Dispatching</h2></div></div></div><p>L4 uses circular ready lists per priority level.
+If these lists were maintained eagerly, a thread would have to be removed
+whenever it blocks (e.g., during a <code class="literal">call</code> IPC, waiting for the reply).
+Removing a thread from the ready list requires touching its preceding
+list element (to update its <code class="literal">next</code> pointer) as well as touching its
+successor list element (to update its <code class="literal">prev</code> pointer) in addition to the
+list element itself.
+With the list being embedded in TCBs, this translates to having to touch
+three TCBs (predecessor, successor, and current), each one probably
+covered by a different TLB entry.
+Though we cannot avoid touching the current TCB, and though we will
+probably switch to the next thread anyways, so touching the successor
+list element does not "waste" a TLB entry for the single purpose of
+updating the ready list, touching the predecessor TCB solely serves the
+purpose of keeping the ready list up-to-date.
+The possible TLB miss on touching the predecessor TCB can be avoided
+by maintaining the ready lists lazily as follows.</p><p>Instead of removing a blocking thread's TCB from the ready list
+immediately, we just leave it in there and simply set its state to
+<code class="literal">blocked</code>.
+If a thread that is selected for dispatching is marked as <code class="literal">blocked</code>,
+we remove it from the list and dispatch the next thread.
+This lazy handling of ready lists is called <a id="id2534366" class="indexterm"></a>
+lazy dispatching.</p><p>... and what does this scheme buy us?!?</p><div class="orderedlist"><ol type="1"><li>
+If the thread was blocked only for a short time and not scheduled
+   between its block and unblock events, it can remain in the ready
+   list; lazy list maintenance saves us the complete remove/insert
+   operations on the list.
+</li><li>
+If the thread is scheduled while being <code class="literal">blocked</code>, we already touched
+   its predecessor TCB (in most cases, that is the currently
+   executing/preempted thread)!
+   Since we will also have to touch the successor TCB (since that will be
+   the thread to dispatch), performing the list operation now does not
+   introduce additional TLB misses.
+   (Accessing the blocked TCB is as costly and as useless as touching the
+   predecessor TCB in the eager case, but benefit 1. remains.)
+</li></ol></div></div><div class="section" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title" style="clear: both"><a id="sec_timeouts"></a>Timeouts</h2></div></div></div><p>Threads that are blocked during IPC can be unblocked either by <span class="emphasis"><em>completing</em></span>
+their IPC (partner arrives and accepts/delivers a message) or by <span class="emphasis"><em>aborting</em></span>
+it due to a timeout.
+With many blocked threads in a system it would be infeasible to check all
+blocked threads' timeouts on each timer interrupt (aka <a id="id2534441" class="indexterm"></a>
+tick).
+Instead, L4 maintains a (more or less ordered, see below) list of timeouts,
+with the one closest to its expiry at the head of the list.
+This only requires to check a single timeout at each tick (and would even
+allow tickless implementations, setting the timer to <code class="literal">min(timeslice length,
+earliest timeout)</code> on each kernel exit), but requires a clever data structure
+to keep track of the timeouts.</p><p>Since timeouts could be created with every IPC, inserting them into the
+"list" must be fast.
+Under the assumption that most timeouts are never actually raised (they are
+usually used to recover from error conditions/deadlocks/false assumptions;
+under normal conditions they are cancelled once the IPC completes),
+canceling a timeout must also be cheap.
+With the same argument (raised timeouts indicate some error in the
+application), handling an expired timeout may be more expensive.</p><p>Both unsorted and sorted true lists do not meet our requirements:
+Unsorted lists take <code class="literal">O(n)</code> time to find the nearest timeout,
+sorted lists take <code class="literal">O(n)</code> time to insert a new element.</p><p>Using (balanced) trees to maintain the timeouts would probably allow
+cheap lookup/insert operations (<code class="literal">O(1)</code>, <code class="literal">O(log n)</code>), but are deemed to be too
+complicated <sup>[<a id="id2534525" href="#ftn.id2534525" class="footnote">8</a>]</sup> and expensive (probably in terms of time (e.g.,
+reorganizing an AVL tree) and memory (&gt;= 3 pointers per tree node instead
+of 1 or 2 in lists)).</p><p>Anyway, an epoch-based multi-list scheme has been proposed for L4.
+<sup>[<a id="id2534542" href="#ftn.id2534542" class="footnote">9</a>]</sup>
+The idea is to define two absolute times on system startup, e<sub>soon</sub> and
+e<sub>late</sub>, with e<sub>soon</sub> being several micro- or milliseconds from now on
+and e<sub>late</sub> being approx. an order of magnitude later.
+We can now use an ordered list (aka <a id="id2534570" class="indexterm"></a>
+soon list) for the nearly
+expired timeouts (those that fire before e<sub>soon</sub>),
+an unsorted list (aka <a id="id2534585" class="indexterm"></a>
+late late list) for timeouts in the far future
+(firing after e<sub>late</sub>),
+and another unsorted list (aka <a id="id2534600" class="indexterm"></a>
+late list) for timeouts in between
+the other two (at or after e<sub>soon</sub> but before e<sub>late</sub>).</p><p>Insertion into the sorted soon list is cheap because (hopefully) there is
+only a small number of timeouts stored in that list (e<sub>soon</sub> should be
+chosen to maintain this property).
+Insertion into the unsorted late and late late lists is cheap because
+we can simply append (or prepend) new timeouts (<code class="literal">O(1)</code>).
+To facilitate quick removal of cancelled timeouts, we can store a pointer
+to the timeout list entry in the associated TCB (<code class="literal">O(1)</code>).
+As the current design precludes any thread from having more than one
+active timeout, we can even go further and include a wakeup list node in
+the TCBs (as is done with the ready lists as well), removing the necessity
+to store a pointer to the list node.</p><p>Once e<sub>soon</sub> is reached, a correction phase is required (note that the
+soon list is empty at this time!):
+First, we define a new e<sub>soon</sub> in the near future, then we iterate over the
+late list, moving all timeouts that fire before the new e<sub>soon</sub> into the
+(sorted) soon list and continue.</p><p>Whenever we reach the updated e<sub>soon</sub>, we process the late list as just
+described.
+Only once we reach e<sub>late</sub> do we need to inspect the timeouts in the late
+late list; which we process similar to the late correction above:
+First update e<sub>late</sub>, then iterate over all entries from the late late list
+and move them into the (sorted) soon list (if expiry is before e<sub>soon</sub>)
+or the late list (if expiry is before e<sub>late</sub>).</p><p>The epochs serve to reduce the sorting efforts (only nearly expired timeouts
+are sorted), the late list keeps the cost of the late correction phase
+small (if e<sub>late</sub> is not too far in the future), and the probably costly
+late late correction phase handles the remaining (long-term) timeouts.</p><p>Note that the correction phases are only required once the current time
+exceeds e<sub>soon</sub> or e<sub>late</sub>:
+The insertion strategy guarantees that no timeout in the late or late late
+lists can be missed (all expiry times are later than e<sub>soon</sub> or e<sub>late</sub>,
+respectively).</p><p>As an additional optimization, we can reuse the lazy dispatching idea:
+Instead of removing the timeout list element when a timeout is cancelled,
+we can leave it in the list and just set its expiry time to <code class="literal">never</code>.
+Such items can be removed from the lists (at a low cost) during correction
+phases or can be reused for the next timeout iff it falls into the same
+late/late late list (the soon list must always be sorted).</p></div><div class="footnotes"><br/><hr width="100" align="left"/><div class="footnote"><p><sup>[<a id="ftn.id2534525" href="#id2534525" class="simpara">8</a>] </sup>Trees being to complicated is a kind of strange
+argument; once you get them right, their complexity should be no problem,
+and data structures such as the mapping database are both tree-like and
+even more complex...</p></div><div class="footnote"><p><sup>[<a id="ftn.id2534542" href="#id2534542" class="simpara">9</a>] </sup>The scheme presented has never been implemented.
+As non-zero and non-infinite timeouts have been found to be rarely used,
+L4 uses a single (ordered) wakeup list for all non-trivial timeouts.</p></div></div></div><div class="chapter" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="ch_virtualMemoryMapping"></a>Chapter 8. Virtual Memory Mapping</h2></div></div></div><p>TODO</p></div><div class="chapter" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="ch_smallspaces"></a>Chapter 9. Small Spaces</h2></div></div></div><p>TODO</p></div><div class="chapter" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="ch_localIPC"></a>Chapter 10. Local IPC</h2></div></div></div><p>TODO</p></div><div class="chapter" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="ch_interruptAndExceptionHandling"></a>Chapter 11. Interrupt and Exception Handling</h2></div></div></div><p>TODO</p></div><div class="chapter" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="ch_security"></a>Chapter 12. Security</h2></div></div></div><p>TODO</p></div><div class="index"><div class="titlepage"><div><div><h2 class="title"><a id="id2534827"></a>Index</h2></div></div></div><div class="index"><div class="indexdiv"><h3>Symbols</h3><dl><dt>0-page, <a class="indexterm" href="#id2529464">0-Mapping-Trick</a></dt></dl></div><div class="indexdiv"><h3>A</h3><dl><dt>acceptor, <a class="indexterm" href="#receivebuffers">Receive Buffers</a></dt><dt>address space, <a class="indexterm" href="#id2477422">Basic Abstractions and Mechanisms</a></dt></dl></div><div class="indexdiv"><h3>C</h3><dl><dt>call, <a class="indexterm" href="#id2529997">Communication Primitives</a></dt><dt>closed receive, <a class="indexterm" href="#id2529997">Communication Primitives</a></dt></dl></div><div class="indexdiv"><h3>F</h3><dl><dt>fast path, <a class="indexterm" href="#sec_fastpathIPC">Fast Path IPC</a></dt><dt>fixed priorities, <a class="indexterm" href="#sec_scheduling">Scheduling in L4</a></dt></dl></div><div class="indexdiv"><h3>H</h3><dl><dt>hard priorities, <a class="indexterm" href="#sec_scheduling">Scheduling in L4</a></dt><dt>highest active priority, <a class="indexterm" href="#id2534140">Optimizations</a></dt></dl></div><div class="indexdiv"><h3>I</h3><dl><dt>IPC, <a class="indexterm" href="#id2477422">Basic Abstractions and Mechanisms</a></dt></dl></div><div class="indexdiv"><h3>L</h3><dl><dt>late late list), <a class="indexterm" href="#sec_timeouts">Timeouts</a></dt><dt>late list), <a class="indexterm" href="#sec_timeouts">Timeouts</a></dt><dt>lazy dispatching, <a class="indexterm" href="#sec_lazyDispatching">Lazy Dispatching</a></dt><dt>Long IPC, <a class="indexterm" href="#sec_longIPC">Long IPC</a></dt></dl></div><div class="indexdiv"><h3>M</h3><dl><dt>mapping, <a class="indexterm" href="#id2477422">Basic Abstractions and Mechanisms</a></dt><dt>message tag, <a class="indexterm" href="#id2531054">Message Content</a>, <a class="indexterm" href="#id2531518">Message Format</a></dt></dl></div><div class="indexdiv"><h3>N</h3><dl><dt>NIL thread ID, <a class="indexterm" href="#sec_operationAndAddresses">Operation and Addresses</a></dt><dt>null-page, <a class="indexterm" href="#id2529464">0-Mapping-Trick</a></dt></dl></div><div class="indexdiv"><h3>O</h3><dl><dt>open receive, <a class="indexterm" href="#id2529997">Communication Primitives</a></dt></dl></div><div class="indexdiv"><h3>P</h3><dl><dt>page fault tunneling, <a class="indexterm" href="#id2533614">Management of the Temporary Mapping Area</a></dt></dl></div><div class="indexdiv"><h3>R</h3><dl><dt>receive, <a class="indexterm" href="#id2529997">Communication Primitives</a></dt><dt>receive from, <a class="indexterm" href="#id2529997">Communication Primitives</a></dt><dt>receive pagefault timeout, <a class="indexterm" href="#id2530453">Transfer Timeout</a></dt><dt>receive timeout, <a class="indexterm" href="#id2530429">Receive Timeout</a></dt><dt>reply-and-wait, <a class="indexterm" href="#id2529997">Communication Primitives</a></dt><dt>round robin, <a class="indexterm" href="#sec_scheduling">Scheduling in L4</a></dt></dl></div><div class="indexdiv"><h3>S</h3><dl><dt>scheduler, <a class="indexterm" href="#sec_scheduling">Scheduling in L4</a></dt><dt>send, <a class="indexterm" href="#id2529997">Communication Primitives</a></dt><dt>send pagefault timeout, <a class="indexterm" href="#id2530453">Transfer Timeout</a></dt><dt>send timeout, <a class="indexterm" href="#id2530402">Send Timeout</a></dt><dt>short IPC, <a class="indexterm" href="#id2532336">General Implementation of Short IPC</a></dt><dt>soon list), <a class="indexterm" href="#sec_timeouts">Timeouts</a></dt><dt>String items, <a class="indexterm" href="#id2531118">String Items</a></dt><dt>string specifier, <a class="indexterm" href="#id2531118">String Items</a></dt></dl></div><div class="indexdiv"><h3>T</h3><dl><dt>TCB, <a class="indexterm" href="#ch_TCBs">TCBs</a></dt><dt>thread, <a class="indexterm" href="#id2477422">Basic Abstractions and Mechanisms</a></dt><dt>thread control block, <a class="indexterm" href="#ch_TCBs">TCBs</a></dt><dt>tick), <a class="indexterm" href="#sec_timeouts">Timeouts</a></dt><dt>timeouts, <a class="indexterm" href="#id2530380">Timeouts</a></dt><dt>timeslice, <a class="indexterm" href="#sec_scheduling">Scheduling in L4</a></dt><dt>transfer timeouts, <a class="indexterm" href="#id2530453">Transfer Timeout</a></dt><dt>typed items, <a class="indexterm" href="#id2531054">Message Content</a></dt><dt>Typed words, <a class="indexterm" href="#id2531054">Message Content</a></dt></dl></div><div class="indexdiv"><h3>W</h3><dl><dt>wildcard thread ID, <a class="indexterm" href="#sec_operationAndAddresses">Operation and Addresses</a></dt></dl></div><div class="indexdiv"><h3>X</h3><dl><dt>xfer timeout, <a class="indexterm" href="#id2530453">Transfer Timeout</a></dt></dl></div><div class="indexdiv"><h3>Z</h3><dl><dt>zero-page, <a class="indexterm" href="#id2529464">0-Mapping-Trick</a></dt></dl></div></div></div><div class="appendix" lang="en" xml:lang="en"><div class="titlepage"><div><div><h2 class="title"><a id="id2534833"></a>Appendix A. Communication Spaces</h2></div></div></div><p>TODO</p></div></div></body></html>
+<!--
+     FILE ARCHIVED ON 11:23:20 Aug 03, 2014 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 23:07:05 Aug 23, 2019.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->
+<!--
+playback timings (ms):
+  LoadShardBlock: 90.297 (3)
+  load_resource: 218.698
+  PetaboxLoader3.datanode: 154.689 (5)
+  CDXLines.iter: 12.201 (3)
+  RedisCDXSource: 0.486
+  PetaboxLoader3.resolve: 110.367 (3)
+  esindex: 0.007
+  exclusion.robots.policy: 0.152
+  captures_list: 105.885
+  exclusion.robots: 0.162
+-->
