@@ -1,6 +1,8 @@
 CC     := ../toolchain/bin/i686-elf-gcc
 AS     := ../toolchain/bin/i686-elf-as
 CFLAGS := -ffreestanding -Wall -Wextra
+DEPS   := kernel/kmem.h kernel/kstd.h
+KOBJ   := kernel/boot.o kernel/kmain.o kernel/kterm.o kernel/kmem.o
 
 all: os.bin
 
@@ -10,8 +12,10 @@ boot.o:
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-os.bin: boot.o kernel/kmain.o kernel/kterm.o
-	$(CC) -T linker.ld -o os.bin -ffreestanding -O2 -nostdlib kernel/boot.o kernel/kmain.o kernel/kterm.o -lgcc
+kernel: $(KOBJ)
+
+os.bin: kernel
+	$(CC) -T linker.ld -o os.bin -ffreestanding -O2 -nostdlib $(KOBJ) -lgcc
 
 clean:
 	rm kernel/*.o
