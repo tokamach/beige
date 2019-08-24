@@ -9,7 +9,9 @@ static const size_t VGA_WIDTH  = 80;
 
 static const size_t VGA_BUF_ADDRESS = 0xB8000;
 
-//bg color, white on black TODO: add colour support
+static const uint8_t VGA_FG = 7;
+static const uint8_t VGA_BG = 6;
+
 //static const uint8_t color = 15 | 0 << 4;
 
 size_t term_col;
@@ -37,14 +39,20 @@ void k_term_init()
     {
 	for(size_t j = 0; j < VGA_WIDTH; j++)
 	{
-	    vga_buf[(i * VGA_WIDTH) + j] = vga_entry(' ', vga_color(0, 0));
+	    vga_buf[(i * VGA_WIDTH) + j] = vga_entry(' ', vga_color(VGA_FG, VGA_BG));
 	}
     }
 }
 
+void k_term_disable_cursor()
+{
+    outb(0x3D4, 0x0A);
+    outb(0x3D5, 0x20);
+}
+
 void k_term_put_char(const char c, size_t x, size_t y)
 {
-    vga_buf[(y * VGA_WIDTH) + x] = vga_entry(c, vga_color(15, 0));
+    vga_buf[(y * VGA_WIDTH) + x] = vga_entry(c, vga_color(VGA_FG, VGA_BG));
 }
 
 void k_term_print_char(const char c)

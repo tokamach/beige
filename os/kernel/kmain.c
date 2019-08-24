@@ -10,6 +10,7 @@
 void k_main(multiboot_info_t* mbd)
 {    
     k_term_init();
+    k_term_disable_cursor();
     k_print("kernel init\n");
 
     if(!(mbd->flags & MULTIBOOT_INFO_MEMORY))
