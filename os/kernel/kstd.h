@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdint.h>
 
 size_t strlen(const char *s)
 {
@@ -40,3 +41,42 @@ int itoa(int num, int base, char* str)
     
     return 0;
 }
+
+uint8_t inb(uint16_t port)
+{
+    uint8_t inval; 
+    asm(
+	"inb %1, %0;"
+	: "=a" (inval)
+	: "Nd" (port)
+	);
+    return inval;
+}
+
+uint16_t inw(uint16_t port)
+{
+    uint16_t inval;
+    asm(
+	"inw %1, %0;"
+	: "=a" (inval)
+	: "Nd" (port)
+	);
+    return inval;
+}
+
+void outb(uint16_t port, uint8_t val)
+{
+    asm(
+	"outb %b0, %w1;"
+	:: "a"(val), "Nd"(port)
+	);
+}
+
+void outw(uint16_t port, uint16_t val)
+{
+    asm(
+	"outw %w0, %w1;"
+	:: "a"(val), "Nd"(port)
+	);
+}
+
