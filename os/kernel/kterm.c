@@ -59,6 +59,21 @@ void k_term_disable_cursor()
     outb(0x3D5, 0x20);
 }
 
+void k_term_move_cursor(uint8_t x, uint8_t y)
+{
+    uint16_t pos = y * VGA_WIDTH + x;
+
+    outb(0x3D4, 0x0F);
+    outb(0x3D5, (uint8_t) (pos & 0xFF));
+    outb(0x3D4, 0x0E);
+    outb(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
+}
+
+void k_term_update_cursor()
+{
+    k_term_move_cursor(term_col, term_row);
+}
+
 void k_term_put_char(const char c, size_t x, size_t y)
 {
     vga_buf[(y * VGA_WIDTH) + x] = vga_entry(c, vga_color(VGA_FG, VGA_BG));
@@ -98,6 +113,8 @@ void k_print(const char * s)
     {
 	k_term_print_char(s[i]);
     }
+
+    k_term_update_cursor();
 }
 
 void k_print_num(int i)
