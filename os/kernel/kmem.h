@@ -10,12 +10,29 @@ typedef struct MMapEntry {
     uint32_t LengthL;
     uint32_t LengthH;
 
-#define MEMORY_AVAILABLE 1
-#define MEMORY_RESERVED  2
+    #define MEMORY_AVAILABLE 1
+    #define MEMORY_RESERVED  2
     uint32_t Type;
 }__attribute__((packed)) MMapEntry_t;
 
+typedef struct BuddyTree {
+    uint8_t marked;      //0 = free, 1 = allocated, 2 = split
+    size_t size;
+    struct BuddyTree* A; //pointer to child
+    struct BuddyTree* B; //pointer to other child
+    
+} BuddyTree_t;
+
+typedef struct HeapHeader {
+    uint8_t marked;
+    size_t size;
+} HeapHeader_t;
+
 void k_mem_init();
+
+//HeapHeader_t* k_mem_add_header(size_t addr, size_t size);
+//HeapHeader_t* k_mem_next_header(HeapHeader_t* header);
+//HeapHeader_t* k_mem_split_header(HeapHeader_t* header);
 
 void* kmalloc(size_t size);
 void  kfree(void* block);

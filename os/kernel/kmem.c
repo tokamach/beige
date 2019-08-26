@@ -4,7 +4,10 @@
 #include "kmem.h"
 
 #include "kterm.h"
+#include "kstd.h"
 #include "multiboot.h"
+
+static const MAX_HEAP_SIZE = (2^10) * 64; //1 MB * 64 = 64MB
 
 multiboot_info_t* _mbd;
 
@@ -20,6 +23,7 @@ size_t mem_region_end;
 
 //malloc data
 size_t malloc_offset = 0;
+HeapHeader_t* first_header;
 
 void k_mem_init(multiboot_info_t* mbd)
 {
@@ -61,29 +65,130 @@ void k_mem_init(multiboot_info_t* mbd)
 	    mem_region_size  = len;
 	}
     }
+
+    //set working memory region
+    working_mem_region = k_mem_map_entry(biggest_index);
+    mem_region_end = mem_region_start + mem_region_size;
     
+    //debug print found region
     k_print("Found largest memory entry ");
     k_print_num(biggest_index);
     k_print(" with size ");
     k_print_hex(biggest_size);
     k_print("\n");
 
-    working_mem_region = k_mem_map_entry(biggest_index);
-    mem_region_end = mem_region_start + mem_region_size;
+    //initalise heap buddy tree
+    //TODO: move to kmalloc_init function
+    first_header = (HeapHeader_t*) mem_region_start;
+    first_header->size = mem_region_size - sizeof(HeapHeader_t*);
+    first_header->marked = 0;
+
+    k_print("[DEBUG] created inital block at ");
+    k_print_hex((int)first_header);
+    k_print(" with size ");
+    k_print_hex(first_header->size);
+    k_print("\n");
 
     k_print("Memory initialized\n");
 }
 
-void* kmalloc(size_t size)
+HeapHeader_t* add_header(size_t addr, size_t size)
 {
-    void* found_block = (void*) mem_region_start + malloc_offset;
-    malloc_offset += size;
-    return found_block;
+    HeapHeader_t* head = (HeapHeader_t*)addr;
+    head->marked = 0;
+    head->size = size;
+    return head;
 }
 
-void kfree(void* block)
+HeapHeader_t* next_block(HeapHeader_t* header)
 {
-    //f lol
+    //move to next header
+    //no going back fuck lol
+    //just go to the next header its that easy
+    return header + sizeof(HeapHeader_t) + header->size;
+}
+
+HeapHeader_t* split_block(HeapHeader_t* header)
+{
+    //split header, return new first header
+    //next header can be found with k_mem_next_header()
+    //Split like so
+    //|--------+----------------------|
+    //| Header | Data                 |
+    //|--------+----------------------|
+    // into
+    //|--------+------|--------+------|
+    //| Header | Data | Header | Data |
+    //|--------+------|--------+------|
+
+    size_t old_size = header->size;
+    size_t total_size = sizeof(HeapHeader_t) + old_size;
+    
+    //current address + half is the point for the new header to be inserted
+    size_t new_addr = (size_t) header + (total_size / 2);
+    size_t new_size = (total_size / 2) - sizeof(HeapHeader_t);
+    
+    HeapHeader_t* new_header = (HeapHeader_t*) new_addr;
+    header->marked = 0;
+    header->size = new_size;
+    new_header->marked = 0;
+    new_header->size = new_size;
+
+    return header;
+}
+
+void* kmalloc(size_t size)
+{
+    //bitmap (build in init)
+    //each bit represets 4byte? 1byte?
+    //0 is free, 1 is allocated
+    //use first fit
+
+    if(first_header->marked)
+    {
+	//memory all used FUCK
+	k_print("ERROR: first header marked\n");
+	
+	//return null pointer and pray
+	return 0;
+    }
+
+    HeapHeader_t* cur_header = first_header;
+    
+    //keep seeking until we find a header that can fit the object and is unmarked
+    int DEBUG_SKIP_COUNT = 0;
+    while(!(size <= cur_header->size) && cur_header->marked != 0)
+    {
+	cur_header = next_block(cur_header);
+	DEBUG_SKIP_COUNT++;
+    }
+
+    int DEBUG_SPLIT_COUNT = 0;
+    while((cur_header->size / 2) > size)
+    {
+	split_block(cur_header);
+	DEBUG_SPLIT_COUNT++;
+    }
+
+    k_print("[DEBUG] Found block at ");
+    k_print_hex((int)cur_header);
+    k_print(" by skipping ");
+    k_print_num(DEBUG_SKIP_COUNT);
+    k_print(" times and splitting ");
+    k_print_num(DEBUG_SPLIT_COUNT);
+    k_print(" times.\n");
+
+    //we've found our ideal block
+    cur_header->marked = 1;
+    
+    return cur_header + sizeof(HeapHeader_t*);
+}
+
+void kfree(void* addr)
+{
+    //TODO: merge blocks
+    HeapHeader_t* block = addr - sizeof(HeapHeader_t);
+    block->marked = 0;
 }
 
 MMapEntry_t* k_mem_map_entry(uint16_t entry)
