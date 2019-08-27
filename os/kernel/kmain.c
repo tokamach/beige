@@ -5,40 +5,30 @@
 
 #include "kterm.h"
 #include "kmem.h"
+#include "kstd.h"
 
 // kernel entry point
-void k_main(multiboot_info_t* mbd)
-{    
+void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
+{
     k_term_init();
-    k_term_disable_cursor();
-    k_print("kernel init\n");
+    k_print("kernel init\n");    
+    k_mem_init(mbd);
 
-    if(!(mbd->flags & MULTIBOOT_INFO_MEMORY))
-    {
-	//error
-	k_print("ERROR: multiboot flag 0 not set\n");
-	return;
-    }
-    
+    //TODO: move this to memory
     k_print("lower memory: ");
     k_print_hex(mbd->mem_lower);
     k_print("\nupper memory: ");
     k_print_hex(mbd->mem_upper);
+    k_print_mem_map();
 
-    if(mbd->flags & MULTIBOOT_INFO_MEM_MAP)
-    {
-	size_t mmap_addr = mbd->mmap_addr;
-	size_t mmap_size = mbd->mmap_length;
-	
-	k_print("\nmem map location: ");
-	k_print_hex(mmap_addr);
-	k_print("\nmem map length: ");
-	k_print_hex(mmap_size);
+    int* i = kmalloc(sizeof(i));
+    *i = 10;
 
-	k_print("\n\nmem map:\n");
-	k_query_mem_map(mmap_addr, mmap_size);
-    }
-    
+    k_print_num(*i);
+
+    //kfree(i);
+
+    //enable memory, paging
     //start scheduler
-    //start shell
+    //start userspace, userspace processes (shell)
 }

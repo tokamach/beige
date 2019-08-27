@@ -1,8 +1,8 @@
 CC     := ../toolchain/bin/i686-elf-gcc
 AS     := ../toolchain/bin/i686-elf-as
 CFLAGS := -ffreestanding -Wall -Wextra
-DEPS   := kernel/kmem.h kernel/kstd.h
-KOBJ   := kernel/boot.o kernel/kmain.o kernel/kterm.o kernel/kmem.o
+#DEPS   := kernel/kmem.h kernel/kstd.h
+KOBJ   := kernel/boot.o kernel/kmain.o kernel/kstd.o kernel/kterm.o kernel/kmem.o
 TESTS  := tests/atoi.o
 
 all: os.bin

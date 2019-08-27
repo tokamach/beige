@@ -117,6 +117,12 @@ void k_print(const char * s)
     k_term_update_cursor();
 }
 
+void k_println(const char * s)
+{
+    k_print(s);
+    k_print("\n");
+}
+
 void k_print_num(int i)
 {
     char buf[21];

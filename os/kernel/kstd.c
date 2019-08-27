@@ -42,7 +42,7 @@ int itoa(int num, int base, char* str)
     return 0;
 }
 
-inline size_t align(size_t n)
+size_t align(size_t n)
 {
     return (n + sizeof(size_t) - 1) & ~(sizeof(size_t) - 1);
 }

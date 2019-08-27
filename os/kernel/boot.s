@@ -30,6 +30,7 @@ _start:
 
 	/* setup multiboot info structure */
 	pushl %ebx
+	pushl %eax
 	/* TODO: initalize GDT, floating point, etc */
 
 	/* enter kernel */

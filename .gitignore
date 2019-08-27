@@ -8,5 +8,5 @@ toolchain/share
 .DS_store
 *.o
 *.bin
-
 ref/*
+os/isodir/*

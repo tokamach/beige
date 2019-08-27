@@ -7,7 +7,7 @@
 #include "kstd.h"
 #include "multiboot.h"
 
-static const MAX_HEAP_SIZE = (2^10) * 64; //1 MB * 64 = 64MB
+static const size_t MAX_HEAP_SIZE = (2^10) * 64; //1 MB * 64 = 64MB
 
 multiboot_info_t* _mbd;
 
@@ -50,13 +50,15 @@ void k_mem_init(multiboot_info_t* mbd)
 	MMapEntry_t* entry = k_mem_map_entry(i);
 	uint64_t addr = entry->AddrH;
 	addr <<= 32;
-	addr += entry->AddrL;
+	addr = addr | entry->AddrL;
 
 	uint64_t len = entry->LengthH;
 	len <<= 32;
-	len += entry->LengthL;
+	len = len | entry->LengthL;
 
-	if(len > biggest_size)
+	//if(len > biggest_size)
+	//temporarily use first mem
+	if(i == 0)
 	{
 	    biggest_size  = len;
 	    biggest_index = i;
@@ -71,7 +73,7 @@ void k_mem_init(multiboot_info_t* mbd)
     mem_region_end = mem_region_start + mem_region_size;
     
     //debug print found region
-    k_print("Found largest memory entry ");
+    k_print("[DEBUG] Found largest memory entry ");
     k_print_num(biggest_index);
     k_print(" with size ");
     k_print_hex(biggest_size);
@@ -81,6 +83,8 @@ void k_mem_init(multiboot_info_t* mbd)
     //TODO: move to kmalloc_init function
     first_header = (HeapHeader_t*) mem_region_start;
     first_header->size = mem_region_size - sizeof(HeapHeader_t*);
+    //first_header->size = MAX_HEAP_SIZE;//(2^10) * (2^4); //16k
+
     first_header->marked = 0;
 
     k_print("[DEBUG] created inital block at ");
@@ -128,12 +132,10 @@ HeapHeader_t* split_block(HeapHeader_t* header)
     size_t new_addr = (size_t) header + (total_size / 2);
     size_t new_size = (total_size / 2) - sizeof(HeapHeader_t);
     
-    HeapHeader_t* new_header = (HeapHeader_t*) new_addr;
+    HeapHeader_t* new_header = add_header(new_addr, new_size);
     header->marked = 0;
     header->size = new_size;
-    new_header->marked = 0;
-    new_header->size = new_size;
-
+    
     return header;
 }
 
@@ -148,7 +150,9 @@ void* kmalloc(size_t size)
     {
 	//memory all used FUCK
 	k_print("ERROR: first header marked\n");
-	
+
+	while(1){/*hang*/}
+	    
 	//return null pointer and pray
 	return 0;
     }
@@ -170,13 +174,14 @@ void* kmalloc(size_t size)
 	DEBUG_SPLIT_COUNT++;
     }
 
-    k_print("[DEBUG] Found block at ");
-    k_print_hex((int)cur_header);
+    k_print("[DEBUG] Found block ");
+    k_print_hex((size_t) cur_header);
+    k_print_num(size);
     k_print(" by skipping ");
     k_print_num(DEBUG_SKIP_COUNT);
     k_print(" times and splitting ");
     k_print_num(DEBUG_SPLIT_COUNT);
-    k_print(" times.\n");
+    k_println(" times.");
 
     //we've found our ideal block
     cur_header->marked = 1;
@@ -225,11 +230,11 @@ void k_print_mem_map()
 
 	    uint64_t addr = entry->AddrH;
 	    addr <<= 32;
-	    addr += entry->AddrL;
+	    addr = addr | entry->AddrL;
 
 	    uint64_t len = entry->LengthH;
 	    len <<= 32;
-	    len += entry->LengthL;
+	    len = len | entry->LengthL;
 	
 	    k_print("|");
 	    k_print_hex(entry->Size);

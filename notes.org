@@ -25,11 +25,13 @@
 *** minimal side effects OS
 *** transactional OS
 
-* OS Concepts
 ** Links
 - https://wiki.osdev.org/Expanded_Main_Page
 - https://github.com/littlekernel/lk
 - https://github.com/SerenityOS/serenity
+
+- fonts: https://github.com/Tecate/bitmap-fonts/tree/master/screenshots
+
 
 * OS Planning
 ** TODO Scheduler
@@ -37,6 +39,15 @@
 *** Round robin
 ** TODO Memory Management
 - SDM vol3 3
+*** malloc
+- first fit/worst fit/best fit
+- fill largest region
+- fill all regions
+*** free
+- find block specified, mark as free
+*** Memory Map
+- kernel space: fixed
+- user space: grows upwards
 *** Segmentation
 - SDM vol3 3.2
 - add *segment descriptor* to GDT
@@ -44,9 +55,6 @@
 - track pages with AVL tree
 - page table
 - swap pages/page faults
-*** malloc
-- first fit/worst fit/best fit
-*** free
 ** TODO Filesystem
 *** ext2
 ** TODO IO
@@ -69,12 +77,19 @@
 **** GUI library
 ** TODO stdlib
 *** klib
-- itoa
+- better print/debug
 - sprintf
-*** outb/inb
 ** TODO Tests
 - add test feature to Makefile
 - full coverage unit tests
+
 * TODO Proposal
   SCHEDULED: <2019-10-21 Mon>
+  
 
+
+* Tasks
+** kmalloc
+- I think memory map get function is wrong
+- 0x10000 might be kernel space???
+- 0x10000 is where kernel is loaded, find a data segment or something damn
