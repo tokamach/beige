@@ -18,6 +18,9 @@ kernel: $(KOBJ)
 os.bin: kernel
 	$(CC) -T linker.ld -o os.bin -ffreestanding -O2 -nostdlib $(KOBJ) -lgcc
 
+debug: CFLAGS += -DDEBUG
+debug: os.bin
+
 test: kernel $(TESTS)
 	./$(TESTS)
 
