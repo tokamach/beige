@@ -21,13 +21,6 @@ void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
     k_print_hex(mbd->mem_upper);
     k_print_mem_map();
 
-    int* i = kmalloc(sizeof(i));
-    *i = 10;
-
-    k_print_num(*i);
-
-    //kfree(i);
-
     //enable memory, paging
     //start scheduler
     //start userspace, userspace processes (shell)

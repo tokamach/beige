@@ -32,7 +32,7 @@ void k_mem_init(multiboot_info_t* mbd)
     if(!(mbd->flags & MULTIBOOT_INFO_MEMORY))
     {
 	//error
-	k_print("ERROR: multiboot flag 0 not set\n");
+	k_print("[ERROR][k_mem_init] multiboot flag 0 not set\n");
 	return;
     }
     
@@ -73,7 +73,7 @@ void k_mem_init(multiboot_info_t* mbd)
     mem_region_end = mem_region_start + mem_region_size;
     
     //debug print found region
-    k_print("[DEBUG] Found largest memory entry ");
+    k_print("[DEBUG][k_mem_init] Found largest memory entry ");
     k_print_num(biggest_index);
     k_print(" with size ");
     k_print_hex(biggest_size);
@@ -87,7 +87,7 @@ void k_mem_init(multiboot_info_t* mbd)
 
     first_header->marked = 0;
 
-    k_print("[DEBUG] created inital block at ");
+    k_print("[DEBUG][k_mem_init] created inital block at ");
     k_print_hex((int)first_header);
     k_print(" with size ");
     k_print_hex(first_header->size);
@@ -149,12 +149,12 @@ void* kmalloc(size_t size)
     if(first_header->marked)
     {
 	//memory all used FUCK
-	k_print("ERROR: first header marked\n");
+	k_println("[ERROR][kmalloc] first header marked");
 
-	while(1){/*hang*/}
+	//while(1){/*hang*/}
 	    
 	//return null pointer and pray
-	return 0;
+	//return 0;
     }
 
     HeapHeader_t* cur_header = first_header;
@@ -170,12 +170,13 @@ void* kmalloc(size_t size)
     int DEBUG_SPLIT_COUNT = 0;
     while((cur_header->size / 2) > size)
     {
-	split_block(cur_header);
+	cur_header = split_block(cur_header);
 	DEBUG_SPLIT_COUNT++;
     }
 
-    k_print("[DEBUG] Found block ");
+    k_print("[DEBUG][kmalloc] Found block ");
     k_print_hex((size_t) cur_header);
+    k_print(":");
     k_print_num(size);
     k_print(" by skipping ");
     k_print_num(DEBUG_SKIP_COUNT);
@@ -185,14 +186,26 @@ void* kmalloc(size_t size)
 
     //we've found our ideal block
     cur_header->marked = 1;
-    
-    return cur_header + sizeof(HeapHeader_t*);
+
+    void* result = (char*)cur_header + (size_t)sizeof(HeapHeader_t);
+    return result;
 }
 
 void kfree(void* addr)
 {
     //TODO: merge blocks
     HeapHeader_t* block = addr - sizeof(HeapHeader_t);
+
+
+    //DEBUG
+    k_print("[DEBUG][kfree] Freeing ");
+    k_print_hex((size_t)block);
+    k_print(", marked: ");
+    k_print_num(block->marked);
+    k_print(", size: ");
+    k_print_hex(block->size);
+    k_print("\n");
+	
     block->marked = 0;
 }
 
@@ -265,54 +278,25 @@ void k_print_mem_map()
     }
 }
 
-//DEPRECATED, use for debug
-void k_print_mem_map_at(size_t addr, size_t length)
+void k_mem_print_block(HeapHeader_t* header)
 {
-    //TODO: check using multiboot memmap (grub)
+    k_print_hex(header);
+    k_print(":");
+    k_print_num(header->marked);
+    k_print(":");
+    k_print_num(header->size);
+    k_print("; ");
+}
 
-    int entries = length / sizeof(MMapEntry_t);
-
-    k_print("|Size|Addr|Len|Type|\n");
-    for(int i = 0; i < entries; i++)
+void k_mem_print_blocks()
+{
+    HeapHeader_t* h = first_header;
+    for(int i = 0; i < 2; i++)
     {
-	MMapEntry_t* entry = k_mem_map_entry_at(addr, i);
-
-	uint64_t addr = entry->AddrH;
-	addr <<= 32;
-	addr += entry->AddrL;
-
-	uint64_t len = entry->LengthH;
-	len <<= 32;
-	len += entry->LengthL;
-	
-	k_print("|");
-	k_print_hex(entry->Size);
-	k_print("|");
-	k_print_hex(addr);
-	k_print("|");
-	k_print_hex(len);
-	k_print("|");
-
-	switch(entry->Type)
-	{
-	case MEMORY_AVAILABLE:
-	    k_print("Available");
-	    break;
-
-	case MEMORY_RESERVED:
-	    k_print("Reserved");
-	    break;
-
-	default:
-	    k_print("UNIMPLEMENTED MEM TYPE");
-	    break;
-	}
-	
-	k_print("|");	
-	k_print("\n");
+	k_mem_print_block(h);
+	h = next_block(h);
     }
-        
-    return 0;
+    k_print("\n");
 }
 
 void k_segment_init()

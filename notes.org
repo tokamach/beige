@@ -90,6 +90,4 @@
 
 * Tasks
 ** kmalloc
-- I think memory map get function is wrong
-- 0x10000 might be kernel space???
-- 0x10000 is where kernel is loaded, find a data segment or something damn
+- problem in adding cur_header to sizeof(HeapHeader_t) on line 

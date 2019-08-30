@@ -41,4 +41,5 @@ MMapEntry_t* k_mem_map_entry(uint16_t entry);
 MMapEntry_t* k_mem_map_entry_at(size_t addr, uint16_t entry);
 
 void k_print_mem_map();
-void k_print_mem_map_at(size_t addr, size_t length);
+void k_mem_print_blocks();
+
