@@ -25,12 +25,15 @@
 *** minimal side effects OS
 *** transactional OS
 
-** Links
+
+* Links
 - https://wiki.osdev.org/Expanded_Main_Page
 - https://github.com/littlekernel/lk
 - https://github.com/SerenityOS/serenity
 
 - fonts: https://github.com/Tecate/bitmap-fonts/tree/master/screenshots
+
+- booting:  https://www.gnu.org/software/grub/manual/multiboot/multiboot.html
 
 
 * OS Planning
@@ -89,5 +92,8 @@
 
 
 * Tasks
-** kmalloc
-- problem in adding cur_header to sizeof(HeapHeader_t) on line 
+** segmentation
+- basic flat model
+** paging
+- page allocator
+- pages

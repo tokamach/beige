@@ -5,6 +5,7 @@
 
 #include "kterm.h"
 #include "kmem.h"
+#include "kmalloc.h"
 #include "kstd.h"
 
 // kernel entry point
@@ -13,13 +14,9 @@ void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
     k_term_init();
     k_print("kernel init\n");    
     k_mem_init(mbd);
+    k_malloc_init(mbd);
 
     //TODO: move this to memory
-    k_print("lower memory: ");
-    k_print_hex(mbd->mem_lower);
-    k_print("\nupper memory: ");
-    k_print_hex(mbd->mem_upper);
-    k_print_mem_map();
 
     //enable memory, paging
     //start scheduler

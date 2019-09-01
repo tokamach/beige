@@ -23,23 +23,14 @@ typedef struct BuddyTree {
     
 } BuddyTree_t;
 
-typedef struct HeapHeader {
-    uint8_t marked;
-    size_t size;
-} HeapHeader_t;
+MMapEntry_t* working_mem_region;
+size_t mem_region_start;
+size_t mem_region_size;
+size_t mem_region_end;
 
 void k_mem_init();
-
-//HeapHeader_t* k_mem_add_header(size_t addr, size_t size);
-//HeapHeader_t* k_mem_next_header(HeapHeader_t* header);
-//HeapHeader_t* k_mem_split_header(HeapHeader_t* header);
-
-void* kmalloc(size_t size);
-void  kfree(void* block);
 
 MMapEntry_t* k_mem_map_entry(uint16_t entry);
 MMapEntry_t* k_mem_map_entry_at(size_t addr, uint16_t entry);
 
 void k_print_mem_map();
-void k_mem_print_blocks();
-
