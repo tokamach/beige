@@ -45,6 +45,25 @@
 ** TODO Scheduler
 - calculate avg wait and turnaround time
 *** Round robin
+** Process Model
+*** Header
+- id, name
+- compiled?
+- should be on the fly compiled?
+*** Env
+- hashmap
+- global vars and consts
+**** code metadata
+- special entry
+- list of functions, their relative addrs, and init func
+*** Stack
+- lexically scoped vars
+*** Code (List)
+- Lisp List functions
+*** Code (compiled)
+- Lisp compiled
+*** Thread Model
+- read only access to env, return 
 ** TODO Memory Management
 - SDM vol3 3
 *** TODO malloc
@@ -111,8 +130,17 @@
 *** eval
 - args: in_ast, env
 - return: out_ast, env
+*** eval_async
+- env is read only
+- args: in_ast
+- return: out_ast
 *** types
 - atom, list
+** Compiler
+- equal results and interchangeable with VM
+** Memory Layout
+- word (32bit) pair of car and cdr for cons cell
+- odd addr is car, even is cdr
 
 * TODO Proposal
   SCHEDULED: <2019-10-21 Mon>
