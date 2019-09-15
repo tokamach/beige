@@ -37,15 +37,20 @@
 
 
 * OS Planning
+** Principles
+- Lisp as primary language
+- Immutable data structures first
+- Memory is large, don't worry about it
+- Lisp process consists of 'env' and code sections
 ** TODO Scheduler
 - calculate avg wait and turnaround time
 *** Round robin
 ** TODO Memory Management
 - SDM vol3 3
-*** malloc
-- first fit/worst fit/best fit
-- fill largest region
-- fill all regions
+*** TODO malloc
+- needs tidying/more sanity checks
+- needs bitmap
+- needs block merging
 *** free
 - find block specified, mark as free
 *** Memory Map
@@ -54,6 +59,11 @@
 *** Segmentation
 - SDM vol3 3.2
 - add *segment descriptor* to GDT
+- 4 segments:
+  kernel code
+  kernel data
+  userspace code
+  userspace data
 *** Paging
 - track pages with AVL tree
 - page table
@@ -86,14 +96,74 @@
 - add test feature to Makefile
 - full coverage unit tests
 
+** TODO Lisp
+*** Interpreter
+*** C interaction
+*** fundamenal functions
+- [[https://stackoverflow.com/questions/3482389/how-many-primitives-does-it-take-to-build-a-lisp-machine-ten-seven-or-five/][stackoverflow question]]
+
+* Lisp Planning
+- if they could do it on a PDP, you can do it too
+** Parser
+- no regex
+- stateful, simple, fast
+** VM
+*** eval
+- args: in_ast, env
+- return: out_ast, env
+*** types
+- atom, list
+
 * TODO Proposal
   SCHEDULED: <2019-10-21 Mon>
   
 
 
 * Tasks
+** malloc
+- use linked list to store mem map
 ** segmentation
 - basic flat model
 ** paging
 - page allocator
+- linked list or AVL Tree to store
 - pages
+** lisp
+** interrupts
+** multitasking
+** userspace
+** gui
+
+#+BEGIN_SRC dot :cmd fdp :file arch.png
+graph os_architecture {
+    rank = "max";
+
+    subgraph cluster_kernel {
+        label = "Kernel";
+    }
+    
+    subgraph cluster_lisp_vm {
+        label = "Lisp VM"
+	global_state;
+	global_consts;
+    }
+
+    subgraph cluster_lisp_proc_a {
+        label = "Lisp Process 1";
+        code_a [label="Code"];
+	env_a [label="Env"];
+    }
+
+    subgraph cluster_lisp_proc_b {
+        label = "Lisp Process 2";
+        code_b [label="Code"];
+	env_b [label="Env"];
+    }
+
+    cluster_kernel -- cluster_lisp_vm;
+    cluster_kernel -- cluster_lisp_proc_a;
+    cluster_kernel -- cluster_lisp_proc_b;
+}
+#+END_SRC
+#+RESULTS:
+[[file:arch.png]]

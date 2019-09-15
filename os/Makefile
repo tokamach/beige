@@ -1,11 +1,6 @@
 CC     := ../toolchain/bin/i686-elf-gcc
 AS     := ../toolchain/bin/i686-elf-as
 CFLAGS := -ffreestanding -Wall -Wextra
-#DEPS   := kernel/kmem.h kernel/kstd.h
-#KOBJ   := kernel/boot.o kernel/kmain.o kernel/kstd.o kernel/kterm.o kernel/kmem.o kernel/kmalloc.o
-#SRCS   := $(wildcard $(SRCDIR)/*.c)
-#OBJS   := $(patsubst $(SRCDIR)/%.c, $(SRCDIR)/%.o, $(SRCS))
-#TESTS  := tests/atoi.o
 
 all: os.bin
 
@@ -29,4 +24,5 @@ test: kernel $(TESTS)
 	./$(TESTS)
 
 clean:
-	rm kernel/*.o
+	rm -f kernel/*.o
+	rm -f lisp/*.o
