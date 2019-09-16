@@ -33,5 +33,5 @@ typedef struct LVar {
 	uint16_t     u16;
 	uint32_t     u32;
 	uint32_t     num;
-    } var;
+    } data;
 } LVar_t;
