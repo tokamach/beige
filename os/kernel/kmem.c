@@ -13,9 +13,9 @@ size_t mem_map_addr;
 size_t mem_map_size;
 size_t mem_map_entries;
 
-static const uint16_t MAX_PAGES = 1024 * 1024;
+/*static const uint16_t MAX_PAGES = 1024 * 1024;
 static size_t page_stack[MAX_PAGES];
-static size_t page_stack_top;
+static size_t page_stack_top;*/
 
 //region to fill
 void k_mem_init(multiboot_info_t* mbd)
@@ -155,7 +155,7 @@ void k_segment_init()
 
     //setup 4 segs + null segment
 }
-
+/*
 void populate_pages()
 {
     
@@ -186,3 +186,4 @@ void k_paging_init()
 
     
 }
+*/

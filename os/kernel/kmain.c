@@ -8,6 +8,9 @@
 #include "kmalloc.h"
 #include "kstd.h"
 
+#include "../lisp/parser.h"
+#include "../lisp/types.h"
+
 // kernel entry point
 void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
 {
@@ -16,7 +19,10 @@ void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
     k_mem_init(mbd);
     k_malloc_init(mbd);
 
-    //TODO: move this to memory
+    SExp_t* tree = lisp_read("(defun f (x y) (+ x y))");
+    print_sexp(tree);
+
+    //free_sexp(tree);
 
     //enable memory, paging
     //start scheduler

@@ -6,10 +6,23 @@
 #include "multiboot.h"
 #include "kmem.h"
 #include "kterm.h"
+#include "kstd.h"
 
 //malloc data
 size_t malloc_offset = 0;
+uint16_t total_blocks = 0;
 HeapHeader_t* first_header;
+
+static const size_t MAX_HEAP_SIZE = (2^10) * (2^4); //16k
+
+HeapHeader_t* add_header(size_t addr, size_t size)
+{
+    HeapHeader_t* head = (HeapHeader_t*)addr;
+    head->marked = 0;
+    head->size = size;
+    total_blocks++;
+    return head;
+}
 
 void k_malloc_init(multiboot_info_t* mbd)
 {
@@ -23,10 +36,10 @@ void k_malloc_init(multiboot_info_t* mbd)
     }
     
     //initalise heap buddy tree
-    //TODO: move to kmalloc_init function
-    first_header = (HeapHeader_t*) mem_region_start;
-    first_header->size = mem_region_size - sizeof(HeapHeader_t*);
-    //first_header->size = MAX_HEAP_SIZE;//(2^10) * (2^4); //16k
+    first_header = add_header(mem_region_start, MAX_HEAP_SIZE);
+    //first_header = (HeapHeader_t*) mem_region_start;
+    //first_header->size = mem_region_size - sizeof(HeapHeader_t*);
+    //first_header->size = MAX_HEAP_SIZE;
 
     first_header->marked = 0;
 
@@ -35,14 +48,6 @@ void k_malloc_init(multiboot_info_t* mbd)
     k_print(" with size ");
     k_print_hex(first_header->size);
     k_print("\n");
-}
-
-HeapHeader_t* add_header(size_t addr, size_t size)
-{
-    HeapHeader_t* head = (HeapHeader_t*)addr;
-    head->marked = 0;
-    head->size = size;
-    return head;
 }
 
 HeapHeader_t* next_block(HeapHeader_t* header)
@@ -76,18 +81,23 @@ HeapHeader_t* split_block(HeapHeader_t* header)
     HeapHeader_t* new_header = add_header(new_addr, new_size);
     header->marked = 0;
     header->size = new_size;
+
+    total_blocks++;
     
     return header;
 }
 
+void k_mem_print_blocks();
 void* kmalloc(size_t size)
 {
+    size = align(size);
+    
     if(first_header->marked)
     {
 	//memory all used FUCK
-	k_println("[ERROR][kmalloc] first header marked");
+	//k_println("[ERROR][kmalloc] first header marked");
 
-	while(1){/*hang*/}
+	//while(1){/*hang*/}
 	    
 	//return null pointer and pray
 	//return 0;
@@ -97,7 +107,7 @@ void* kmalloc(size_t size)
     
     //keep seeking until we find a header that can fit the object and is unmarked
     int DEBUG_SKIP_COUNT = 0;
-    while(!(size <= cur_header->size) && cur_header->marked != 0)
+    while(size > cur_header->size && cur_header->marked != 0)
     {
 	cur_header = next_block(cur_header);
 	DEBUG_SKIP_COUNT++;
@@ -109,7 +119,7 @@ void* kmalloc(size_t size)
 	cur_header = split_block(cur_header);
 	DEBUG_SPLIT_COUNT++;
     }
-
+    
     k_print("[DEBUG][kmalloc] Found block ");
     k_print_hex((size_t) cur_header);
     k_print(":");
@@ -118,7 +128,9 @@ void* kmalloc(size_t size)
     k_print_num(DEBUG_SKIP_COUNT);
     k_print(" times and splitting ");
     k_print_num(DEBUG_SPLIT_COUNT);
-    k_println(" times.");
+    k_println(" times");
+    
+    //k_mem_print_blocks();
 
     //we've found our ideal block
     cur_header->marked = 1;
@@ -158,7 +170,7 @@ void k_mem_print_block(HeapHeader_t* header)
 void k_mem_print_blocks()
 {
     HeapHeader_t* h = first_header;
-    for(int i = 0; i < 2; i++)
+    for(int i = 0; i < total_blocks; i++)
     {
 	k_mem_print_block(h);
 	h = next_block(h);
