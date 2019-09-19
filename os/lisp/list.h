@@ -12,6 +12,6 @@ typedef struct List {
 
 List_t* make_list();
 void free_list(List_t* list);
-ListNode_t* list_elem_at(List_t* list, int index);
+void* list_elem_at(List_t* list, int index);
 void list_append(List_t* list, void* elem);
 void list_pop(List_t* list);

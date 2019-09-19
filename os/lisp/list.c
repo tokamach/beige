@@ -26,7 +26,7 @@ void free_list(List_t* list)
     kfree(list);
 }
 
-ListNode_t* list_elem_at(List_t* list, int index)
+void* list_elem_at(List_t* list, int index)
 {
     ListNode_t* tmp = list->first;
     for(int i = 0; i < index; i++)
@@ -36,7 +36,7 @@ ListNode_t* list_elem_at(List_t* list, int index)
 	    while(1) { } //out of range, hang TODO: actual err
     }
 
-    return tmp;
+    return tmp->data;
 }
 
 void list_append(List_t* list, void* elem)

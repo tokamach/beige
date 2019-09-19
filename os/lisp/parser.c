@@ -149,13 +149,40 @@ SExp_t* lisp_read(char* str)
     return root;
 }
 
-void print_sexp(SExp_t* root)
+void pad_print(int padding, char* str)
 {
+    for(int i = 0; i < padding; i++)
+	k_print(" ");
+
+    k_print(str);
+}
+
+void print_sexp_iter(SExp_t* root, int depth)
+{
+    pad_print(depth, "\n");
+    
     for(int i = 0; i < root->list.size; i++)
     {
-	if(((SExpElem_t*)list_elem_at(&root->list, i)->data)->type == Atom)
+	//this is fucking disgusting
+	//TODO: CLEAN THIS SHIT UP
+	SExpElem_t* elem = ((SExpElem_t*)list_elem_at(&root->list, i));
+	if(elem->type == Atom)
 	{
-	    
+	    //its atom
+	    pad_print(depth, ((Atom_t*)elem->val)->val.str);
+	    k_print("\n");
+	}
+	else if(elem->type == List)
+	{
+	    //its list
+	    print_sexp_iter(elem->val, depth + 1);
 	}
     }
+
+    pad_print(depth, ")");
+}
+
+void print_sexp(SExp_t* root)
+{
+    print_sexp_iter(root, 0);
 }
