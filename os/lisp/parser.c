@@ -165,7 +165,7 @@ void print_sexp_iter(SExp_t* root, int depth)
     {
 	//this is fucking disgusting
 	//TODO: CLEAN THIS SHIT UP
-	SExpElem_t* elem = ((SExpElem_t*)list_elem_at(&root->list, i));
+	SExpElem_t* elem = ((SExpElem_t*)list_node_at(&root->list, i));
 	if(elem->type == Atom)
 	{
 	    //its atom
@@ -179,7 +179,7 @@ void print_sexp_iter(SExp_t* root, int depth)
 	}
     }
 
-    pad_print(depth, ")");
+    pad_print(depth, ")\n");
 }
 
 void print_sexp(SExp_t* root)

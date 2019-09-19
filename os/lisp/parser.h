@@ -13,3 +13,4 @@ typedef struct Reader {
 
 LCons_t* parse_sexp_to_cons(char* str);
 SExp_t* lisp_read(char* str);
+void print_sexp(SExp_t* sexp);

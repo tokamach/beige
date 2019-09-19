@@ -26,6 +26,20 @@ void free_list(List_t* list)
     kfree(list);
 }
 
+ListNode_t* list_node_at(List_t* list, int index)
+{
+    ListNode_t* tmp = list->first;
+    for(int i = 0; i < index; i++)
+    {
+	tmp = tmp->next;
+	if(!tmp)
+	    while(1) { } //out of range, hang TODO: actual err
+    }
+
+    return tmp;
+}
+
+
 void* list_elem_at(List_t* list, int index)
 {
     ListNode_t* tmp = list->first;
@@ -41,7 +55,7 @@ void* list_elem_at(List_t* list, int index)
 
 void list_append(List_t* list, void* elem)
 {
-    ListNode_t* end = list_elem_at(list, list->size);
+    ListNode_t* end = list_node_at(list, list->size);
     
     ListNode_t* new = kmalloc(sizeof(ListNode_t));
     new->data = elem;
@@ -52,8 +66,10 @@ void list_append(List_t* list, void* elem)
 
 void list_pop(List_t* list)
 {
-    ListNode_t* tmp = list_elem_at(list, list->size);
+    ListNode_t* tmp = list_node_at(list, list->size);
     kfree(tmp);
-    list_elem_at(list, list->size - 1)->next = NULL;
+
+    list_node_at(list, list->size - 1)->next = NULL;
+
     list->size--;
 }
