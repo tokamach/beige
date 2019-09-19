@@ -1,37 +1,45 @@
 #pragma once
 
 #include <stdint.h>
+#include "list.h"
+#include "string.h"
 
-typedef struct LVar LVar_t;
+#define MAX_ATOM_LEN 128
 
-typedef enum LType {
-    Nil,
-    Cons,
-    List,
+//Atom
+typedef struct Atom {
+    string_t val;
+    //TODO: add lisp data type
+} Atom_t;
+
+Atom_t* make_atom(char* str);
+void free_atom(Atom_t* atom);
+
+typedef enum e_elem_type {
     Atom,
-    T,
-    u8,
-    u16,
-    u32,
-    Num
-} LType_t;
+    List
+} ElemType;
 
-typedef struct LConsCell {
-    LVar_t* car;
-    LVar_t* cdr;
-} LConsCell_t;
+//Boxed void pointer with "type" annontation
+typedef struct SExpElem {
+    ElemType type;
+    void* val; //either List_t or Atom
+} SExpElem_t;
 
-typedef struct LVar {
-    LType_t type;
+SExpElem_t* make_sexp_elem(ElemType type, void* val);
+void free_sexp_elem(SExpElem_t* elem);
 
-    union {
-	//Nil
-	LConsCell_t cons;
-	//list:     uses cons internally
-	char*       atom;
-	uint8_t       u8;
-	uint16_t     u16;
-	uint32_t     u32;
-	uint32_t     num;
-    } data;
-} LVar_t;
+//Sexp
+typedef struct SExp {
+    List_t list;
+} SExp_t;
+
+SExp_t* make_sexp();
+void free_sexp(SExp_t* sexp);
+void sexp_add_elem(SExp_t* sexp, SExpElem_t* elem);
+
+//old:
+typedef struct LCons {
+    void* car;
+    void* cdr;
+} LCons_t;

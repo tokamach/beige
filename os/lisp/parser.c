@@ -2,6 +2,8 @@
 
 #include <stddef.h>
 #include "types.h"
+#include "string.h"
+#include "list.h"
 
 //testin
 //#include <stdlib.h>
@@ -9,34 +11,6 @@
 //real world
 #include "../kernel/kmalloc.h"
 #include "../kernel/kterm.h"
-
-size_t list_size(LVarList_t* list)
-{
-    size_t n = 0;
-    while((list = list->next))
-	n++;
-
-    return n;
-}
-
-void list_append(LVarList_t* list, LVar_t* elem)
-{
-    //seek to end
-    while((list = list->next)) {}
-
-    LVarList_t* new = kmalloc(sizeof(LVarList_t));
-    new->var = elem;
-    new->next = NULL;
-    list->next = new;
-}
-
-void list_concat(LVarList_t* lista, LVarList_t* listb)
-{
-    //seek to end
-    while((lista = lista->next)) {}
-
-    lista->next = listb;
-}
 
 Reader_t* get_reader(char* str)
 {
@@ -56,15 +30,12 @@ char reader_next(Reader_t* reader)
     return reader->str[++reader->offset];
 }
 
-LVar_t* tokenize_one(Reader_t* reader)
+Atom_t* tokenize_one(Reader_t* reader)
 {
-    LVar_t* res = kmalloc(sizeof(LVar_t));
-    res->type = Atom;
-    
     char* tok = kmalloc(sizeof(char) * MAX_TOKEN_LEN);
     int offset = 0;
 
-    char c;
+    char c = reader_next(reader);
     //loop on char != whitespace
     //add char to result str
     do
@@ -73,46 +44,96 @@ LVar_t* tokenize_one(Reader_t* reader)
     }
     while((c = reader_next(reader)) && (c != ' ' || c != '\n'));
     
-    //return result str
-    res->data.atom = tok;
-
-    return res;
+    //return result atom
+    return make_atom(tok);
 }
 
-ASTNode_t* parse_sexp(Reader_t* r)
+/*
+LCons_t* parse_sexp_to_cons(char* str)
 {
-    ASTNode_t* ret = kmalloc(sizeof(ASTNode_t));
-    
+
+    Reader_t* r = get_reader(str);
+    char c = *r->str;
+	
+    if(c != '(')
+    {
+	//error
+	while(1) {} //hang
+    }
+
+    /*
+      loop
+      create cons
+          car:
+              if token, car = token
+	      if (, car = loop on new cons
+	  cdr:
+              if ), cdr = nil
+	      if token, cdr = loop on new cons
+    */
+/*
+    LCons_t* cons = kmalloc(sizeof(LCons_t));
+
+    while((reader_next(r)))
+    {
+	//car
+	if(*r->str == '(')
+	{
+	    cons->car->type = LType_t.Cons;
+	    
+	}
+	else if(*r->str == ')')
+	{
+	    
+	}
+	else //if(is_alpha(r->str))
+	{
+	    
+	}
+
+	//cdr
+    }
+
+    return cons;
+}
+*/
+
+SExp_t* parse_sexp(Reader_t* r)
+{
+    SExp_t* sexp = make_sexp();
+    /*
+      loop on c
+          c = '(':   recurse
+          c = token: tokenize(r), add to sexp->list
+	  c = ')': return sexp
+    */
+
     char c;
-    while((c = reader_next(r)) && c != ')')
+    while((c = reader_next(r)))
     {
 	if(c == '(')
 	{
-	    //opening or closing level of s-exp
-	    //if ) end ASTNode
-	    //if ( create new ASTNode
-	    ret->next = parse_sexp(r);
+	    //todo tail recurse (pointless)
+	    SExpElem_t* elem = make_sexp_elem(List, parse_sexp(r));
+	    sexp_add_elem(sexp, elem);
 	}
-	else if(c == ' ' || c == '\n')
+	else if (c == ')')
 	{
-	    //c is whitespace, skip
+	    return sexp;
 	}
 	else
 	{
-	    //c is alphanumeric
-	    
-	    //tokenize
-	    list_append(&ret->contents, tokenize_one(r));
+	    //TODO: check if c = valid token
+	    sexp_add_elem(sexp, make_sexp_elem(Atom, tokenize_one(r)));
 	}
     }
-    return ret;
 }
 
-ASTNode_t* lisp_read(char* str)
+SExp_t* lisp_read(char* str)
 {
     Reader_t* r = get_reader(str);
 
-    ASTNode_t* root;
+    SExp_t* root;
 
     char c = *r->str;
     if(c == '(')
@@ -128,22 +149,13 @@ ASTNode_t* lisp_read(char* str)
     return root;
 }
 
-void print_ast(ASTNode_t* ast)
+void print_sexp(SExp_t* root)
 {
-    int indent = 0;
-    do
+    for(int i = 0; i < root->list.size; i++)
     {
-	k_println("(");
-	LVarList_t l = ast->contents;
-	
-	for(int i = 0; i < list_size(&l); i++)
+	if(((SExpElem_t*)list_elem_at(&root->list, i)->data)->type == Atom)
 	{
-	    for(int n = 0; n < indent; n++)
-		k_print(" ");
-
-	    k_print(l.var.data.atom);
-	    l = l.next;
+	    
 	}
-	indent++;
-    } while((ast = ast->next));
+    }
 }
