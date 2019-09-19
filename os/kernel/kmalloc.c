@@ -147,7 +147,7 @@ void kfree(void* addr)
 
 void k_mem_print_block(HeapHeader_t* header)
 {
-    k_print_hex(header);
+    k_print_hex((int)header);
     k_print(":");
     k_print_num(header->marked);
     k_print(":");

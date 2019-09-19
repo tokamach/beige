@@ -7,18 +7,24 @@
 #include "kstd.h"
 #include "multiboot.h"
 
-static const size_t MAX_HEAP_SIZE = (2^10) * 64; //1 MB * 64 = 64MB
-
 multiboot_info_t* _mbd;
 
 size_t mem_map_addr;
 size_t mem_map_size;
 size_t mem_map_entries;
 
+static const uint16_t MAX_PAGES = 1024 * 1024;
+static size_t page_stack[MAX_PAGES];
+static size_t page_stack_top;
+
 //region to fill
 void k_mem_init(multiboot_info_t* mbd)
 {
     _mbd = mbd;
+
+    //
+    // read memory map
+    //
     
     if(!(mbd->flags & MULTIBOOT_INFO_MEMORY))
     {
@@ -70,18 +76,13 @@ void k_mem_init(multiboot_info_t* mbd)
     k_print_hex(biggest_size);
     k_print("\n");
 
+    
     k_print("Memory initialized\n");
 }
 
 MMapEntry_t* k_mem_map_entry(uint16_t entry)
 {
     MMapEntry_t* res = (MMapEntry_t*)(mem_map_addr + (entry * sizeof(MMapEntry_t)));
-    return res;
-}
-
-MMapEntry_t* k_mem_map_entry_at(size_t addr, uint16_t entry)
-{
-    MMapEntry_t* res = (MMapEntry_t*)(addr + (entry * sizeof(MMapEntry_t)));
     return res;
 }
 
@@ -148,10 +149,40 @@ void k_print_mem_map()
 
 void k_segment_init()
 {
+    //
+    // initalise segments
+    //
+
+    //setup 4 segs + null segment
+}
+
+void populate_pages()
+{
     
 }
 
-void k_paging_init()
+size_t get_page()
 {
-    //build page 
+    if(page_stack_top > 0)
+	return page_stack[--page_stack_top];
+    else
+    {
+	//no more pages
+	k_println("[ERROR][get_page] ran out of pages...");
+	while(1){} //hang
+    }
+}
+
+void free_page(size_t page_addr)
+{
+    page_stack[page_stack_top++] = page_addr;
+}
+
+void k_paging_init()
+{    
+    //
+    // initialise paging
+    //
+
+    
 }

@@ -2,6 +2,7 @@
 #include <stdint.h>
 
 #include "kstd.h"
+#include "kmalloc.h"
 
 size_t strlen(const char *s)
 {
@@ -9,6 +10,14 @@ size_t strlen(const char *s)
     while(s[size])
 	size++;
     return size;
+}
+
+//assumes new is allocated and fits str
+void strcopy(const char* str, char* new)
+{
+    size_t oldlen = strlen(str);
+    for(size_t i = 0; i < oldlen; i++)
+	new[i] = str[i];
 }
 
 // convert int to string
