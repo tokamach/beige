@@ -45,7 +45,7 @@
 ** TODO Scheduler
 - calculate avg wait and turnaround time
 *** Round robin
-** Process Model
+** TODO Process Model
 *** Header
 - id, name
 - compiled?
@@ -89,6 +89,7 @@
 - swap pages/page faults
 ** TODO Filesystem
 *** ext2
+*** serializable lisp
 ** TODO IO
 *** keyboard
 **** PS2 interface
@@ -111,16 +112,18 @@
 *** klib
 - better print/debug
 - sprintf
+*** lisp-interface-lib
+- all kernel calls available from lisp
 ** TODO Tests
 - add test feature to Makefile
 - full coverage unit tests
 
 ** TODO Lisp
-*** Interpreter
+*** Kernelspace
 *** C interaction
 *** fundamenal functions
 - [[https://stackoverflow.com/questions/3482389/how-many-primitives-does-it-take-to-build-a-lisp-machine-ten-seven-or-five/][stackoverflow question]]
-
+*** low level interaction funcs
 * Lisp Planning
 - if they could do it on a PDP, you can do it too
 ** Parser
@@ -157,6 +160,18 @@
 - linked list or AVL Tree to store
 - pages
 ** lisp
+- write k realloc
+- test c strings
+- c lists 
+*** parser
+- loop
+  create cons
+    car:
+        if token, car = token
+        if (, car = loop on new cons
+    cdr:
+        if ), cdr = nil
+        if token, cdr = loop on new cons
 ** interrupts
 ** multitasking
 ** userspace
