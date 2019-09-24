@@ -152,6 +152,7 @@
 
 * Tasks
 ** malloc
+- re-write using bitmap
 - use linked list to store mem map
 ** segmentation
 - basic flat model
@@ -162,7 +163,7 @@
 ** lisp
 - write k realloc
 - test c strings
-- c lists 
+- test c lists 
 *** parser
 - loop
   create cons

@@ -13,7 +13,7 @@ size_t malloc_offset = 0;
 uint16_t total_blocks = 0;
 HeapHeader_t* first_header;
 
-static const size_t MAX_HEAP_SIZE = (2^10) * (2^4); //16k
+static const size_t MAX_HEAP_SIZE = 0x4000; //(2^10) * (2^4); //16k
 
 HeapHeader_t* add_header(size_t addr, size_t size)
 {
@@ -78,7 +78,8 @@ HeapHeader_t* split_block(HeapHeader_t* header)
     size_t new_addr = (size_t) header + (total_size / 2);
     size_t new_size = (total_size / 2) - sizeof(HeapHeader_t);
     
-    HeapHeader_t* new_header = add_header(new_addr, new_size);
+    //HeapHeader_t* new_header =
+    add_header(new_addr, new_size);
     header->marked = 0;
     header->size = new_size;
 
@@ -129,8 +130,6 @@ void* kmalloc(size_t size)
     k_print(" times and splitting ");
     k_print_num(DEBUG_SPLIT_COUNT);
     k_println(" times");
-    
-    //k_mem_print_blocks();
 
     //we've found our ideal block
     cur_header->marked = 1;

@@ -15,6 +15,7 @@ typedef struct MMapEntry {
     uint32_t Type;
 }__attribute__((packed)) MMapEntry_t;
 
+//TODO: move to globals
 MMapEntry_t* working_mem_region;
 size_t mem_region_start;
 size_t mem_region_size;

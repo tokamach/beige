@@ -92,7 +92,6 @@ void k_print_mem_map()
     k_print_hex(_mbd->mem_lower);
     k_print("\nupper memory: ");
     k_print_hex(_mbd->mem_upper);
-    k_print_mem_map();
     
     if(_mbd->flags & MULTIBOOT_INFO_MEM_MAP)
     {
