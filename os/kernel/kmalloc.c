@@ -41,29 +41,34 @@ void k_malloc_init(multiboot_info_t* mbd)
 
 void* kmalloc(size_t size)
 {
-    size_t base;
+    size_t base  = 0;
     size_t accum = 0;
     
-    for(size_t i = 0; i < total_blocks; i++)
+    for(size_t i = 0; i < max_blocks; i++)
     {
 	if(bitmap[i] == Free && accum == 0)
 	{
 	    base = i;
 	    accum++;
 	}
-
-	if(accum == size)
+	else if (bitmap[i] == Used)
 	{
-	    for(size_t j = 0; j < accum; j++)
+	    accum = 0;
+	}
+	
+	if((accum * factor) >= size)
+	{
+	    for(size_t j = 0; j < (accum); j++)
 		bitmap[base + j] = Used;
-	    
+		
 	    k_print("Alloced ");
-	    k_print_hex(mem_region_start + (i * base));
+	    k_print_hex((size_t)arena + (i * base) * factor);
 	    k_print(":");
 	    k_print_hex(size);
 	    k_print("\n");
-		
-	    return (void*)(mem_region_start + (i * base));
+	    
+	    //total_blocks++;
+	    return (void*)(arena + (base * factor));
 	}
     }
 }
