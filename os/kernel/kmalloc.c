@@ -56,6 +56,12 @@ void* kmalloc(size_t size)
 	{
 	    for(size_t j = 0; j < accum; j++)
 		bitmap[base + j] = Used;
+	    
+	    k_print("Alloced ");
+	    k_print_hex(mem_region_start + (i * base));
+	    k_print(":");
+	    k_print_hex(size);
+	    k_print("\n");
 		
 	    return (void*)(mem_region_start + (i * base));
 	}
@@ -66,4 +72,9 @@ void kfree(void* addr)
 {
     size_t bitmap_addr = (size_t)(addr) / factor;
     bitmap[bitmap_addr] = Free;
+
+    k_print("freed ");
+    k_print_hex((size_t)addr);
+    k_print("\n");
+
 }
