@@ -39,6 +39,7 @@ void k_malloc_init(multiboot_info_t* mbd)
 	bitmap[i] = Free;
 }
 
+//TODO: sanity checks
 void* kmalloc(size_t size)
 {
     size_t base  = 0;
@@ -60,12 +61,13 @@ void* kmalloc(size_t size)
 	{
 	    for(size_t j = 0; j < (accum); j++)
 		bitmap[base + j] = Used;
-		
+#ifdef DEBUG
 	    k_print("Alloced ");
-	    k_print_hex((size_t)arena + (i * base) * factor);
+	    k_print_hex((size_t)arena + (base * factor));
 	    k_print(":");
 	    k_print_hex(size);
 	    k_print("\n");
+#endif
 	    
 	    //total_blocks++;
 	    return (void*)(arena + (base * factor));
