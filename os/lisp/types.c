@@ -47,3 +47,7 @@ void sexp_add_elem(SExp_t* sexp, SExpElem_t* elem)
     list_append(&sexp->list, elem);
 }
 
+SExpElem_t* sexp_elem_at(SExp_t* sexp, int index)
+{
+    return (SExpElem_t*)list_elem_at(&sexp->list, index);
+}

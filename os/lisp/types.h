@@ -37,6 +37,7 @@ typedef struct SExp {
 SExp_t* make_sexp();
 void free_sexp(SExp_t* sexp);
 void sexp_add_elem(SExp_t* sexp, SExpElem_t* elem);
+SExpElem_t* sexp_elem_at(SExp_t* sexp, int index);
 
 //old:
 typedef struct LCons {

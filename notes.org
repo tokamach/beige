@@ -152,7 +152,6 @@
 
 * Tasks
 ** malloc
-- re-write using bitmap
 - use linked list to store mem map
 ** segmentation
 - basic flat model
@@ -165,14 +164,7 @@
 - test c strings
 - test c lists 
 *** parser
-- loop
-  create cons
-    car:
-        if token, car = token
-        if (, car = loop on new cons
-    cdr:
-        if ), cdr = nil
-        if token, cdr = loop on new cons
+- 
 ** interrupts
 ** multitasking
 ** userspace

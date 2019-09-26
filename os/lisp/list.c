@@ -1,5 +1,6 @@
 #include "list.h"
 #include "../kernel/kmalloc.h"
+#include "../kernel/kterm.h"
 
 List_t* make_list()
 {
@@ -33,7 +34,7 @@ ListNode_t* list_node_at(List_t* list, int index)
     {
 	tmp = tmp->next;
 	if(!tmp)
-	    while(1) { } //out of range, hang TODO: actual err
+	    while(1) {k_print("LISTERR");} //out of range, hang TODO: actual err
     }
 
     return tmp;
@@ -47,7 +48,7 @@ void* list_elem_at(List_t* list, int index)
     {
 	tmp = tmp->next;
 	if(!tmp)
-	    while(1) { } //out of range, hang TODO: actual err
+	    while(1) {k_print("LISTERR");} //out of range, hang TODO: actual err
     }
 
     return tmp->data;
@@ -62,6 +63,7 @@ void list_append(List_t* list, void* elem)
     new->next = NULL;
     
     end->next = new;
+    list->size++;
 }
 
 void list_pop(List_t* list)
