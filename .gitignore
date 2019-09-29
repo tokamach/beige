@@ -12,3 +12,6 @@ ref/*
 os/isodir/*
 *.png
 .clang_complete
+.ccls
+.ccls-cache/*
+compile_commands.json

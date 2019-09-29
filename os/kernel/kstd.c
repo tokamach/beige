@@ -20,6 +20,12 @@ void strcopy(const char* str, char* new)
 	new[i] = str[i];
 }
 
+int is_alpha(char c)
+{
+    size_t cval = (size_t) c;
+    //if(c > )
+}
+
 // convert int to string
 int itoa(int num, int base, char* str)
 {

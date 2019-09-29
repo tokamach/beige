@@ -22,6 +22,7 @@ void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
     SExp_t* tree = lisp_read("(defun f (x y) (+ x y))");
     k_println("");
     print_sexp(tree);
+
     //free_sexp(tree);
 
     //enable memory, paging

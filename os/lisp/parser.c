@@ -43,18 +43,19 @@ Atom_t* tokenize_one(Reader_t* reader)
     char c = reader_cur(reader);
     //loop on char != whitespace
     //add char to result str
-    do
-    {
-	tok[offset++] = c;
-    }
     while((c != ' '  &&
 	   c != '\n' &&
 	   c != '('  &&
-	   c != ')'  &&
-	   (c = reader_next(reader))));
+	   c != ')'))
+    {
+	      tok[offset++] = c;
+	      c = reader_next(reader);
+    }
+	   
 
     tok[offset] = '\0';
     //return result atom
+    k_print(tok);
     reader->offset--; //TODO: rewrite this whole function to avoid this
     return make_atom(tok);
 }
@@ -72,14 +73,11 @@ SExp_t* parse_sexp(Reader_t* r)
     char c = reader_next(r);
     do
     {
-	//k_term_print_char(c);
-	//while(1){}
 	if(c == '(')
 	{
 	    //todo tail recurse (pointless)
 	    SExpElem_t* elem = make_sexp_elem(List, parse_sexp(r));
-	    //k_print_num(((SExp_t*)elem->val)->list.size);
-	    //while(1){}
+	    k_print_num(((SExp_t*)elem->val)->list.size);
 	    sexp_add_elem(sexp, elem);
 	}
 	else if (c == ')')
@@ -137,19 +135,17 @@ void print_sexp_iter(SExp_t* root, int depth)
 	//TODO: CLEAN THIS SHIT UP
 	
 	//TODO: THIS IS WRONG
-	SExpElem_t* elem = sexp_elem_at(root, 0);
-	k_print_num(elem->type);
-	k_println("");
+	SExpElem_t* elem = sexp_elem_at(root, i);
+	//k_print_num(elem->type);
+	//k_println("");
 	if(elem->type == Atom)
 	{
 	    //its atom
 	    pad_print(depth, ((Atom_t*)elem->val)->val.str);
-	    k_print("AJLK\n");
 	}
 	else if(elem->type == List)
 	{
 	    //its list
-	    k_print("ZZZZZ");
 	    print_sexp_iter(elem->val, depth + 1);
 	}
     }
