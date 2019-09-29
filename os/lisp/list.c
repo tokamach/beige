@@ -1,15 +1,10 @@
 #include "list.h"
-
-#ifdef LISP_TEST
-#include "../tests/kernel_mappings.h"
-#endif
-
 #include "../kernel/kmalloc.h"
 #include "../kernel/kterm.h"
 
 List_t* make_list()
 {
-    List_t* ret = malloc(sizeof(List_t));
+    List_t* ret = kmalloc(sizeof(List_t));
     ret->size = 0;
     ret->first = NULL;
     return ret;
@@ -25,11 +20,11 @@ void free_list(List_t* list)
     {
 	tmp = nextnode;
 	nextnode = nextnode->next;
-	free(tmp->data);
-	free(tmp);
+	kfree(tmp->data);
+	kfree(tmp);
     }
 
-    free(list);
+    kfree(list);
 }
 
 ListNode_t* list_node_at(List_t* list, int index)
@@ -63,7 +58,7 @@ void list_append(List_t* list, void* elem)
 {
     ListNode_t* end = list_node_at(list, list->size);
     
-    ListNode_t* new = malloc(sizeof(ListNode_t));
+    ListNode_t* new = kmalloc(sizeof(ListNode_t));
     new->data = elem;
     new->next = NULL;
     
@@ -74,7 +69,7 @@ void list_append(List_t* list, void* elem)
 void list_pop(List_t* list)
 {
     ListNode_t* tmp = list_node_at(list, list->size);
-    free(tmp);
+    kfree(tmp);
 
     list_node_at(list, list->size - 1)->next = NULL;
 

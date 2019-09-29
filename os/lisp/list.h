@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef LISP_TEST
-#include "../tests/kernel_mappings.h"
-#endif
-
 typedef struct ListNode {
     void* data;
     struct ListNode* next;

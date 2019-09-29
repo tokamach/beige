@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef LISP_TEST
-#include "../tests/kernel_mappings.h"
-#endif
-
 #include <stdint.h>
 #include "list.h"
 #include "string.h"

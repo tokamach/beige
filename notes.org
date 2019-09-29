@@ -160,9 +160,7 @@
 - linked list or AVL Tree to store
 - pages
 ** lisp
-*** allow lisp to be run in host userspace
-- top of lisp files, ifdef LISPTEST
-- include tests/kernel-rename
+- write k realloc
 - test c strings
 - test c lists 
 *** parser
