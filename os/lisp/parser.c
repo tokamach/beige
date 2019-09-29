@@ -1,5 +1,9 @@
 #include "parser.h"
 
+#ifdef LISP_TEST
+#include "../tests/kernel_mappings.h"
+#endif
+
 #include <stddef.h>
 #include "types.h"
 #include "string.h"
@@ -14,7 +18,7 @@
 
 Reader_t* make_reader(char* str)
 {
-    Reader_t* r = kmalloc(sizeof(Reader_t));
+    Reader_t* r = malloc(sizeof(Reader_t));
     r->offset = 0;
     r->str = str;
     return r;
@@ -37,7 +41,7 @@ char reader_next(Reader_t* reader)
 
 Atom_t* tokenize_one(Reader_t* reader)
 {
-    char* tok = kmalloc(sizeof(char) * MAX_TOKEN_LEN);
+    char* tok = malloc(sizeof(char) * MAX_TOKEN_LEN);
     int offset = 0;
 
     char c = reader_cur(reader);
