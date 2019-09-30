@@ -1,9 +1,18 @@
 #include "types.h"
 
-#include "../kernel/kmalloc.h"
-#include "../kernel/kstd.h"
 #include "string.h"
 #include "list.h"
+
+#ifdef LISP_TEST
+//testin
+#include <stdio.h>
+#include "../tests/kernel_mappings.h"
+#else
+//real world
+#include "../kernel/kmalloc.h"
+#include "../kernel/kterm.h"
+#endif
+
 
 Atom_t* make_atom(char* str)
 {

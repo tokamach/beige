@@ -1,7 +1,14 @@
 #include "string.h"
 
+#ifdef LISP_TEST
+//testin
+#include <stdio.h>
+#include "../tests/kernel_mappings.h"
+#else
+//real world
 #include "../kernel/kmalloc.h"
-#include "../kernel/kstd.h"
+#include "../kernel/kterm.h"
+#endif
 
 string_t* make_string(const char *str)
 {

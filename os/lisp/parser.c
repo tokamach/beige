@@ -5,12 +5,15 @@
 #include "string.h"
 #include "list.h"
 
+#ifdef LISP_TEST
 //testin
-//#include <stdlib.h>
-
+#include <stdio.h>
+#include "../tests/kernel_mappings.h"
+#else
 //real world
 #include "../kernel/kmalloc.h"
 #include "../kernel/kterm.h"
+#endif
 
 Reader_t* make_reader(char* str)
 {
