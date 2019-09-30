@@ -19,7 +19,11 @@ void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
     k_mem_init(mbd);
     k_malloc_init(mbd);
 
-    SExp_t* tree = lisp_read("(defun f (x y) (+ x y))");
+    SExp_t* tree = lisp_read("\
+                              (defun factorial (x) \
+                                  (if (zerop x)    \
+                                      1 \
+                                      (* x (factorial (- x 1)))))");
     k_println("");
     print_sexp(tree);
 

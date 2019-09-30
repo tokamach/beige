@@ -48,14 +48,14 @@ Atom_t* tokenize_one(Reader_t* reader)
 	   c != '('  &&
 	   c != ')'))
     {
-	      tok[offset++] = c;
-	      c = reader_next(reader);
+	tok[offset++] = c;
+	c = reader_next(reader);
     }
 	   
 
     tok[offset] = '\0';
-    //return result atom
-    reader->offset--; //TODO: rewrite this whole function to avoid this
+    
+    //return result in atom
     return make_atom(tok);
 }
 
@@ -75,15 +75,19 @@ SExp_t* parse_sexp(Reader_t* r)
 	if(c == '(')
 	{
 	    //todo tail recurse (pointless)
-	    r->offset++;
-	    SExpElem_t* elem = make_sexp_elem(List, parse_sexp(r));
+	    //r->offset++;
+	    SExp_t* child = parse_sexp(r);
+	    SExpElem_t* elem = make_sexp_elem(List, child);
 	    sexp_add_elem(sexp, elem);
+	    c = reader_next(r);
 	}
 	//TODO: is_alpha
 	else if (c != ' ')
 	{
-	    //TODO: check if c = valid token	    
-	    sexp_add_elem(sexp, make_sexp_elem(Atom, tokenize_one(r)));
+	    //TODO: check if c = valid token
+	    Atom_t* a = tokenize_one(r);
+	    sexp_add_elem(sexp, make_sexp_elem(Atom, a));
+	    c = reader_cur(r);
 	}
 	else
 	{
@@ -130,7 +134,7 @@ void print_sexp_iter(SExp_t* root, int depth, int debug)
 	
 	//TODO: THIS IS WRONG
 	SExpElem_t* elem = sexp_elem_at(root, i);
-
+	
 	if(debug)
 	{
 	    k_print("{");
@@ -143,8 +147,10 @@ void print_sexp_iter(SExp_t* root, int depth, int debug)
 	if(elem->type == Atom)
 	{
 	    //its atom
-	    pad_print(depth, ((Atom_t*)elem->val)->val.str);
-	    k_print(" ");
+	    if(i != 0)
+		k_print(" ");
+
+	    k_print(((Atom_t*)elem->val)->val.str);
 	}
 	else if(elem->type == List)
 	{
@@ -153,10 +159,15 @@ void print_sexp_iter(SExp_t* root, int depth, int debug)
 	}
     }
 
-    pad_print(depth, ")\n");
+    k_print(")");
 }
 
 void print_sexp(SExp_t* root)
 {
     print_sexp_iter(root, 0, 0);
+}
+
+void print_sexp_debug(SExp_t* root)
+{
+    print_sexp_iter(root, 0, 1);
 }
