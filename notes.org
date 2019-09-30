@@ -160,11 +160,8 @@
 - linked list or AVL Tree to store
 - pages
 ** lisp
-- write k realloc
 - test c strings
 - test c lists 
-*** parser
-- 
 ** interrupts
 ** multitasking
 ** userspace

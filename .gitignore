@@ -13,5 +13,7 @@ os/isodir/*
 *.png
 .clang_complete
 .ccls
+.ccls-root
 .ccls-cache/*
 compile_commands.json
+os/lisptest

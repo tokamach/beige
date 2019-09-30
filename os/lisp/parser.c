@@ -55,7 +55,6 @@ Atom_t* tokenize_one(Reader_t* reader)
 
     tok[offset] = '\0';
     //return result atom
-    k_print(tok);
     reader->offset--; //TODO: rewrite this whole function to avoid this
     return make_atom(tok);
 }
@@ -76,31 +75,23 @@ SExp_t* parse_sexp(Reader_t* r)
 	if(c == '(')
 	{
 	    //todo tail recurse (pointless)
+	    r->offset++;
 	    SExpElem_t* elem = make_sexp_elem(List, parse_sexp(r));
-	    k_print_num(((SExp_t*)elem->val)->list.size);
 	    sexp_add_elem(sexp, elem);
-	}
-	else if (c == ')')
-	{
-	    return sexp;
 	}
 	//TODO: is_alpha
 	else if (c != ' ')
 	{
 	    //TODO: check if c = valid token	    
 	    sexp_add_elem(sexp, make_sexp_elem(Atom, tokenize_one(r)));
-
-	    k_print("[");
-	    k_term_print_char(c);
-	    k_print(":");
-	    k_print_num(r->offset);
-	    k_println("]");
 	}
 	else
 	{
 	    //idk lol
 	}
-    } while((c = reader_next(r)));
+    } while(c != ')' && (c = reader_next(r)));
+    
+    return sexp;
 }
 
 SExp_t* lisp_read(char* str)
@@ -120,14 +111,17 @@ void pad_print(int padding, char* str)
     k_print(str);
 }
 
-void print_sexp_iter(SExp_t* root, int depth)
+void print_sexp_iter(SExp_t* root, int depth, int debug)
 {
-    //pad_print(depth, "\n");
-    
+    pad_print(depth, "\n");
     pad_print(depth, "(");
-    k_print("[");
-    k_print_num(root->list.size);
-    k_print("]");
+
+    if(debug)
+    {
+	k_print("[");
+	k_print_num(root->list.size);
+	k_print("]");
+    }
     
     for(int i = 0; i < root->list.size; i++)
     {
@@ -136,24 +130,33 @@ void print_sexp_iter(SExp_t* root, int depth)
 	
 	//TODO: THIS IS WRONG
 	SExpElem_t* elem = sexp_elem_at(root, i);
-	//k_print_num(elem->type);
-	//k_println("");
+
+	if(debug)
+	{
+	    k_print("{");
+	    k_print_num(elem->type);
+	    k_print(":");
+	    k_print(elem->type ? "List" : "Atom");
+	    k_print("}");
+	}
+	
 	if(elem->type == Atom)
 	{
 	    //its atom
 	    pad_print(depth, ((Atom_t*)elem->val)->val.str);
+	    k_print(" ");
 	}
 	else if(elem->type == List)
 	{
 	    //its list
-	    print_sexp_iter(elem->val, depth + 1);
+	    print_sexp_iter(elem->val, depth + 1, debug);
 	}
     }
 
-    pad_print(depth, ")");
+    pad_print(depth, ")\n");
 }
 
 void print_sexp(SExp_t* root)
 {
-    print_sexp_iter(root, 0);
+    print_sexp_iter(root, 0, 0);
 }
