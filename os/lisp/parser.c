@@ -150,12 +150,14 @@ void print_sexp_iter(SExp_t* root, int depth, int debug)
 	    if(i != 0)
 		k_print(" ");
 
-	    k_print(((Atom_t*)elem->val)->val.str);
+	    k_print_hex((size_t)&((Atom_t*)elem->val)->val);
+	    k_print(":");
+	    k_print(((Atom_t*)elem->val)->val);
 	}
 	else if(elem->type == List)
 	{
 	    //its list
-	    print_sexp_iter(elem->val, depth + 1, debug);
+	    print_sexp_iter(elem->val, depth + 2, debug);
 	}
     }
 

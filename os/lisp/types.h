@@ -8,7 +8,7 @@
 
 //Atom
 typedef struct Atom {
-    string_t val;
+    char* val;
     //TODO: add lisp data type
 } Atom_t;
 

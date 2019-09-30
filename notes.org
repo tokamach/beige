@@ -162,6 +162,9 @@
 ** lisp
 - test c strings
 - test c lists 
+*** parser
+- she doesn't like too many leading or trailing spaces
+- 
 ** interrupts
 ** multitasking
 ** userspace

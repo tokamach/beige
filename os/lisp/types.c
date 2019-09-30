@@ -1,12 +1,15 @@
 #include "types.h"
+
 #include "../kernel/kmalloc.h"
+#include "../kernel/kstd.h"
 #include "string.h"
 #include "list.h"
 
 Atom_t* make_atom(char* str)
 {
     Atom_t* ret = kmalloc(sizeof(Atom_t));
-    ret->val = *make_string(str);
+    ret->val = kmalloc(strlen(str));
+    strcopy(str, ret->val);
     return ret;
 }
 
