@@ -19,10 +19,11 @@ lisp: $(shell find lisp -name '*.c' | sed -e "s/\\.c.*/\\.o/g")
 test_lisp: CC := clang
 test_lisp: CFLAGS += -Itests
 test_lisp: CFLAGS += -DLISP_TEST
+test_lisp: CFLAGS += -g
 test_lisp: CFLAGS := $(filter-out -ffreestanding,$(CFLAGS))
 test_lisp: CFLAGS := $(filter-out -Ikernel,$(CFLAGS))
 test_lisp: lisp tests/lisp_test.o
-	$(CC) -Itests -Ilisp -o test_lisp tests/lisp_test.o $(LOBJ)
+	$(CC) -Itests -Ilisp -o test_lisp tests/lisp_test.o $(LOBJ) -g
 
 
 os.bin: lisp kernel
