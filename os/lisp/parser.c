@@ -2,8 +2,6 @@
 
 #include <stddef.h>
 #include "types.h"
-#include "string.h"
-#include "list.h"
 
 #ifdef LISP_TEST
 //testin
@@ -80,7 +78,7 @@ SExp_t* parse_sexp(Reader_t* r)
 	    //todo tail recurse (pointless)
 	    //r->offset++;
 	    SExp_t* child = parse_sexp(r);
-	    SExpElem_t* elem = make_sexp_elem(List, child);
+	    SExpElem_t* elem = make_sexp_elem_list(child);
 	    sexp_add_elem(sexp, elem);
 	    c = reader_next(r);
 	}
@@ -89,7 +87,7 @@ SExp_t* parse_sexp(Reader_t* r)
 	{
 	    //TODO: check if c = valid token
 	    Atom_t* a = tokenize_one(r);
-	    sexp_add_elem(sexp, make_sexp_elem(Atom, a));
+	    sexp_add_elem(sexp, make_sexp_elem_atom(a));
 	    c = reader_cur(r);
 	}
 	else
@@ -126,11 +124,11 @@ void print_sexp_iter(SExp_t* root, int depth, int debug)
     if(debug)
     {
 	k_print("[");
-	k_print_num(root->list.size);
+	k_print_num(root->size);
 	k_print("]");
     }
     
-    for(int i = 0; i < root->list.size; i++)
+    for(int i = 0; i < root->size; i++)
     {
 	//this is fucking disgusting
 	//TODO: CLEAN THIS SHIT UP
@@ -153,14 +151,13 @@ void print_sexp_iter(SExp_t* root, int depth, int debug)
 	    if(i != 0)
 		k_print(" ");
 
-	    k_print_hex((size_t)&((Atom_t*)elem->val)->val);
 	    k_print(":");
-	    k_print(((Atom_t*)elem->val)->val);
+	    k_print(elem->val.atom->str);
 	}
 	else if(elem->type == List)
 	{
 	    //its list
-	    print_sexp_iter(elem->val, depth + 2, debug);
+	    print_sexp_iter(elem->val.list, depth + 2, debug);
 	}
     }
 
