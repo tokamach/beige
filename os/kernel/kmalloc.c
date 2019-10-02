@@ -16,7 +16,7 @@ size_t total_blocks;
 size_t max_blocks;
 
 static const uint8_t factor = 8;
-static const size_t MAX_HEAP_SIZE = 0x800; //(2^10) * (2^4); //16k
+static const size_t MAX_HEAP_SIZE = 0x1000; //(2^10) * (2^4); //16k
 
 void k_malloc_init(multiboot_info_t* mbd)
 {
@@ -42,25 +42,31 @@ void k_malloc_init(multiboot_info_t* mbd)
 //TODO: sanity checks
 void* kmalloc(size_t size)
 {
+    k_print_num(size);
+    k_print(" ");
     size_t base  = 0;
     size_t accum = 0;
     
     for(size_t i = 0; i < max_blocks; i++)
     {
-	if(bitmap[i] == Free && accum == 0)
+	if(bitmap[i] == Free)
 	{
-	    base = i;
+	    if (accum == 0)
+		base = i;
+	    
 	    accum++;
 	}
 	else if (bitmap[i] == Used)
 	{
 	    accum = 0;
+	    continue;
 	}
 	
 	if((accum * factor) >= size)
 	{
 	    for(size_t j = 0; j < (accum); j++)
 		bitmap[base + j] = Used;
+
 #ifdef DEBUG
 	    k_print("Alloced ");
 	    k_print_hex((size_t)arena + (base * factor));
@@ -73,6 +79,8 @@ void* kmalloc(size_t size)
 	    return (void*)(arena + (base * factor));
 	}
     }
+
+    k_print("ERROR\n");
 }
 
 void kfree(void* addr)
