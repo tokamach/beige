@@ -38,4 +38,6 @@ test: kernel $(TESTS)
 clean:
 	rm -f kernel/*.o
 	rm -f lisp/*.o
+	rm -f tests/*.o
+	rm -f test_lisp
 	rm -f os.bin

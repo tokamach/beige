@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdint.h>
-#include "list.h"
 
 #define MAX_ATOM_LEN 128
 

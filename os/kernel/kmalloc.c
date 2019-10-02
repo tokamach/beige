@@ -42,8 +42,6 @@ void k_malloc_init(multiboot_info_t* mbd)
 //TODO: sanity checks
 void* kmalloc(size_t size)
 {
-    k_print_num(size);
-    k_print(" ");
     size_t base  = 0;
     size_t accum = 0;
     

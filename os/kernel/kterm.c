@@ -9,8 +9,8 @@ static const size_t VGA_WIDTH  = 80;
 
 static const size_t VGA_BUF_ADDRESS = 0xB8000;
 
-static const uint8_t VGA_FG = 7;
-static const uint8_t VGA_BG = 0;
+static const uint8_t VGA_FG = 0;
+static const uint8_t VGA_BG = 15;
 
 //static const uint8_t color = 15 | 0 << 4;
 

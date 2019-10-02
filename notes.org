@@ -164,7 +164,7 @@
 - test c lists 
 *** parser
 - she doesn't like too many leading or trailing spaces
-- 
+- doesn't seem to like longer chars
 ** interrupts
 ** multitasking
 ** userspace

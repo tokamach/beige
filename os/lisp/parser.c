@@ -38,7 +38,7 @@ char reader_next(Reader_t* reader)
 
 Atom_t* tokenize_one(Reader_t* reader)
 {
-    char* tok = kmalloc(sizeof(char) * MAX_TOKEN_LEN);
+    char* tok = kmalloc(sizeof(char) * (MAX_TOKEN_LEN + 1));
     int offset = 0;
 
     char c = reader_cur(reader);
@@ -130,10 +130,6 @@ void print_sexp_iter(SExp_t* root, int depth, int debug)
     
     for(int i = 0; i < root->size; i++)
     {
-	//this is fucking disgusting
-	//TODO: CLEAN THIS SHIT UP
-	
-	//TODO: THIS IS WRONG
 	SExpElem_t* elem = sexp_elem_at(root, i);
 	
 	if(debug)
@@ -142,6 +138,8 @@ void print_sexp_iter(SExp_t* root, int depth, int debug)
 	    k_print_num(elem->type);
 	    k_print(":");
 	    k_print(elem->type ? "List" : "Atom");
+	    k_print(":");
+	    k_print_hex(elem->type ? (size_t)(elem->val.list) : (size_t)(elem->val.atom));
 	    k_print("}");
 	}
 	
@@ -151,7 +149,6 @@ void print_sexp_iter(SExp_t* root, int depth, int debug)
 	    if(i != 0)
 		k_print(" ");
 
-	    k_print(":");
 	    k_print(elem->val.atom->str);
 	}
 	else if(elem->type == List)

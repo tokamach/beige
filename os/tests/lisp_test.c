@@ -10,6 +10,5 @@ int main()
     (* x (factorial (- x 1)))))";
     
     SExp_t* tree = lisp_read(code);
-    print_sexp(tree);
-
+    print_sexp_debug(tree);
 }
