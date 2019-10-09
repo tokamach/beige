@@ -42,6 +42,8 @@ void k_term_init()
 	    vga_buf[(i * VGA_WIDTH) + j] = vga_entry(' ', vga_color(VGA_FG, VGA_BG));
 	}
     }
+
+    k_println("term initialized");
 }
 
 void k_term_enable_cursor(uint8_t cursor_start, uint8_t cursor_end)

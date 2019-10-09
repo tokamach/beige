@@ -37,6 +37,8 @@ void k_malloc_init(multiboot_info_t* mbd)
 
     for(size_t i = 0; i < max_blocks; i++)
 	bitmap[i] = Free;
+
+    k_println("malloc initialized");
 }
 
 //TODO: sanity checks
@@ -65,7 +67,7 @@ void* kmalloc(size_t size)
 	    for(size_t j = 0; j < (accum); j++)
 		bitmap[base + j] = Used;
 
-#ifdef DEBUG
+#ifdef KDEBUG
 	    k_print("Alloced ");
 	    k_print_hex((size_t)arena + (base * factor));
 	    k_print(":");
@@ -86,8 +88,9 @@ void kfree(void* addr)
     size_t bitmap_addr = (size_t)(addr) / factor;
     bitmap[bitmap_addr] = Free;
 
+#ifdef KDEBUG
     k_print("freed ");
     k_print_hex((size_t)addr);
     k_print("\n");
-
+#endif
 }

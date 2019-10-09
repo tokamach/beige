@@ -68,16 +68,18 @@ void k_mem_init(multiboot_info_t* mbd)
     //set working memory region
     working_mem_region = k_mem_map_entry(biggest_index);
     mem_region_end = mem_region_start + mem_region_size;
-    
+
+#ifdef KDEBUG
     //debug print found region
     k_print("[DEBUG][k_mem_init] Found largest memory entry ");
     k_print_num(biggest_index);
     k_print(" with size ");
     k_print_hex(biggest_size);
     k_print("\n");
+#endif
 
     
-    k_print("Memory initialized\n");
+    k_println("memory initialized");
 }
 
 MMapEntry_t* k_mem_map_entry(uint16_t entry)
@@ -100,7 +102,7 @@ void k_print_mem_map()
 	k_print("\nmem map length: ");
 	k_print_hex(_mbd->mmap_length);
 
-	k_print("\n\nmem map:\n");
+	k_print("\n mem map:\n");
 
 	int entries = mem_map_size / sizeof(MMapEntry_t);
 

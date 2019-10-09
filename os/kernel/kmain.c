@@ -6,6 +6,7 @@
 #include "kterm.h"
 #include "kmem.h"
 #include "kmalloc.h"
+#include "kinterrupt.h"
 #include "kstd.h"
 
 #include "../lisp/parser.h"
@@ -15,20 +16,11 @@
 void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
 {
     k_term_init();
-    k_print("kernel init\n");    
+    k_print("kernel init\n");
     k_mem_init(mbd);
+    k_print_mem_map();
     k_malloc_init(mbd);
-
-    char* code = "\
-(defun factorial (x)\
-  (if (zerop x)\
-    1\
-    (* x (factorial (- x 1)))))";
-    
-    SExp_t* tree = lisp_read(code);
-    print_sexp(tree);
-
-    //free_sexp(tree);
+    k_interrupt_init();
 
     //enable memory, paging
     //start scheduler

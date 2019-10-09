@@ -10,12 +10,16 @@
 *** Cross Compiler
 *** QEMU
 *** test machine??
-** OS Problems
-- reliability
-- security
-- power use
-- speed
-- multi core speed
+** Problems/Gaps
+- Lisp Machines are dead, Lisp research dead
+- but VM tech has improved (JIT compilers) (thanks java)
+
+- concurrency is needed for further speed, single core won't get faster
+- conventional shared mem concurrency is unsafe
+- Functional programming/concurrency ensures safety
+- x86 is not suited to lisp like languages (functional, dynamic)
+
+- hence: a VM OS optimized for safe (functional) concurrency
 ** Ideas
 *** declarative OS
 - declarative configuration
@@ -25,6 +29,15 @@
 *** minimal side effects OS
 *** transactional OS
 
+** Literature Survey
+- identify gaps in research
+- find references to *support* your observations
+- this will lead to a stronger /background/ section
+- reference list revauls the quality of your research
+
+** plan search
+- identify keywords (concurrency OS, multithreading, functional concurrency)
+- date?
 
 * Links
 - https://wiki.osdev.org/Expanded_Main_Page
@@ -63,7 +76,8 @@
 *** Code (compiled)
 - Lisp compiled
 *** Thread Model
-- read only access to env, return 
+- children share parents env in a read only form
+- children have their own private mutable envcat
 ** TODO Memory Management
 - SDM vol3 3
 *** TODO malloc
@@ -74,6 +88,7 @@
 - find block specified, mark as free
 *** Memory Map
 - kernel space: fixed
+- kernel starts at 0x100000
 - user space: grows upwards
 *** Segmentation
 - SDM vol3 3.2
@@ -124,7 +139,7 @@
 *** fundamenal functions
 - [[https://stackoverflow.com/questions/3482389/how-many-primitives-does-it-take-to-build-a-lisp-machine-ten-seven-or-five/][stackoverflow question]]
 *** low level interaction funcs
-* Lisp Planning
+y* Lisp Planning
 - if they could do it on a PDP, you can do it too
 ** Parser
 - no regex
@@ -147,14 +162,18 @@
 
 * TODO Proposal
   SCHEDULED: <2019-10-21 Mon>
-  
+** 
 
 
 * Tasks
+** all
+- rewrite structs to use snake_case
+- switch to NASM?
 ** malloc
 - use linked list to store mem map
 ** segmentation
 - basic flat model
+- none?
 ** paging
 - page allocator
 - linked list or AVL Tree to store
@@ -164,8 +183,10 @@
 - test c lists 
 *** parser
 - she doesn't like too many leading or trailing spaces
-- doesn't seem to like longer chars
 ** interrupts
+- write assembly macro for generic interrupt handler
+- tell the PIC that we're handling interrupts now
+- write keeb handler
 ** multitasking
 ** userspace
 ** gui

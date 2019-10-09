@@ -76,7 +76,6 @@ SExp_t* parse_sexp(Reader_t* r)
 	if(c == '(')
 	{
 	    //todo tail recurse (pointless)
-	    //r->offset++;
 	    SExp_t* child = parse_sexp(r);
 	    SExpElem_t* elem = make_sexp_elem_list(child);
 	    sexp_add_elem(sexp, elem);

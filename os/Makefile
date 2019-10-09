@@ -1,6 +1,7 @@
 CC     := ../toolchain/bin/i686-elf-gcc
 AS     := ../toolchain/bin/i686-elf-as
-CFLAGS := -ffreestanding -Wall -Wextra -Ikernel -Ilisp
+CFLAGS := -ffreestanding -nostdlib -Wall -Wextra
+INCLD  := -Ikernel -Ilisp
 KOBJ   := $(shell find kernel -name '*.o')
 LOBJ   := $(shell find lisp -name '*.o')
 
@@ -10,7 +11,7 @@ boot.o:
 	$(AS) kernel/boot.s -o kernel/boot.o
 
 %.o: %.c
-	$(CC) -c -o $@ $< $(CFLAGS)
+	$(CC) -c -o $@ $< $(CFLAGS) $(INCLD)
 
 kernel: boot.o $(shell find kernel -name '*.c' | sed -e "s/\\.c.*/\\.o/g")
 
@@ -21,15 +22,15 @@ test_lisp: CFLAGS += -Itests
 test_lisp: CFLAGS += -DLISP_TEST
 test_lisp: CFLAGS += -g
 test_lisp: CFLAGS := $(filter-out -ffreestanding,$(CFLAGS))
-test_lisp: CFLAGS := $(filter-out -Ikernel,$(CFLAGS))
+test_lisp: CFLAGS := $(filter-out -Ikernel,$(INCLD))
 test_lisp: lisp tests/lisp_test.o
 	$(CC) -Itests -Ilisp -o test_lisp tests/lisp_test.o $(LOBJ) -g
 
 
 os.bin: lisp kernel
-	$(CC) -T linker.ld -o os.bin -ffreestanding -O2 -nostdlib $(KOBJ) $(LOBJ) -lgcc
+	$(CC) -T linker.ld -o os.bin $(CFLAGS) $(KOBJ) $(LOBJ) -lgcc
 
-debug: CFLAGS += -DDEBUG
+debug: CFLAGS += -DKDEBUG
 debug: os.bin
 
 test: kernel $(TESTS)
