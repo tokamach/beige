@@ -4,13 +4,13 @@
 
 #define IDT_ENTRIES 256
 
-typedef struct IDT_Entry {
+typedef struct idt_entry {
     uint16_t offset_low;
     uint16_t segment_selector;
     uint8_t  zero;
     uint8_t  flags;
     uint16_t offset_high;
-}__attribute__((packed)) IDT_Entry_t;
+}__attribute__((packed)) idt_entry_t;
 
 typedef struct idt_ptr {
     uint16_t limit;
@@ -18,7 +18,7 @@ typedef struct idt_ptr {
 }__attribute__((packed)) idt_ptr_t;
 
 static struct {
-    IDT_Entry_t entries[IDT_ENTRIES];
+    idt_entry_t entries[IDT_ENTRIES];
     idt_ptr_t pointer;
 } idt;
 

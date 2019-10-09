@@ -10,38 +10,38 @@
 #include "../kernel/kterm.h"
 #endif
 
-Atom_t* make_atom(const char* str)
+atom_t* make_atom(const char* str)
 {
-    Atom_t* ret = kmalloc(sizeof(Atom_t));
+    atom_t* ret = kmalloc(sizeof(atom_t));
     ret->str = kmalloc(strlen(str));
     strcopy(str, ret->str);
     return ret;
 }
 
-void free_atom(Atom_t* atom)
+void free_atom(atom_t* atom)
 {
     kfree(atom);
 }
 
-SExpElem_t* make_sexp_elem_atom(Atom_t* atom)
+sexp_elem_t* make_sexp_elem_atom(atom_t* atom)
 {
-    SExpElem_t* tmp = kmalloc(sizeof(SExpElem_t));
+    sexp_elem_t* tmp = kmalloc(sizeof(sexp_elem_t));
     tmp->type = Atom;
     tmp->val.atom = atom;
     tmp->next = NULL;
     return tmp;
 }
 
-SExpElem_t* make_sexp_elem_list(SExp_t* list)
+sexp_elem_t* make_sexp_elem_list(sexp_t* list)
 {
-    SExpElem_t* tmp = kmalloc(sizeof(SExpElem_t));
+    sexp_elem_t* tmp = kmalloc(sizeof(sexp_elem_t));
     tmp->type = List;
     tmp->val.list = list;
     tmp->next = NULL;
     return tmp;
 }
 
-void free_sexp_elem(SExpElem_t* elem)
+void free_sexp_elem(sexp_elem_t* elem)
 {
     if(elem->type == List)
 	free_sexp(elem->val.list);
@@ -51,18 +51,18 @@ void free_sexp_elem(SExpElem_t* elem)
     kfree(elem);
 }
 
-SExp_t* make_sexp()
+sexp_t* make_sexp()
 {
-    SExp_t* tmp = kmalloc(sizeof(SExp_t));
+    sexp_t* tmp = kmalloc(sizeof(sexp_t));
     tmp->first = NULL;
     tmp->size  = 0;
     return tmp;
 }
 
-void free_sexp(SExp_t* sexp)
+void free_sexp(sexp_t* sexp)
 {
-    SExpElem_t* nextnode = sexp->first;
-    SExpElem_t* tmp = nextnode;
+    sexp_elem_t* nextnode = sexp->first;
+    sexp_elem_t* tmp = nextnode;
 
     //waht the fuck is this
     while(nextnode)
@@ -75,9 +75,9 @@ void free_sexp(SExp_t* sexp)
     kfree(sexp);
 }
 
-SExpElem_t* sexp_elem_at(SExp_t* sexp, int index)
+sexp_elem_t* sexp_elem_at(sexp_t* sexp, int index)
 {
-    SExpElem_t* tmp = sexp->first;
+    sexp_elem_t* tmp = sexp->first;
     
     if(!tmp)
 	return NULL;
@@ -93,9 +93,9 @@ SExpElem_t* sexp_elem_at(SExp_t* sexp, int index)
     return tmp;
 }
 
-void sexp_add_elem(SExp_t* sexp, SExpElem_t* new)
+void sexp_add_elem(sexp_t* sexp, sexp_elem_t* new)
 {
-    SExpElem_t* end = sexp_elem_at(sexp, sexp->size - 1);
+    sexp_elem_t* end = sexp_elem_at(sexp, sexp->size - 1);
     
     if(!end)
     {
@@ -110,10 +110,10 @@ void sexp_add_elem(SExp_t* sexp, SExpElem_t* new)
     sexp->size++;
 }
 
-void sexp_pop(SExp_t* sexp)
+void sexp_pop(sexp_t* sexp)
 {
     //get last elem
-    SExpElem_t* tmp = sexp_elem_at(sexp, sexp->size - 1);
+    sexp_elem_t* tmp = sexp_elem_at(sexp, sexp->size - 1);
     //free it
     free_sexp_elem(tmp);
 

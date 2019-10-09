@@ -6,11 +6,11 @@
 #define MAX_TOKEN_LEN 128
 
 //Stores state of parsing
-typedef struct Reader {
+typedef struct reader {
     int offset;
     char* str;
-} Reader_t;
+} reader_t;
 
-SExp_t* lisp_read(char* str);
-void print_sexp(SExp_t* sexp);
-void print_sexp_debug(SExp_t* sexp);
+sexp_t* lisp_read(char* str);
+void print_sexp(sexp_t* sexp);
+void print_sexp_debug(sexp_t* sexp);

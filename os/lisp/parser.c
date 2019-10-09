@@ -13,30 +13,30 @@
 #include "../kernel/kterm.h"
 #endif
 
-Reader_t* make_reader(char* str)
+reader_t* make_reader(char* str)
 {
-    Reader_t* r = kmalloc(sizeof(Reader_t));
+    reader_t* r = kmalloc(sizeof(reader_t));
     r->offset = 0;
     r->str = str;
     return r;
 }
 
-char reader_cur(Reader_t* reader)
+char reader_cur(reader_t* reader)
 {
     return reader->str[reader->offset];
 }
 
-char reader_peek(Reader_t* reader)
+char reader_peek(reader_t* reader)
 {
     return reader->str[reader->offset + 1];
 }
 
-char reader_next(Reader_t* reader)
+char reader_next(reader_t* reader)
 {
     return reader->str[++reader->offset];
 }
 
-Atom_t* tokenize_one(Reader_t* reader)
+atom_t* tokenize_one(reader_t* reader)
 {
     char* tok = kmalloc(sizeof(char) * (MAX_TOKEN_LEN + 1));
     int offset = 0;
@@ -60,9 +60,9 @@ Atom_t* tokenize_one(Reader_t* reader)
     return make_atom(tok);
 }
 
-SExp_t* parse_sexp(Reader_t* r)
+sexp_t* parse_sexp(reader_t* r)
 {
-    SExp_t* sexp = make_sexp();
+    sexp_t* sexp = make_sexp();
     /*
       loop on c
           c = '(':   recurse
@@ -76,8 +76,8 @@ SExp_t* parse_sexp(Reader_t* r)
 	if(c == '(')
 	{
 	    //todo tail recurse (pointless)
-	    SExp_t* child = parse_sexp(r);
-	    SExpElem_t* elem = make_sexp_elem_list(child);
+	    sexp_t* child = parse_sexp(r);
+	    sexp_elem_t* elem = make_sexp_elem_list(child);
 	    sexp_add_elem(sexp, elem);
 	    c = reader_next(r);
 	}
@@ -85,7 +85,7 @@ SExp_t* parse_sexp(Reader_t* r)
 	else if (c != ' ')
 	{
 	    //TODO: check if c = valid token
-	    Atom_t* a = tokenize_one(r);
+	    atom_t* a = tokenize_one(r);
 	    sexp_add_elem(sexp, make_sexp_elem_atom(a));
 	    c = reader_cur(r);
 	}
@@ -98,10 +98,10 @@ SExp_t* parse_sexp(Reader_t* r)
     return sexp;
 }
 
-SExp_t* lisp_read(char* str)
+sexp_t* lisp_read(char* str)
 {
-    Reader_t* r = make_reader(str);
-    SExp_t* root;
+    reader_t* r = make_reader(str);
+    sexp_t* root;
 
     root = parse_sexp(r);
     return root;
@@ -115,7 +115,7 @@ void pad_print(int padding, char* str)
     k_print(str);
 }
 
-void print_sexp_iter(SExp_t* root, int depth, int debug)
+void print_sexp_iter(sexp_t* root, int depth, int debug)
 {
     pad_print(depth, "\n");
     pad_print(depth, "(");
@@ -129,7 +129,7 @@ void print_sexp_iter(SExp_t* root, int depth, int debug)
     
     for(int i = 0; i < root->size; i++)
     {
-	SExpElem_t* elem = sexp_elem_at(root, i);
+	sexp_elem_t* elem = sexp_elem_at(root, i);
 	
 	if(debug)
 	{
@@ -160,12 +160,12 @@ void print_sexp_iter(SExp_t* root, int depth, int debug)
     k_print(")");
 }
 
-void print_sexp(SExp_t* root)
+void print_sexp(sexp_t* root)
 {
     print_sexp_iter(root, 0, 0);
 }
 
-void print_sexp_debug(SExp_t* root)
+void print_sexp_debug(sexp_t* root)
 {
     print_sexp_iter(root, 0, 1);
 }

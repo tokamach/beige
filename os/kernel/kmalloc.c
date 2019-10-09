@@ -10,7 +10,7 @@
 
 //malloc data
 //uint8_t* bitmap;
-BitmapStatus* bitmap; 
+bitmap_status* bitmap; 
 void*    arena;
 size_t total_blocks;
 size_t max_blocks;
@@ -32,7 +32,7 @@ void k_malloc_init(multiboot_info_t* mbd)
     //initalise bitmap
     total_blocks = 0;
     max_blocks = MAX_HEAP_SIZE * factor;
-    bitmap = (BitmapStatus*)mem_region_start;
+    bitmap = (bitmap_status*)mem_region_start;
     arena  = bitmap + max_blocks;
 
     for(size_t i = 0; i < max_blocks; i++)

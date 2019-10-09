@@ -8,7 +8,7 @@
 typedef enum bs {
     Free,
     Used
-} BitmapStatus;
+} bitmap_status;
 
 void  k_malloc_init(multiboot_info_t* mbd);
 void* kmalloc(size_t size);

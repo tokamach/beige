@@ -5,43 +5,43 @@
 #define MAX_ATOM_LEN 128
 
 //Atom
-typedef struct Atom {
+typedef struct atom {
     char* str;
     //TODO: add lisp data type
-} Atom_t;
+} atom_t;
 
-Atom_t* make_atom(const char* str);
-void free_atom(Atom_t* atom);
+atom_t* make_atom(const char* str);
+void free_atom(atom_t* atom);
 
 typedef enum e_elem_type {
     Atom,
     List
-} ElemType;
+} elem_type;
 
-typedef struct SExp SExp_t;
+typedef struct sexp sexp_t;
 //Boxed void pointer with "type" annontation
-typedef struct SExpElem {
-    ElemType type;
+typedef struct sexp_elem {
+    elem_type type;
     union {
-	Atom_t* atom;
-	SExp_t* list;
+	atom_t* atom;
+	sexp_t* list;
     } val; //either List_t or Atom
-    struct SExpElem* next;
+    struct sexp_elem* next;
     
-} SExpElem_t;
+} sexp_elem_t;
 
-SExpElem_t* make_sexp_elem_atom(Atom_t* atom);
-SExpElem_t* make_sexp_elem_list(SExp_t* list);
-void free_sexp_elem(SExpElem_t* elem);
+sexp_elem_t* make_sexp_elem_atom(atom_t* atom);
+sexp_elem_t* make_sexp_elem_list(sexp_t* list);
+void free_sexp_elem(sexp_elem_t* elem);
 
 //Sexp
-typedef struct SExp {
+typedef struct sexp {
     //List_t list;
-    SExpElem_t* first;
+    sexp_elem_t* first;
     int size;
-} SExp_t;
+} sexp_t;
 
-SExp_t* make_sexp();
-void free_sexp(SExp_t* sexp);
-void sexp_add_elem(SExp_t* sexp, SExpElem_t* elem);
-SExpElem_t* sexp_elem_at(SExp_t* sexp, int index);
+sexp_t* make_sexp();
+void free_sexp(sexp_t* sexp);
+void sexp_add_elem(sexp_t* sexp, sexp_elem_t* elem);
+sexp_elem_t* sexp_elem_at(sexp_t* sexp, int index);

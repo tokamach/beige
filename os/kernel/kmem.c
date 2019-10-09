@@ -36,7 +36,7 @@ void k_mem_init(multiboot_info_t* mbd)
     //init mem map info
     mem_map_addr = mbd->mmap_addr;
     mem_map_size = mbd->mmap_length;
-    mem_map_entries = mem_map_size / sizeof(MMapEntry_t);
+    mem_map_entries = mem_map_size / sizeof(m_map_entry_t);
     
     //find largest region
     size_t   biggest_size = 0;
@@ -44,7 +44,7 @@ void k_mem_init(multiboot_info_t* mbd)
 
     for(uint16_t i = 0; i < mem_map_entries; i++)
     {
-	MMapEntry_t* entry = k_mem_map_entry(i);
+	m_map_entry_t* entry = k_mem_map_entry(i);
 	uint64_t addr = entry->AddrH;
 	addr <<= 32;
 	addr = addr | entry->AddrL;
@@ -82,9 +82,9 @@ void k_mem_init(multiboot_info_t* mbd)
     k_println("memory initialized");
 }
 
-MMapEntry_t* k_mem_map_entry(uint16_t entry)
+m_map_entry_t* k_mem_map_entry(uint16_t entry)
 {
-    MMapEntry_t* res = (MMapEntry_t*)(mem_map_addr + (entry * sizeof(MMapEntry_t)));
+    m_map_entry_t* res = (m_map_entry_t*)(mem_map_addr + (entry * sizeof(m_map_entry_t)));
     return res;
 }
 
@@ -104,12 +104,12 @@ void k_print_mem_map()
 
 	k_print("\n mem map:\n");
 
-	int entries = mem_map_size / sizeof(MMapEntry_t);
+	int entries = mem_map_size / sizeof(m_map_entry_t);
 
 	k_print("|Size|Addr|Len|Type|\n");
 	for(int i = 0; i < entries; i++)
 	{
-	    MMapEntry_t* entry = k_mem_map_entry(i);
+	    m_map_entry_t* entry = k_mem_map_entry(i);
 
 	    uint64_t addr = entry->AddrH;
 	    addr <<= 32;

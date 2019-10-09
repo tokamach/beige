@@ -4,7 +4,7 @@
 #include "kmalloc.h"
 #include "kterm.h"
 
-IDT_Entry_t set_idt_entry(uint8_t entry,
+idt_entry_t set_idt_entry(uint8_t entry,
 			  uint32_t offset,
 			  uint16_t seg_sel,
 			  uint8_t  present,
