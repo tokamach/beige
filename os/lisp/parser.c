@@ -77,7 +77,7 @@ sexp_t* parse_sexp(reader_t* r)
 	{
 	    //todo tail recurse (pointless)
 	    sexp_t* child = parse_sexp(r);
-	    sexp_elem_t* elem = make_sexp_elem_list(child);
+	    cons_t* elem = make_sexp_elem_list(child);
 	    sexp_add_elem(sexp, elem);
 	    c = reader_next(r);
 	}
@@ -129,7 +129,7 @@ void print_sexp_iter(sexp_t* root, int depth, int debug)
     
     for(int i = 0; i < root->size; i++)
     {
-	sexp_elem_t* elem = sexp_elem_at(root, i);
+	cons_t* elem = sexp_elem_at(root, i);
 	
 	if(debug)
 	{

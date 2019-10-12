@@ -23,25 +23,25 @@ void free_atom(atom_t* atom)
     kfree(atom);
 }
 
-sexp_elem_t* make_sexp_elem_atom(atom_t* atom)
+cons_t* make_sexp_elem_atom(atom_t* atom)
 {
-    sexp_elem_t* tmp = kmalloc(sizeof(sexp_elem_t));
+    cons_t* tmp = kmalloc(sizeof(cons_t));
     tmp->type = Atom;
     tmp->val.atom = atom;
     tmp->next = NULL;
     return tmp;
 }
 
-sexp_elem_t* make_sexp_elem_list(sexp_t* list)
+cons_t* make_sexp_elem_list(sexp_t* list)
 {
-    sexp_elem_t* tmp = kmalloc(sizeof(sexp_elem_t));
+    cons_t* tmp = kmalloc(sizeof(cons_t));
     tmp->type = List;
     tmp->val.list = list;
     tmp->next = NULL;
     return tmp;
 }
 
-void free_sexp_elem(sexp_elem_t* elem)
+void free_sexp_elem(cons_t* elem)
 {
     if(elem->type == List)
 	free_sexp(elem->val.list);
@@ -61,8 +61,8 @@ sexp_t* make_sexp()
 
 void free_sexp(sexp_t* sexp)
 {
-    sexp_elem_t* nextnode = sexp->first;
-    sexp_elem_t* tmp = nextnode;
+    cons_t* nextnode = sexp->first;
+    cons_t* tmp = nextnode;
 
     //waht the fuck is this
     while(nextnode)
@@ -75,9 +75,9 @@ void free_sexp(sexp_t* sexp)
     kfree(sexp);
 }
 
-sexp_elem_t* sexp_elem_at(sexp_t* sexp, int index)
+cons_t* sexp_elem_at(sexp_t* sexp, int index)
 {
-    sexp_elem_t* tmp = sexp->first;
+    cons_t* tmp = sexp->first;
     
     if(!tmp)
 	return NULL;
@@ -93,9 +93,9 @@ sexp_elem_t* sexp_elem_at(sexp_t* sexp, int index)
     return tmp;
 }
 
-void sexp_add_elem(sexp_t* sexp, sexp_elem_t* new)
+void sexp_add_elem(sexp_t* sexp, cons_t* new)
 {
-    sexp_elem_t* end = sexp_elem_at(sexp, sexp->size - 1);
+    cons_t* end = sexp_elem_at(sexp, sexp->size - 1);
     
     if(!end)
     {
@@ -113,7 +113,7 @@ void sexp_add_elem(sexp_t* sexp, sexp_elem_t* new)
 void sexp_pop(sexp_t* sexp)
 {
     //get last elem
-    sexp_elem_t* tmp = sexp_elem_at(sexp, sexp->size - 1);
+    cons_t* tmp = sexp_elem_at(sexp, sexp->size - 1);
     //free it
     free_sexp_elem(tmp);
 
