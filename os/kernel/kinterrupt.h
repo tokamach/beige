@@ -37,11 +37,12 @@ typedef struct cpu_state {
   uint32_t eax;
 }__attribute__((packed)) cpu_state_t;
 
-typedef struct stack_state {
+typedef struct interrupt_frame {
     uint32_t error_code;
     uint32_t eip;
     uint32_t cs;
     uint32_t eflags;
-}__attribute__((packed)) stack_state_t;
+}__attribute__((packed)) interrupt_frame_t;
 
-void interrupt_handler(cpu_state_t cpu, stack_state_t stack, uint32_t interrupt);
+__attribute__((interrupt))
+void interrupt_handler(interrupt_frame_t* frame);

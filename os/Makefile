@@ -1,6 +1,6 @@
 CC     := ../toolchain/bin/i686-elf-gcc
 AS     := ../toolchain/bin/i686-elf-as
-CFLAGS := -ffreestanding -nostdlib -Wall -Wextra
+CFLAGS := -ffreestanding -nostdlib -Wall -Wextra -mgeneral-regs-only
 INCLD  := -Ikernel -Ilisp
 KOBJ   := $(shell find kernel -name '*.o')
 LOBJ   := $(shell find lisp -name '*.o')

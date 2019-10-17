@@ -1,4 +1,4 @@
-* Project Planning
+* DONE Project Planning
 ** DONE Which Architecture?
 - ARM
 - x86
@@ -48,27 +48,25 @@
 
 - booting:  https://www.gnu.org/software/grub/manual/multiboot/multiboot.html
 
-
-* OS Planning
+* OS Plan
 ** Principles
 - Lisp as primary language
 - Immutable data structures first
 - Memory is large, don't worry about it
 - Lisp process consists of 'env' and code sections
-** TODO Scheduler
+** Scheduler
 - calculate avg wait and turnaround time
+- mark lisp processes for JIT
 *** Round robin
-** TODO Process Model
+** Process Model
 *** Header
 - id, name
 - compiled?
 - should be on the fly compiled?
 *** Env
+- just use a list initally (BAD)
 - hashmap
-- global vars and consts
-**** code metadata
-- special entry
-- list of functions, their relative addrs, and init func
+- global vars, consts, functions in current scope
 *** Stack
 - lexically scoped vars
 *** Code (List)
@@ -78,9 +76,9 @@
 *** Thread Model
 - children share parents env in a read only form
 - children have their own private mutable envcat
-** TODO Memory Management
+** Memory Management
 - SDM vol3 3
-*** TODO malloc
+*** malloc
 - needs tidying/more sanity checks
 - needs bitmap
 - needs block merging
@@ -162,8 +160,13 @@ y* Lisp Planning
 
 * TODO Proposal
   SCHEDULED: <2019-10-21 Mon>
-** 
-
+** Intro
+** Background
+-  yang et al (p103-yang.pdf) virtual memory support for gargage collected applications 
+- 
+** Impl
+** Work Plan
+** Resources Required
 
 * Tasks
 ** all
@@ -181,6 +184,10 @@ y* Lisp Planning
 ** lisp
 - test c strings
 - test c lists 
+*** data types
+**** TODO rewrite s-exp to just have a basic lisp obj (cons_t)
+- the s_exp wrapper is redundant
+*** env
 *** parser
 - she doesn't like too many leading or trailing spaces
 ** interrupts
@@ -190,37 +197,3 @@ y* Lisp Planning
 ** multitasking
 ** userspace
 ** gui
-
-#+BEGIN_SRC dot :cmd fdp :file arch.png
-graph os_architecture {
-    rank = "max";
-
-    subgraph cluster_kernel {
-        label = "Kernel";
-    }
-    
-    subgraph cluster_lisp_vm {
-        label = "Lisp VM"
-	global_state;
-	global_consts;
-    }
-
-    subgraph cluster_lisp_proc_a {
-        label = "Lisp Process 1";
-        code_a [label="Code"];
-	env_a [label="Env"];
-    }
-
-    subgraph cluster_lisp_proc_b {
-        label = "Lisp Process 2";
-        code_b [label="Code"];
-	env_b [label="Env"];
-    }
-
-    cluster_kernel -- cluster_lisp_vm;
-    cluster_kernel -- cluster_lisp_proc_a;
-    cluster_kernel -- cluster_lisp_proc_b;
-}
-#+END_SRC
-#+RESULTS:
-[[file:arch.png]]
