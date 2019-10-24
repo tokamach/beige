@@ -17,3 +17,12 @@ os/isodir/*
 .ccls-cache/*
 compile_commands.json
 os/lisptest
+
+proposal/*.aux
+proposal/*.bbl
+proposal/*.bcf
+proposal/*.blg
+proposal/*.log
+proposal/*.pdf
+proposal/*.xml
+proposal/auto
