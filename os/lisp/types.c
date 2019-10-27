@@ -10,21 +10,6 @@
 #include "../kernel/kterm.h"
 #endif
 
-/*
-atom_t* make_atom(const char* str)
-{
-    atom_t* ret = kmalloc(sizeof(atom_t));
-    ret->str = kmalloc(strlen(str));
-    strcopy(str, ret->str);
-    return ret;
-}
-
-void free_atom(atom_t* atom)
-{
-    kfree(atom);
-}
-*/
-
 cons_t* cons(cons_t* car, cons_t* cdr)
 {
     cons_t* tmp = kmalloc(sizeof(cons_t));
@@ -58,8 +43,8 @@ void free_cons(cons_t* elem)
 
 void append(cons_t* list, cons_t* elem)
 {
-    if(list->type != Atom)
-	return; //ERROR
+    if(list->type == Atom)
+	return; //ERROR: can't access cdr of atom
 	
     while(list->cdr != NULL)
 	list = list->cdr;

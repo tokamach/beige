@@ -61,52 +61,72 @@ char* tokenize_one(reader_t* reader)
     return tok;
 }
 
-cons_t* parse_sexp(reader_t* r)
+cons_t* parse_sym(reader_t* r)
+{
+    char* str = tokenize_one(r);
+    cons_t* newatom = atom(str);	    
+    kfree(str);
+    return newatom;
+}
+
+cons_t* parse_list(reader_t* r)
 {
     /*
-      loop on c
-          c = '(':   recurse
-          c = token: tokenize(r), add to sexp->list
-	  c = ')': return sexp
+      c = '(': car = recurse
+               cdr = continue loop
+      c = tok: cur->car = tokenize(r)
+               cur = cur->cdr               
+      c = ')': cdr = nil
+               return sexp
     */
+
     char c;
-TOP:
-    c = reader_next(r);
-    cons_t* ret;
+    cons_t* ret = NULL; //maintains pointer to root
+    
+    while((c = reader_next(r)) &&
+	   c != ')')
+    {
+	if(c == '(')
+	{
+	    cons_t* newcons = cons(parse_list(r), NULL);
+	    if(ret == NULL)
+		ret = newcons;
+	    else
+		append(ret, newcons);
+	}
+	else if(c == ' ' || c == '\n' || c == ' ') //TODO: is_blank
+	{
+	    continue;
+	}
+	else// if (c != ' ') //TODO: is_alpha
+	{
+	    //TODO: check if c = atom
+	    //TODO: check if c = int
+	    
+	    if(ret == NULL)
+		ret = cons(parse_sym(r), NULL);
+	    else
+		append(ret, cons(parse_sym(r), NULL));
+	}
+    }
+
+    return ret;
+}
+
+cons_t* parse_exp(reader_t* r)
+{
+    char c = reader_cur(r);    
     if(c == '(')
-    {		
-	return cons(parse_sexp(r), parse_sexp(r));
-    }
-    else if (c == ')' || c == '\0')
-    {
-	return NULL;
-    }
-    else if (c == '.')
-    {
-	//TODO: cons
-    }
-    else if(c == ' ')
-    {
-	goto TOP;
-    }
-    else// if (c != ' ') //TODO: is_alpha
-    {
-	//TODO: check if c = atom
-	//TODO: check if c = int
-	char* str = tokenize_one(r);
-	printf("[%s, %c]", str, reader_cur(r));
-	ret = atom(str);
-	kfree(str);
-	
-	return cons(ret, parse_sexp(r));
-    }
+	return parse_list(r);
+    else //TODO: is_alpha
+	return parse_sym(r);
 }
 
 cons_t* lisp_read(char* str)
 {	
     reader_t* r = make_reader(str);
-    r->offset--; //TODO: fix this dumb hack
-    return parse_sexp(r); //TODO: fix this car thing
+    //r->offset; //TODO: fix this dumb hack
+    return parse_exp(r); //TODO: fix this car thing
 }
 
 void pad_print(int padding, char* str)
@@ -132,7 +152,7 @@ void print_cons_iter(cons_t* root, int depth, int debug)
 	if(elem->type == Cons)
 	{
 	    k_print("{");
-	    k_print(elem->type ? "List" : "Atom");
+	    k_print("Cons");
 	    k_print(":");
 	    k_print_hex((size_t)(elem->car));
 	    k_print(":");
@@ -174,7 +194,6 @@ void print_cons_iter(cons_t* root, int depth, int debug)
 
 void print_cons(cons_t* root)
 {
-    k_print("\n");
     print_cons_iter(root, 0, 0);
 }
 
