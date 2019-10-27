@@ -201,3 +201,39 @@ void print_cons_debug(cons_t* root)
 {
     print_cons_iter(root, 0, 1);
 }
+
+void print_sexp_iter(cons_t* root, int depth, int debug)
+{
+    cons_t* elem = root;
+
+    /*
+     * each elem->car.type =
+     *    atom: print val, space
+     *    cons: recur
+     */
+
+    pad_print(depth, "(");
+    while(elem)
+    {
+	if(elem->car->type == Atom)
+	{
+	    k_print(" ");
+	    k_print(elem->car->val);
+	}
+	else if(elem->type == Cons)
+	{
+	    //its list
+	    k_print("\n");
+	    print_sexp_iter(elem->car, depth + 2, debug);
+	}
+	
+	elem = elem->cdr;
+    }
+
+    k_print(")");
+}
+
+void print_sexp(cons_t* root)
+{
+    print_sexp_iter(root, 0, 0);
+}
