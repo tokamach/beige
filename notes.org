@@ -132,12 +132,11 @@
 - full coverage unit tests
 
 ** TODO Lisp
-*** Kernelspace
-*** C interaction
+*** Kernel REPL
 *** fundamenal functions
 - [[https://stackoverflow.com/questions/3482389/how-many-primitives-does-it-take-to-build-a-lisp-machine-ten-seven-or-five/][stackoverflow question]]
 *** low level interaction funcs
-y* Lisp Planning
+* Lisp Planning
 - if they could do it on a PDP, you can do it too
 ** Parser
 - no regex
@@ -157,8 +156,13 @@ y* Lisp Planning
 ** Memory Layout
 - word (32bit) pair of car and cdr for cons cell
 - odd addr is car, even is cdr
-
-* TODO Proposal
+** Native Calls
+- in env a native functions value is a function pointer to a C function
+*** kernel env
+- premade env with native functions for kprint, inb/outb, peek/poke
+- a repl can run in kernel
+- allows writing drivers in lisp
+* DONE Proposal
   SCHEDULED: <2019-10-21 Mon>
 ** Intro
 ** Background
