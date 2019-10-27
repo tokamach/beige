@@ -10,6 +10,7 @@
 #include "../kernel/kterm.h"
 #endif
 
+/*
 atom_t* make_atom(const char* str)
 {
     atom_t* ret = kmalloc(sizeof(atom_t));
@@ -22,35 +23,51 @@ void free_atom(atom_t* atom)
 {
     kfree(atom);
 }
+*/
 
-cons_t* make_sexp_elem_atom(atom_t* atom)
+cons_t* cons(cons_t* car, cons_t* cdr)
+{
+    cons_t* tmp = kmalloc(sizeof(cons_t));
+    tmp->type = Cons;
+    tmp->car = car;
+    tmp->cdr = cdr;
+    return tmp;
+}
+
+cons_t* atom(char* str)
 {
     cons_t* tmp = kmalloc(sizeof(cons_t));
     tmp->type = Atom;
-    tmp->val.atom = atom;
-    tmp->next = NULL;
+    tmp->val = kmalloc(sizeof(char) * strlen(str));
+    strcopy(str, tmp->val);
     return tmp;
 }
 
-cons_t* make_sexp_elem_list(sexp_t* list)
+void free_cons(cons_t* elem)
 {
-    cons_t* tmp = kmalloc(sizeof(cons_t));
-    tmp->type = List;
-    tmp->val.list = list;
-    tmp->next = NULL;
-    return tmp;
-}
-
-void free_sexp_elem(cons_t* elem)
-{
-    if(elem->type == List)
-	free_sexp(elem->val.list);
-/*    else
-      kfree(elem->val.atom); */
+    if(elem->type == Cons)
+    {
+	free_cons(elem->car);
+	free_cons(elem->cdr);
+    }
+    else
+      kfree(elem->val);
     
     kfree(elem);
 }
 
+void append(cons_t* list, cons_t* elem)
+{
+    if(list->type != Atom)
+	return; //ERROR
+	
+    while(list->cdr != NULL)
+	list = list->cdr;
+
+    list->cdr = elem;
+}
+
+/*
 sexp_t* make_sexp()
 {
     sexp_t* tmp = kmalloc(sizeof(sexp_t));
@@ -85,9 +102,9 @@ cons_t* sexp_elem_at(sexp_t* sexp, int index)
     for(int i = 0; i < index; i++)
     {
 	tmp = tmp->next;
-	/*if(!tmp)
+	if(!tmp)
 	    while(1) {k_print("LISTERR");} //out of range, hang TODO: actual err
-	*/
+	
     }
 
     return tmp;
@@ -121,3 +138,4 @@ void sexp_pop(sexp_t* sexp)
     sexp_elem_at(sexp, sexp->size - 2)->next = NULL;
     sexp->size--;
 }
+*/

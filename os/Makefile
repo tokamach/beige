@@ -22,10 +22,9 @@ test_lisp: CFLAGS += -Itests
 test_lisp: CFLAGS += -DLISP_TEST
 test_lisp: CFLAGS += -g
 test_lisp: CFLAGS := $(filter-out -ffreestanding,$(CFLAGS))
-test_lisp: CFLAGS := $(filter-out -Ikernel,$(INCLD))
+test_lisp: INCLD := $(filter-out -Ikernel,$(INCLD))
 test_lisp: lisp tests/lisp_test.o
 	$(CC) -Itests -Ilisp -o test_lisp tests/lisp_test.o $(LOBJ) -g
-
 
 os.bin: lisp kernel
 	$(CC) -T linker.ld -o os.bin $(CFLAGS) $(KOBJ) $(LOBJ) -lgcc

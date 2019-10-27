@@ -9,6 +9,11 @@ int main()
     1\
     (* x (factorial (- x 1)))))";
     
-    SExp_t* tree = lisp_read(code);
-    print_sexp_debug(tree);
+    cons_t* tree = lisp_read("((a b) (c d))");
+    /*cons_t* tree = cons(atom("a"),
+			cons(atom("b"),
+			     cons(atom("see"),
+			     NULL)));*/
+    print_cons_debug(tree);
+    printf("\n");
 }

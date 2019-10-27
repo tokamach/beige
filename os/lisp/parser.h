@@ -11,6 +11,9 @@ typedef struct reader {
     char* str;
 } reader_t;
 
-sexp_t* lisp_read(char* str);
-void print_sexp(sexp_t* sexp);
-void print_sexp_debug(sexp_t* sexp);
+cons_t* lisp_read(char* str);
+void print_cons(cons_t* root);
+void print_cons_debug(cons_t* root);
+
+void print_list(cons_t* root);
+void print_list_debug(cons_t* root);
