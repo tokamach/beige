@@ -18,6 +18,6 @@ int main()
 			      cons(cons(atom("e"),
 					cons(atom("f"), NULL)),
 				   NULL)));
-    print_cons_debug(tree);
+    print_sexp(tree);
     printf("\n");
 }

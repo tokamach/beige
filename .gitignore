@@ -1,3 +1,5 @@
+.DS_store
+
 toolchain/bin
 toolchain/src
 toolchain/i686-elf
@@ -5,18 +7,21 @@ toolchain/include
 toolchain/lib
 toolchain/libexec
 toolchain/share
-.DS_store
+
 *.o
 *.bin
 ref/*
 os/isodir/*
 *.png
+
 .clang_complete
 .ccls
 .ccls-root
 .ccls-cache/*
 compile_commands.json
+
 os/lisptest
+os/test_lisp
 
 proposal/*.aux
 proposal/*.bbl
