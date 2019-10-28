@@ -195,11 +195,13 @@ void print_cons_iter(cons_t* root, int depth, int debug)
 void print_cons(cons_t* root)
 {
     print_cons_iter(root, 0, 0);
+    k_print("\n");
 }
 
 void print_cons_debug(cons_t* root)
 {
     print_cons_iter(root, 0, 1);
+    k_print("\n");
 }
 
 void print_sexp_iter(cons_t* root, int depth, int debug)
@@ -236,4 +238,5 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
 void print_sexp(cons_t* root)
 {
     print_sexp_iter(root, 0, 0);
+    k_print("\n");
 }
