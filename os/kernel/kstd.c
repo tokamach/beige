@@ -4,6 +4,20 @@
 #include "kstd.h"
 #include "kmalloc.h"
 
+/*
+ * Number utilities
+ */
+uint32_t pow(uint32_t n, uint32_t exp)
+{
+    uint32_t result = 1;
+    for(uint32_t i = 0; i < exp; i++)
+	result *= n;
+    return result;
+}
+
+/*
+ * String utilities
+ */
 size_t strlen(const char *s)
 {
     size_t size = 0;
@@ -57,6 +71,24 @@ int itoa(int num, int base, char* str)
     return 0;
 }
 
+// convert string to int
+int atoi(char *str)
+{
+    //TODO: hex check
+
+    int accum = 0;
+    int len = strlen(str);
+    for(int power = len - 1; pow > 0; power--)
+    {
+	accum += pow((str[power - 1] - '0'), power);
+    }
+
+    return accum;
+}
+
+/*
+ * Bitwise utilities
+ */
 size_t align(size_t n)
 {
     return (n + sizeof(size_t) - 1) & ~(sizeof(size_t) - 1);
