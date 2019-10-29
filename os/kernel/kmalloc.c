@@ -38,7 +38,11 @@ void k_malloc_init(multiboot_info_t* mbd)
     for(size_t i = 0; i < max_blocks; i++)
 	bitmap[i] = Free;
 
-    k_println("malloc initialized");
+    k_print("malloc initialized, bitmap at ");
+    k_print_hex((size_t) bitmap);
+    k_print(" heap at ");
+    k_print_hex((size_t) arena);
+    k_print("\n");
 }
 
 //TODO: sanity checks
