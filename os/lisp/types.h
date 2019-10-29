@@ -22,7 +22,8 @@ void free_atom(atom_t* atom);
  */
 typedef enum e_cons_type {
     Cons,
-    Atom
+    Atom,
+    Literal
 } cons_type;
 
 // cons cell, the core of any lisp
@@ -35,17 +36,18 @@ typedef struct cons {
 	    struct cons* car;
 	    struct cons* cdr;
 	};
-	
 	// atom
 	struct {
 	    //TODO: symbol_t and symbol table with lookup
 	    char* val;
 	};
+	int numval;
     };
 } cons_t;
 
 cons_t* cons(cons_t* car, cons_t* cdr);
 cons_t* atom(char* str);
+cons_t* literal(int num);
 void free_cons(cons_t* elem);
 
 void append(cons_t* list, cons_t* elem);

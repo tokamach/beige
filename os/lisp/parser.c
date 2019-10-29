@@ -11,6 +11,7 @@
 //real world
 #include "../kernel/kmalloc.h"
 #include "../kernel/kterm.h"
+#include "../kernel/kstd.h"
 #endif
 
 reader_t* make_reader(char* str)
@@ -61,12 +62,59 @@ char* tokenize_one(reader_t* reader)
     return tok;
 }
 
+int valid_dec_literal(char* str)
+{
+    int ret = 1;
+    while(*str != '\0' &&
+	  ret)
+    {
+	if(*str < '0' ||
+	   *str > '9')
+	{
+	    ret = 0;
+	}
+	str++;
+    }
+
+    return ret;
+}
+
+int valid_atom(char* str)
+{
+    int ret = 1;
+    while(*str != '\0' &&
+	  ret)
+    {
+	if((*str < 'a'  ||
+	    *str > 'z') &&
+	   (*str != '-' &&
+	    *str != '*'))
+	{
+	    ret = 0;
+	}
+	str++;
+    }
+
+    return ret;
+}
+
 cons_t* parse_sym(reader_t* r)
 {
     char* str = tokenize_one(r);
-    cons_t* newatom = atom(str);	    
+    cons_t* newatom;
+	    
+    if (valid_atom(str))
+    {
+	newatom = atom(str);	    
+    }
+    else if(valid_dec_literal(str))
+    {
+	newatom = literal(atoi(str));
+    }
+
     kfree(str);
-    return newatom;
+    
+    return newatom;	
 }
 
 cons_t* parse_list(reader_t* r)
@@ -177,6 +225,11 @@ void print_cons_iter(cons_t* root, int depth, int debug)
 
 	pad_print(1, elem->val);
     }
+    else if(elem->type == Literal)
+    {
+	k_print(" ");
+	k_print_num(elem->numval);
+    }
     else if(elem->type == Cons)
     {
 	k_print("─┐");
@@ -217,7 +270,16 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
     pad_print(depth, "(");
     while(elem)
     {
-	if(elem->car->type == Atom)
+	if(elem == NULL)
+	{
+	    break;
+	}
+	else if(elem->car->type == Literal)
+	{
+	    k_print(" ");
+	    k_print_num(elem->numval);
+	}
+	else if(elem->car->type == Atom)
 	{
 	    k_print(" ");
 	    k_print(elem->car->val);

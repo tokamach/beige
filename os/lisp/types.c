@@ -28,6 +28,14 @@ cons_t* atom(char* str)
     return tmp;
 }
 
+cons_t* literal(int val)
+{
+    cons_t* tmp = kmalloc(sizeof(cons_t));
+    tmp->type = Literal;
+    tmp->numval = val;
+    return tmp;    
+}
+
 void free_cons(cons_t* elem)
 {
     if(elem->type == Cons)
