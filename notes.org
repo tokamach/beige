@@ -162,6 +162,14 @@
 - premade env with native functions for kprint, inb/outb, peek/poke
 - a repl can run in kernel
 - allows writing drivers in lisp
+** Garbage Collector
+- mark/sweep
+- concurrently marks and sweeps
+- flag objects dirty when modified
+- unflag when marked
+- don't sweep if dirty
+
+- consider the generational hypothesis: 
 * DONE Proposal
   SCHEDULED: <2019-10-21 Mon>
 ** Intro
@@ -174,10 +182,11 @@
 
 * Tasks
 ** all
-- rewrite structs to use snake_case
 - switch to NASM?
+- literate programming? (nah)
 ** malloc
 - use linked list to store mem map
+- optimize for cons allocation
 ** segmentation
 - basic flat model
 - none?
@@ -186,14 +195,25 @@
 - linked list or AVL Tree to store
 - pages
 ** lisp
-- test c strings
-- test c lists 
+- write tests for lisp code
 *** data types
 **** TODO rewrite s-exp to just have a basic lisp obj (cons_t)
 - the s_exp wrapper is redundant
+*** eval
+- write it
+**** kernel repl
+- need keyboard driver
+- write kernel env
 *** env
+- add types, side effect inference
+- hashmap for faster lookup
+**** kernel env
+- useful low level functions
+- peek/poke, inb/outb, direct memory access (unsafe!)
+- kernel print
 *** parser
-- she doesn't like too many leading or trailing spaces
+- add correct checks for valid symbols, literals, mismatched parens
+- add literal type
 ** interrupts
 - write assembly macro for generic interrupt handler
 - tell the PIC that we're handling interrupts now

@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 //Number
-uint32_t pow(uint32_t n, uint32_t exp);
+uint32_t power(uint32_t n, uint32_t exp);
 
 //String
 size_t strlen(const char *s);

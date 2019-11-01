@@ -43,8 +43,10 @@ void free_cons(cons_t* elem)
 	free_cons(elem->car);
 	free_cons(elem->cdr);
     }
-    else
-      kfree(elem->val);
+    else if(elem->type == Atom)
+	kfree(elem->val);
+    else if(elem->type == Literal)
+	kfree(elem->numval);
     
     kfree(elem);
 }

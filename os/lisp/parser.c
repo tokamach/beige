@@ -101,7 +101,7 @@ int valid_atom(char* str)
 cons_t* parse_sym(reader_t* r)
 {
     char* str = tokenize_one(r);
-    cons_t* newatom;
+    cons_t* newatom = NULL;
 	    
     if (valid_atom(str))
     {
@@ -215,6 +215,14 @@ void print_cons_iter(cons_t* root, int depth, int debug)
 	    k_print_hex((size_t)(elem->val));
 	    k_print("} ");
 	}
+	else if(elem->type == Literal)
+	{
+	    k_print("{");
+	    k_print("Literal");
+	    k_print(":");
+	    k_print_hex((size_t)(elem->numval));
+	    k_print("} ");
+	}
     }
 
     if(elem->type == Atom)
@@ -270,25 +278,71 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
     pad_print(depth, "(");
     while(elem)
     {
+	if(debug && elem)
+	{
+	    if(elem->type == Cons)
+	    {
+		k_print("{");
+		k_print("Cons");
+		k_print(":");
+		k_print_hex((size_t)(elem->car));
+		k_print(":");
+		k_print_hex((size_t)(elem->cdr));
+		k_print("}");
+	    }
+	    else if(elem->type == Atom)
+	    {
+		k_print("{");
+		k_print("Atom");
+		k_print(":");
+		k_print_hex((size_t)(elem->val));
+		k_print("} ");
+	    }
+	    else if(elem->type == Literal)
+	    {
+		k_print("{");
+		k_print("Literal");
+		k_print(":");
+		k_print_hex((size_t)(elem->numval));
+		k_print("} ");
+	    }
+
+	}
+
 	if(elem == NULL)
 	{
 	    break;
 	}
-	else if(elem->car->type == Literal)
+	else if(elem->type == Atom)
+	{
+	    k_print(" ");
+	    k_print(elem->val);
+	    return;
+	}
+	else if(elem->type == Literal)
 	{
 	    k_print(" ");
 	    k_print_num(elem->numval);
-	}
-	else if(elem->car->type == Atom)
-	{
-	    k_print(" ");
-	    k_print(elem->car->val);
+	    return;
 	}
 	else if(elem->type == Cons)
 	{
-	    //its list
-	    k_print("\n");
-	    print_sexp_iter(elem->car, depth + 2, debug);
+	    if(elem->car->type == Atom)
+	    {
+		k_print(" ");
+		k_print(elem->car->val);
+	    }
+	    else if(elem->car->type == Literal)
+	    {
+		k_print(" ");
+		k_print_num(elem->car->numval);
+	    }
+	    else if(elem->car->type == Cons)
+	    {
+		//its list
+		k_print("\n");
+		print_sexp_iter(elem->car, depth + 2, debug);
+	    }
 	}
 	
 	elem = elem->cdr;
@@ -300,5 +354,11 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
 void print_sexp(cons_t* root)
 {
     print_sexp_iter(root, 0, 0);
+    k_print("\n");
+}
+
+void print_sexp_debug(cons_t* root)
+{
+    print_sexp_iter(root, 0, 1);
     k_print("\n");
 }

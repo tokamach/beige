@@ -7,7 +7,7 @@
 /*
  * Number utilities
  */
-uint32_t pow(uint32_t n, uint32_t exp)
+uint32_t power(uint32_t n, uint32_t exp)
 {
     uint32_t result = 1;
     for(uint32_t i = 0; i < exp; i++)
@@ -75,15 +75,14 @@ int itoa(int num, int base, char* str)
 int atoi(char *str)
 {
     //TODO: hex check
+    int ret = 0;
 
-    int accum = 0;
-    int len = strlen(str);
-    for(int power = len - 1; pow > 0; power--)
+    for(int i = 0; str[i] != '\0'; ++i)
     {
-	accum += pow((str[power - 1] - '0'), power);
+	ret = str[i] - '0' + ret * 10;
     }
 
-    return accum;
+    return ret;
 }
 
 /*

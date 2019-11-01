@@ -22,6 +22,9 @@ void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
     k_malloc_init(mbd);
     k_interrupt_init();
 
+    cons_t* ast = lisp_read("(defun f (x) (* 1 20)");
+    print_sexp(ast);
+
     //enable memory, paging
     //start scheduler
     //start userspace, userspace processes (shell)
