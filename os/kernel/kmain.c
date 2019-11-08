@@ -30,7 +30,7 @@ void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
     k_print(" => ");
     
     env_t* core_env = make_core_env();
-    print_cons(eval(core_env, ast));
+    print_sexp(eval(core_env, ast));
 
 
     //enable memory, paging

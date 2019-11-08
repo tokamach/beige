@@ -275,7 +275,9 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
      *    cons: recur
      */
 
-    pad_print(depth, "(");
+    if(elem->type == Cons)
+	pad_print(depth, "(");
+    
     while(elem)
     {
 	if(debug && elem)
@@ -354,11 +356,9 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
 void print_sexp(cons_t* root)
 {
     print_sexp_iter(root, 0, 0);
-    k_print("\n");
 }
 
 void print_sexp_debug(cons_t* root)
 {
     print_sexp_iter(root, 0, 1);
-    k_print("\n");
 }
