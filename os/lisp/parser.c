@@ -240,15 +240,15 @@ void print_cons_iter(cons_t* root, int depth, int debug)
     }
     else if(elem->type == Cons)
     {
-	k_print("─┐");
+	k_print("-\\");
 
 	//its list
 	k_print("\n");
-	pad_print(depth + 1, "├");
+	pad_print(depth + 1, "|-");
 	print_cons_iter(elem->car, depth + 2, debug);
 
 	k_print("\n");
-	pad_print(depth + 1, "└");
+	pad_print(depth + 1, "\\-");
 	print_cons_iter(elem->cdr, depth + 2, debug);
     }
 }

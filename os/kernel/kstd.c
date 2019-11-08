@@ -34,6 +34,21 @@ void strcopy(const char* str, char* new)
 	new[i] = str[i];
 }
 
+int streq(const char* stra, const char* strb)
+{
+    size_t lena = strlen(stra);
+    size_t lenb = strlen(strb);
+
+    if(lena != lenb)
+	return 0;
+
+    for(int i = 0; i < lena; i++)
+	if(stra[i] != strb[i])
+	    return 0;
+
+    return 1;
+}
+
 int is_alpha(char c)
 {
     size_t cval = (size_t) c;

@@ -11,6 +11,8 @@
 
 #include "../lisp/parser.h"
 #include "../lisp/types.h"
+#include "../lisp/env.h"
+#include "../lisp/eval.h"
 
 // kernel entry point
 void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
@@ -22,8 +24,14 @@ void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
     k_malloc_init(mbd);
     k_interrupt_init();
 
-    cons_t* ast = lisp_read("(defun f (x) (* 1 20)");
+    char* code = "(add 1 2)";
+    cons_t* ast = lisp_read(code);
     print_sexp(ast);
+    k_print(" => ");
+    
+    env_t* core_env = make_core_env();
+    print_cons(eval(core_env, ast));
+
 
     //enable memory, paging
     //start scheduler

@@ -10,12 +10,12 @@ typedef struct {
     char* symbol;
 } symbol_t;
     
-char** symbol_table;
+symbol_t symbol_table[MAX_SYMBOLS];
 uint8_t symbol_count;
 
-void add_symbol(char* symbol);
-int symbol_exists(char* symbol);
-void lookup_symbol(char* symbol);
+uint8_t add_symbol(char* symbol);
+uint8_t lookup_symbol(char* symbol);
+char* lookup_id(uint8_t i);
 
 typedef enum e_env_entry_type {
     nativef1, //native function 1 arg
@@ -29,7 +29,7 @@ typedef enum e_env_entry_type {
 
 typedef struct env_entry {
     env_entry_type type;
-    char *sym;
+    uint8_t sym;
     union {
 	//TODO: macroize this
 	cons_t* (*nativef1)(const void* arg1);
@@ -40,7 +40,7 @@ typedef struct env_entry {
 	cons_t* (*nativef5)(const void* arg1, const void* arg2, const void* arg3,
 			    const void* arg4, const void* arg5);
 	cons_t* lispf;
-	cons_t* atoml;
+	cons_t* atom;
     };
 } env_entry_t;
 
@@ -53,7 +53,15 @@ typedef struct env {
     //pointer to child
 
     env_entry_t entries[ENV_SIZE];
+    uint8_t entry_count;
 } env_t;
 
-env_entry_t* make_env_entry(env_entry_type type, char *sym);
-env_entry_t* env_entry(char* sym);
+void add_env_entry_cons(env_t* env, env_entry_type type, char *sym, cons_t* val);
+void add_env_entry_native(env_t* env, env_entry_type type, char *sym, void* fun);
+
+env_entry_t* get_env_entry(env_t* env, char* sym);
+
+/*
+ * Core env
+ */
+env_t* make_core_env();
