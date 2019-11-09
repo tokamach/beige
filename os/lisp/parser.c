@@ -58,7 +58,7 @@ char* tokenize_one(reader_t* reader)
     tok[offset] = '\0';
     reader->offset--; //TODO: fix workaround for eating chars
     
-    //return result in atom
+    //return result in sym
     return tok;
 }
 
@@ -79,7 +79,7 @@ int valid_dec_literal(char* str)
     return ret;
 }
 
-int valid_atom(char* str)
+int valid_sym(char* str)
 {
     int ret = 1;
     while(*str != '\0' &&
@@ -101,20 +101,20 @@ int valid_atom(char* str)
 cons_t* parse_sym(reader_t* r)
 {
     char* str = tokenize_one(r);
-    cons_t* newatom = NULL;
+    cons_t* newsym = NULL;
 	    
-    if (valid_atom(str))
+    if (valid_sym(str))
     {
-	newatom = atom(str);	    
+	newsym = sym(str);	    
     }
     else if(valid_dec_literal(str))
     {
-	newatom = literal(atoi(str));
+	newsym = literal(atoi(str));
     }
 
     kfree(str);
     
-    return newatom;	
+    return newsym;	
 }
 
 cons_t* parse_list(reader_t* r)
@@ -148,7 +148,7 @@ cons_t* parse_list(reader_t* r)
 	}
 	else// if (c != ' ') //TODO: is_alpha
 	{
-	    //TODO: check if c = atom
+	    //TODO: check if c = sym
 	    //TODO: check if c = int
 	    
 	    if(ret == NULL)
@@ -207,10 +207,10 @@ void print_cons_iter(cons_t* root, int depth, int debug)
 	    k_print_hex((size_t)(elem->cdr));
 	    k_print("}");
 	}
-	else if(elem->type == Atom)
+	else if(elem->type == Sym)
 	{
 	    k_print("{");
-	    k_print("Atom");
+	    k_print("Sym");
 	    k_print(":");
 	    k_print_hex((size_t)(elem->val));
 	    k_print("} ");
@@ -225,9 +225,9 @@ void print_cons_iter(cons_t* root, int depth, int debug)
 	}
     }
 
-    if(elem->type == Atom)
+    if(elem->type == Sym)
     {
-	//its atom
+	//its sym
 	/*if(i != 0)
 	  k_print(" ");*/
 
@@ -271,7 +271,7 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
 
     /*
      * each elem->car.type =
-     *    atom: print val, space
+     *    sym: print val, space
      *    cons: recur
      */
 
@@ -292,10 +292,10 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
 		k_print_hex((size_t)(elem->cdr));
 		k_print("}");
 	    }
-	    else if(elem->type == Atom)
+	    else if(elem->type == Sym)
 	    {
 		k_print("{");
-		k_print("Atom");
+		k_print("Sym");
 		k_print(":");
 		k_print_hex((size_t)(elem->val));
 		k_print("} ");
@@ -315,7 +315,7 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
 	{
 	    break;
 	}
-	else if(elem->type == Atom)
+	else if(elem->type == Sym)
 	{
 	    k_print(" ");
 	    k_print(elem->val);
@@ -329,7 +329,7 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
 	}
 	else if(elem->type == Cons)
 	{
-	    if(elem->car->type == Atom)
+	    if(elem->car->type == Sym)
 	    {
 		k_print(" ");
 		k_print(elem->car->val);

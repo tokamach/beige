@@ -45,9 +45,9 @@ void add_env_entry_cons(env_t* env, env_entry_type type, char* sym, cons_t* val)
     {
 	ret->lispf = val;
     }
-    else if(type == atoml)
+    else if(type == syml)
     {
-	ret->atom = val;
+	ret->sym = val;
     }
 
     env->entry_count++;

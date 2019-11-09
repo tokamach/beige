@@ -6,10 +6,10 @@
 
 cons_t* apply(env_t* env, cons_t* fun, cons_t* args)
 {
-    if(args->car->type != Atom &&
+    if(args->car->type != Sym &&
        args->car->type != Literal)
     {
-	k_println("lisperr: car of args wasn't an atom or literal");
+	k_println("lisperr: car of args wasn't an sym or literal");
 	return NULL;
     }
 
@@ -37,9 +37,9 @@ cons_t* eval(env_t* env, cons_t* exp)
 	return NULL;
 
     if(exp->type == Literal ||
-       exp->type == Atom)
+       exp->type == Sym)
     {
-	//atoms and literals evaluate to themselves
+	//syms and literals evaluate to themselves
 	return exp;
     }
 

@@ -2,19 +2,19 @@
 
 #include <stdint.h>
 
-#define MAX_ATOM_LEN 128
+#define MAX_SYM_LEN 128
 
 /*
- * Atom
+ * Sym
  */
 /*
-typedef struct atom {
+typedef struct sym {
     char* str;
     //TODO: add lisp data type
-} atom_t;
+} sym_t;
 
-atom_t* make_atom(const char* str);
-void free_atom(atom_t* atom);
+sym_t* make_sym(const char* str);
+void free_sym(sym_t* sym);
 */
 
 /*
@@ -22,12 +22,12 @@ void free_atom(atom_t* atom);
  */
 typedef enum e_cons_type {
     Cons,
-    Atom,
+    Sym,
     Literal
 } cons_type;
 
 // cons cell, the core of any lisp
-// TODO: rename to lisp object (technically not a cons since it can be atom)
+// TODO: rename to lisp object (technically not a cons since it can be sym)
 typedef struct cons {
     cons_type type;
     union {
@@ -36,7 +36,7 @@ typedef struct cons {
 	    struct cons* car;
 	    struct cons* cdr;
 	};
-	// atom
+	// sym
 	struct {
 	    //TODO: symbol_t and symbol table with lookup
 	    char* val;
@@ -46,7 +46,7 @@ typedef struct cons {
 } cons_t;
 
 cons_t* cons(cons_t* car, cons_t* cdr);
-cons_t* atom(char* str);
+cons_t* sym(char* str);
 cons_t* literal(int num);
 void free_cons(cons_t* elem);
 

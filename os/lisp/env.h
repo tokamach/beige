@@ -24,7 +24,7 @@ typedef enum e_env_entry_type {
     nativef4,
     nativef5,
     lispf,    //lisp function (pointer to lisp sexp)
-    atoml     //atom literal
+    syml     //sym literal
 } env_entry_type;
 
 typedef struct env_entry {
@@ -40,7 +40,7 @@ typedef struct env_entry {
 	cons_t* (*nativef5)(const void* arg1, const void* arg2, const void* arg3,
 			    const void* arg4, const void* arg5);
 	cons_t* lispf;
-	cons_t* atom;
+	cons_t* symbol;
     };
 } env_entry_t;
 

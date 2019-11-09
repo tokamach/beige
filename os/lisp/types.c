@@ -19,10 +19,10 @@ cons_t* cons(cons_t* car, cons_t* cdr)
     return tmp;
 }
 
-cons_t* atom(char* str)
+cons_t* sym(char* str)
 {
     cons_t* tmp = kmalloc(sizeof(cons_t));
-    tmp->type = Atom;
+    tmp->type = Sym;
     tmp->val = kmalloc(sizeof(char) * strlen(str));
     strcopy(str, tmp->val);
     return tmp;
@@ -43,7 +43,7 @@ void free_cons(cons_t* elem)
 	free_cons(elem->car);
 	free_cons(elem->cdr);
     }
-    else if(elem->type == Atom)
+    else if(elem->type == Sym)
 	kfree(elem->val);
     else if(elem->type == Literal)
 	kfree(elem->numval);
@@ -53,8 +53,8 @@ void free_cons(cons_t* elem)
 
 void append(cons_t* list, cons_t* elem)
 {
-    if(list->type == Atom)
-	return; //ERROR: can't access cdr of atom
+    if(list->type == Sym)
+	return; //ERROR: can't access cdr of sym
 	
     while(list->cdr != NULL)
 	list = list->cdr;
