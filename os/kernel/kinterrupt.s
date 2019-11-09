@@ -24,3 +24,8 @@ common_interrupt_handler:
 	add 8, %esp
 	sti
 	iret
+
+	global load_idt
+load_idt:
+	mov 0, %eax
+	lidt (%eax)

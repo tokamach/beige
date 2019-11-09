@@ -20,8 +20,8 @@ void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
     k_term_init();
     k_print("kernel init\n");
     k_mem_init(mbd);
-    k_print_mem_map();
     k_malloc_init(mbd);
+    k_pic_init();
     k_interrupt_init();
 
     char* code = "(add 1 2)";

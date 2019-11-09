@@ -35,13 +35,15 @@ void k_interrupt_init()
     for(uint8_t i = 0; i < IDT_ENTRIES - 1; i++)
 	idt.entries[i] = (idt_entry_t){0, 0, 0, 0, 0};
 
-    //make_idt_entry(0, &interrupt_handler, 0, 1, 0, )
+    set_idt_entry(0, &interrupt_handler, 0, 1, 0, 0);
     
     //load IDT
     asm(
 	"mov %0, %%eax;"
 	"lidt (%%eax);"
 	:: "m" (idt_ptr));
+
+    k_println("interrupts handlers installed");
 }
 
  
@@ -49,6 +51,7 @@ __attribute__((interrupt))
 void interrupt_handler(interrupt_frame_t* frame)
 {
     k_print_hex(frame->error_code);
+    //call exception or software dependent on error
 }
 
 //TODO: write exception handler (error code in args)
