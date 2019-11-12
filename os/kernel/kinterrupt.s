@@ -1,5 +1,6 @@
+/*
 	.macro	no_error_code_interrupt_handler num
-	global interrupt_handler_\num
+	.globl interrupt_handler_\num
 interrupt_handler_\num:
 	pushw 0
 	pushw \num
@@ -15,17 +16,28 @@ interrupt_handler_\num:
 	
 
 common_interrupt_handler:
-	pushad
+	pushal
 	
-	;; TODO: hlt and validate reg in qemu
+	#TODO: hlt and validate reg in qemu
 	call interrupt_handler
 
-	popad
+	popal
 	add 8, %esp
 	sti
 	iret
+*/
+	.globl load_idt
+	.globl enable_interrupts
+	.globl disable_interrupts
 
-	global load_idt
 load_idt:
-	mov 0, %eax
+	mov 4(%esp), %eax
 	lidt (%eax)
+
+enable_interrupts:
+	sti
+	ret
+	
+disable_interrupts:
+	cli
+	ret

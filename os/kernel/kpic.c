@@ -34,6 +34,10 @@ void k_pic_init()
     outb(PIC1_DATA, mask_a);
     outb(PIC2_DATA, mask_b);
 
+    // Only listen to irqs 0, 1, and 2
+    outb( 0xf8, 0x21 );
+    outb( 0xff, 0xA1 );
+
     k_println("pic initialized");
 }
 

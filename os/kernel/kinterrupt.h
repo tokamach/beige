@@ -46,3 +46,8 @@ typedef struct interrupt_frame {
 
 __attribute__((interrupt))
 void interrupt_handler(interrupt_frame_t* frame);
+
+//defined in kinterrupt.s
+void load_idt();
+void enable_interrupts();
+void disable_interrupts();
