@@ -1,8 +1,10 @@
 #include "env.h"
 
+#include "types.h"
+
 #include "../kernel/kstd.h"
 #include "../kernel/kmalloc.h"
-
+#include "../kernel/kassert.h"
 
 /*
  * Symbol stuff
@@ -125,16 +127,42 @@ env_t* make_env(env_t* outer)
     return ret;
 }
 
-env_t* make_base_env()
+/*
+ * Lisp fundamentals
+ */
+cons_t* car_func(cons_t* list)
 {
-    //TODO: add defun, let, etc to env
-    
-    return make_env(NULL);
+    assert(list->type == Cons);
+    return list->car;
 }
 
-cons_t* add(int a, int b)
+cons_t* cdr_func(cons_t* list)
+{
+    assert(list->type == Cons);
+    return list->cdr;
+}
+
+/*
+ * Maths
+ */
+cons_t* add(size_t a, size_t b)
 {
     return num(a + b);
+}
+
+cons_t* sub(size_t a, size_t b)
+{
+    return num(a - b);
+}
+
+cons_t* mul(size_t a, size_t b)
+{
+    return num(a * b);
+}
+
+cons_t* div(size_t a, size_t b)
+{
+    return num(a / b);
 }
 
 cons_t* quote(cons_t* exp)
@@ -142,11 +170,35 @@ cons_t* quote(cons_t* exp)
     return cons(sym("quote"), exp);
 }
 
+env_t* make_base_env()
+{
+    //TODO: add defun, let, etc to env
+    //make an empty env with no outer
+    env_t* env = make_env(NULL);
+
+    /* Lisp Fundamentals */
+    add_env_entry_native(env, nativef1, "car", &car_func);
+    add_env_entry_native(env, nativef1, "cdr", &cdr_func);
+
+    /* Mathematics operators */
+    add_env_entry_native(env, nativef2, "add", &add);
+    add_env_entry_native(env, nativef2, "sub", &sub);
+    add_env_entry_native(env, nativef2, "mul", &mul);
+    add_env_entry_native(env, nativef2, "div", &div);
+    add_env_entry_native(env, nativef1, "quote", &quote);
+    
+    return make_env(NULL);
+}
+
+/*
+ * Kernel env stuff. here we define the functions that the kernel
+ * will probably want to use, memory access, inb/outb
+ */
+
 env_t* make_kernel_env()
 {
-    env_t* env = make_env(NULL);
-    add_env_entry_native(env, nativef2, "add", &add);
-    add_env_entry_native(env, nativef1, "quote", &quote);
+    env_t* env = make_env(make_base_env());
+    
 
     //k_print_hex(get_env_entry(env, "add")->nativef2);
     return env;

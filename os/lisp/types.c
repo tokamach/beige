@@ -45,8 +45,8 @@ void free_cons(cons_t* elem)
     }
     else if(elem->type == Sym)
 	kfree(elem->val);
-    else if(elem->type == Num)
-	kfree(elem->numl);
+    /*else if(elem->type == Num)
+      kfree(elem->numl); */
     
     kfree(elem);
 }
