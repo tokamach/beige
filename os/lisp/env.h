@@ -19,13 +19,15 @@ char* lookup_id(uint8_t i);
 
 typedef enum e_env_entry_type {
     empty,
-    nativef1, //native function 1 arg
-    nativef2, //native function 2 args
+    nativef1, //native function 1 args
+    nativef2, //native function 2 args...
     nativef3,
     nativef4,
     nativef5,
+    
     lispf,    //lisp function (pointer to lisp sexp)
-    syml     //sym literal
+    syml,     //sym num
+    numl      //numeric num
 } env_entry_type;
 
 typedef struct env_entry {
@@ -42,6 +44,7 @@ typedef struct env_entry {
 			    const void* arg4, const void* arg5);
 	cons_t* lispf;
 	cons_t* symbol;
+	size_t  numl;
     };
 } env_entry_t;
 

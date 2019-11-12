@@ -62,7 +62,7 @@ char* tokenize_one(reader_t* reader)
     return tok;
 }
 
-int valid_dec_literal(char* str)
+int valid_dec_num(char* str)
 {
     int ret = 1;
     while(*str != '\0' &&
@@ -107,9 +107,9 @@ cons_t* parse_sym(reader_t* r)
     {
 	newsym = sym(str);	    
     }
-    else if(valid_dec_literal(str))
+    else if(valid_dec_num(str))
     {
-	newsym = literal(atoi(str));
+	newsym = num(atoi(str));
     }
 
     kfree(str);
@@ -215,12 +215,12 @@ void print_cons_iter(cons_t* root, int depth, int debug)
 	    k_print_hex((size_t)(elem->val));
 	    k_print("} ");
 	}
-	else if(elem->type == Literal)
+	else if(elem->type == Num)
 	{
 	    k_print("{");
-	    k_print("Literal");
+	    k_print("Num");
 	    k_print(":");
-	    k_print_hex((size_t)(elem->numval));
+	    k_print_hex((size_t)(elem->numl));
 	    k_print("} ");
 	}
     }
@@ -233,10 +233,10 @@ void print_cons_iter(cons_t* root, int depth, int debug)
 
 	pad_print(1, elem->val);
     }
-    else if(elem->type == Literal)
+    else if(elem->type == Num)
     {
 	k_print(" ");
-	k_print_num(elem->numval);
+	k_print_num(elem->numl);
     }
     else if(elem->type == Cons)
     {
@@ -300,12 +300,12 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
 		k_print_hex((size_t)(elem->val));
 		k_print("} ");
 	    }
-	    else if(elem->type == Literal)
+	    else if(elem->type == Num)
 	    {
 		k_print("{");
-		k_print("Literal");
+		k_print("Num");
 		k_print(":");
-		k_print_hex((size_t)(elem->numval));
+		k_print_hex((size_t)(elem->numl));
 		k_print("} ");
 	    }
 
@@ -321,10 +321,10 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
 	    k_print(elem->val);
 	    return;
 	}
-	else if(elem->type == Literal)
+	else if(elem->type == Num)
 	{
 	    k_print(" ");
-	    k_print_num(elem->numval);
+	    k_print_num(elem->numl);
 	    return;
 	}
 	else if(elem->type == Cons)
@@ -334,10 +334,10 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
 		k_print(" ");
 		k_print(elem->car->val);
 	    }
-	    else if(elem->car->type == Literal)
+	    else if(elem->car->type == Num)
 	    {
 		k_print(" ");
-		k_print_num(elem->car->numval);
+		k_print_num(elem->car->numl);
 	    }
 	    else if(elem->car->type == Cons)
 	    {

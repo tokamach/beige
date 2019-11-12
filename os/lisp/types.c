@@ -28,11 +28,11 @@ cons_t* sym(char* str)
     return tmp;
 }
 
-cons_t* literal(int val)
+cons_t* num(int val)
 {
     cons_t* tmp = kmalloc(sizeof(cons_t));
-    tmp->type = Literal;
-    tmp->numval = val;
+    tmp->type = Num;
+    tmp->numl = val;
     return tmp;    
 }
 
@@ -45,8 +45,8 @@ void free_cons(cons_t* elem)
     }
     else if(elem->type == Sym)
 	kfree(elem->val);
-    else if(elem->type == Literal)
-	kfree(elem->numval);
+    else if(elem->type == Num)
+	kfree(elem->numl);
     
     kfree(elem);
 }
@@ -78,7 +78,7 @@ inline size_t length(cons_t* list)
 
 inline cons_t* nth(cons_t* list, size_t n)
 {
-    for(size_t i = 0; i <= n; i++)
+    for(size_t i = 0; i < n; i++)
 	list = list->cdr;
 
     return list->car;

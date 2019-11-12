@@ -134,7 +134,7 @@ env_t* make_base_env()
 
 cons_t* add(int a, int b)
 {
-    return literal(a + b);
+    return num(a + b);
 }
 
 cons_t* quote(cons_t* exp)

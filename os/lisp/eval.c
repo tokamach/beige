@@ -9,9 +9,9 @@
 cons_t* apply(env_t* env, cons_t* fun, cons_t* args)
 {
     if(args->car->type != Sym &&
-       args->car->type != Literal)
+       args->car->type != Num)
     {
-	k_println("lisperr: car of args wasn't an sym or literal");
+	k_println("lisperr: car of args wasn't an sym or num");
 	return NULL;
     }
 
@@ -35,7 +35,7 @@ cons_t* apply(env_t* env, cons_t* fun, cons_t* args)
 
     case nativef2:
 	assert(argc == 2);
-	return (*funentry->nativef2)((int)args->car->numval, (int)args->cdr->car->numval);
+	return (*funentry->nativef2)((int)args->car->numl, (int)args->cdr->car->numl);
 	break;
     }
 }
@@ -45,10 +45,10 @@ cons_t* eval(env_t* env, cons_t* exp)
     if(exp == NULL)
 	return NULL;
 
-    if(exp->type == Literal ||
+    if(exp->type == Num ||
        exp->type == Sym)
     {
-	//syms and literals evaluate to themselves
+	//syms and nums evaluate to themselves
 	return exp;
     }
 

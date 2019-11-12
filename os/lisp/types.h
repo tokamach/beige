@@ -15,7 +15,7 @@
 typedef enum e_cons_type {
     Cons,
     Sym,
-    Literal
+    Num
 } cons_type;
 
 // cons cell, the core of any lisp
@@ -33,7 +33,7 @@ typedef struct cons {
 	    //TODO: symbol_t and symbol table with lookup
 	    char* val;
 	};
-	int numval;
+	int numl;
     };
 } cons_t;
 
@@ -55,4 +55,4 @@ cons_t* nth(cons_t* list, size_t n);
 
 #define keval_lisp(x) eval(kenv, lisp_read(#x))
 #define kprint_lisp(x) print_sexp(eval(kenv, lisp_read(#x)))
-#define kprinteq_lisp(x) print_sexp(lisp_read(#x)); print_sexp(eval(kenv, lisp_read(#x)))
+#define kprinteq_lisp(x) print_sexp(lisp_read(#x)); k_print("=>"); print_sexp(eval(kenv, lisp_read(#x)))
