@@ -1,21 +1,13 @@
 #pragma once
 
 #include <stdint.h>
+#include <stddef.h>
 
 #define MAX_SYM_LEN 128
 
 /*
  * Sym
  */
-/*
-typedef struct sym {
-    char* str;
-    //TODO: add lisp data type
-} sym_t;
-
-sym_t* make_sym(const char* str);
-void free_sym(sym_t* sym);
-*/
 
 /*
  * Cons struct and cons type enum
@@ -51,6 +43,8 @@ cons_t* literal(int num);
 void free_cons(cons_t* elem);
 
 void append(cons_t* list, cons_t* elem);
+size_t length(cons_t* list);
+cons_t* nth(cons_t* list, size_t n);
 
 /*
  * C macros for lisp functions
@@ -59,18 +53,6 @@ void append(cons_t* list, cons_t* elem);
 #define car(x) (((cons_t*) x)->car)
 #define cdr(x) (((cons_t*) x)->cdr)
 
-
-/*
- * Sexp
- */
-
-/*
-sexp_t* make_sexp();
-void free_sexp(cons_t* sexp);
-void sexp_add_elem(cons_t* sexp, cons_t* elem);
-cons_t* sexp_elem_at(cons_t* sexp, int index);
-*/
-
-/*
- * Env
- */
+#define keval_lisp(x) eval(kenv, lisp_read(#x))
+#define kprint_lisp(x) print_sexp(eval(kenv, lisp_read(#x)))
+#define kprinteq_lisp(x) print_sexp(lisp_read(#x)); print_sexp(eval(kenv, lisp_read(#x)))

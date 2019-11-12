@@ -2,6 +2,8 @@
 #include "types.h"
 #include "env.h"
 
+#include "../kernel/kassert.h"
+
 #include <stddef.h>
 
 cons_t* apply(env_t* env, cons_t* fun, cons_t* args)
@@ -14,18 +16,25 @@ cons_t* apply(env_t* env, cons_t* fun, cons_t* args)
     }
 
     env_entry_t* funentry = get_env_entry(env, fun->val);
+    uint8_t argc = length(args);
+
+    //TODO: type (signature) check
     
     switch(funentry->type)
     {
     case lispf:
-	//dunno waht to do lol
+    {
+	cons_t* func = funentry->lispf;
+	//TODO: substitute vars, execute code
 	break;
-
+    }
     case nativef1:
+	assert(argc == 1);
 	return (*funentry->nativef1)(args->car->val);
 	break;
 
     case nativef2:
+	assert(argc == 2);
 	return (*funentry->nativef2)((int)args->car->numval, (int)args->cdr->car->numval);
 	break;
     }

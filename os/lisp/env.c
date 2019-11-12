@@ -97,6 +97,12 @@ env_entry_t* get_env_entry(env_t* env, char* sym)
 	if(env->entries[i].sym == symid)
 	    return &env->entries[i];
     }
+
+    //not in current env, look in outer
+    if(env->outer)
+	return get_env_entry(env->outer, sym);
+    else
+	return NULL;
 }
 
 /*
@@ -105,15 +111,42 @@ env_entry_t* get_env_entry(env_t* env, char* sym)
  * which others can be built upon
  */
 
+env_t* make_env(env_t* outer)
+{
+    env_t* ret = kmalloc(sizeof(env_t));
+    for(int i = 0; i < ENV_SIZE; i++)
+	ret->entries[i] = (env_entry_t){empty, 0, {0}};
+    
+    if(outer)
+	ret->outer = outer;
+    else
+	ret->outer = NULL;
+    
+    return ret;
+}
+
+env_t* make_base_env()
+{
+    //TODO: add defun, let, etc to env
+    
+    return make_env(NULL);
+}
+
 cons_t* add(int a, int b)
 {
     return literal(a + b);
 }
 
-env_t* make_core_env()
+cons_t* quote(cons_t* exp)
 {
-    env_t* env = kmalloc(sizeof(env_t));
+    return cons(sym("quote"), exp);
+}
+
+env_t* make_kernel_env()
+{
+    env_t* env = make_env(NULL);
     add_env_entry_native(env, nativef2, "add", &add);
+    add_env_entry_native(env, nativef1, "quote", &quote);
 
     //k_print_hex(get_env_entry(env, "add")->nativef2);
     return env;

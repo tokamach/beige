@@ -62,75 +62,24 @@ void append(cons_t* list, cons_t* elem)
     list->cdr = elem;
 }
 
-/*
-sexp_t* make_sexp()
+inline size_t length(cons_t* list)
 {
-    sexp_t* tmp = kmalloc(sizeof(sexp_t));
-    tmp->first = NULL;
-    tmp->size  = 0;
-    return tmp;
+    //TODO: assert
+    //we can't find the length of a list with no cdr
+    if(list->type != Cons)
+	return 1;
+
+    size_t len;
+    for(len = 1; list->cdr != NULL; len++)
+	list = list->cdr;
+
+    return len;
 }
 
-void free_sexp(sexp_t* sexp)
+inline cons_t* nth(cons_t* list, size_t n)
 {
-    cons_t* nextnode = sexp->first;
-    cons_t* tmp = nextnode;
+    for(size_t i = 0; i <= n; i++)
+	list = list->cdr;
 
-    //waht the fuck is this
-    while(nextnode)
-    {
-	tmp = nextnode;
-	nextnode = nextnode->next;
-	free_sexp_elem(tmp);
-    }
-
-    kfree(sexp);
+    return list->car;
 }
-
-cons_t* sexp_elem_at(sexp_t* sexp, int index)
-{
-    cons_t* tmp = sexp->first;
-    
-    if(!tmp)
-	return NULL;
-    
-    for(int i = 0; i < index; i++)
-    {
-	tmp = tmp->next;
-	if(!tmp)
-	    while(1) {k_print("LISTERR");} //out of range, hang TODO: actual err
-	
-    }
-
-    return tmp;
-}
-
-void sexp_add_elem(sexp_t* sexp, cons_t* new)
-{
-    cons_t* end = sexp_elem_at(sexp, sexp->size - 1);
-    
-    if(!end)
-    {
-	//list is empty
-	sexp->first = new;
-    }
-    else
-    {
-	end->next = new;	
-    }
-    
-    sexp->size++;
-}
-
-void sexp_pop(sexp_t* sexp)
-{
-    //get last elem
-    cons_t* tmp = sexp_elem_at(sexp, sexp->size - 1);
-    //free it
-    free_sexp_elem(tmp);
-
-    //set penultimate elem's next to null, reduce sexp size
-    sexp_elem_at(sexp, sexp->size - 2)->next = NULL;
-    sexp->size--;
-}
-*/

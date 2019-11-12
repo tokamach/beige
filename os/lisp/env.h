@@ -18,6 +18,7 @@ uint8_t lookup_symbol(char* symbol);
 char* lookup_id(uint8_t i);
 
 typedef enum e_env_entry_type {
+    empty,
     nativef1, //native function 1 arg
     nativef2, //native function 2 args
     nativef3,
@@ -47,21 +48,15 @@ typedef struct env_entry {
 typedef struct env {
     //TODO:
     //assoc map (hashmap etc) of env_entry_t
-
-    //layering
-    //pointer to parent
-    //pointer to child
-
+    struct env* outer;
     env_entry_t entries[ENV_SIZE];
     uint8_t entry_count;
 } env_t;
 
 void add_env_entry_cons(env_t* env, env_entry_type type, char *sym, cons_t* val);
 void add_env_entry_native(env_t* env, env_entry_type type, char *sym, void* fun);
-
 env_entry_t* get_env_entry(env_t* env, char* sym);
 
-/*
- * Core env
- */
-env_t* make_core_env();
+env_t* make_env(env_t* outer);
+env_t* make_base_env();
+env_t* make_kernel_env();
