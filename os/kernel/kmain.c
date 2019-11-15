@@ -27,7 +27,7 @@ void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
 
     env_t* kenv = make_kernel_env();
 
-    kprinteq_lisp((add 2 (add 2 3)));
+    kprinteq_lisp((add 2 2 3)) ;
     //kprinteq_lisp((add 1 2 ));
 
     //enable memory, paging

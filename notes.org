@@ -38,6 +38,15 @@
 ** plan search
 - identify keywords (concurrency OS, multithreading, functional concurrency)
 - date?
+* DONE Proposal
+  SCHEDULED: <2019-10-21 Mon>
+** Intro
+** Background
+-  yang et al (p103-yang.pdf) virtual memory support for gargage collected applications 
+- 
+** Impl
+** Work Plan
+** Resources Required
 
 * Links
 - https://wiki.osdev.org/Expanded_Main_Page
@@ -47,6 +56,15 @@
 - fonts: https://github.com/Tecate/bitmap-fonts/tree/master/screenshots
 
 - booting:  https://www.gnu.org/software/grub/manual/multiboot/multiboot.html
+
+
+* Milestones
+** TODO Miletstone 1: REPL
+- Type characters which are displayed on screen
+- Enter evaluates the chars as a Lisp expr and prints result
+- persistent env across 'lines'
+** TODO Milestone 2: GUI
+- Show GUI windows on screen which can print arbitary text
 
 * OS Plan
 ** Principles
@@ -110,33 +128,29 @@
 ** TODO Display
 *** Terminal
 **** printf
-**** color management
 **** control chars
-**** high res terminal
+- tab alignment
 *** Graphics
-**** window system
+**** Window system
 - see rio, early X wms, blit terminal?
 - simple design
-**** screen setup
+- show repl, env
+**** Screen setup
 - using VESA/VGA modes
-**** shape drawing library
+**** Shape drawing library
 **** GUI library
+- use lisp and =(defwindow ...)=
 ** TODO stdlib
 *** klib
 - better print/debug
 - sprintf
 *** lisp-interface-lib
 - all kernel calls available from lisp
+- needs function type signature checks in lisp
 ** TODO Tests
 - add test feature to Makefile
 - full coverage unit tests
-
-** TODO Lisp
-*** Kernel REPL
-*** fundamenal functions
-- [[https://stackoverflow.com/questions/3482389/how-many-primitives-does-it-take-to-build-a-lisp-machine-ten-seven-or-five/][stackoverflow question]]
-*** low level interaction funcs
-* Lisp Planning
+* Lisp Plan
 - if they could do it on a PDP, you can do it too
 ** Parser
 - no regex
@@ -149,6 +163,8 @@
 - env is read only
 - args: in_ast
 - return: out_ast
+*** env
+- =Sym='s should be stored in AST simply as an ID, which is looked up in the symbol table, an $O(1)$ operation. Symbol allocation is $O(n)$. Right now they're stored as a string and looked up each call (bad).
 *** types
 - atom, list
 ** Compiler
@@ -169,55 +185,53 @@
 - unflag when marked
 - don't sweep if dirty
 
-- consider the generational hypothesis: 
-* DONE Proposal
-  SCHEDULED: <2019-10-21 Mon>
-** Intro
-** Background
--  yang et al (p103-yang.pdf) virtual memory support for gargage collected applications 
-- 
-** Impl
-** Work Plan
-** Resources Required
+*** Generational
+- consider the generational hypothesis: most objects die young
+- if an object survives the sweep, move it to a higher generation
+- check higher generations less often
+- store references across generations
+- .NET uses 3 generations
 
 * Tasks
-** all
+** General
 - switch to NASM?
 - literate programming? (nah)
-** malloc
+** Malloc
 - use linked list to store mem map
 - optimize for cons allocation
-** segmentation
+** Segmentation
 - basic flat model
 - none?
-** paging
+** Paging
 - page allocator
 - linked list or AVL Tree to store
 - pages
-** lisp
+** Lisp
 - write tests for lisp code
-*** data types
+*** Data types
 **** TODO rewrite s-exp to just have a basic lisp obj (cons_t)
 - the s_exp wrapper is redundant
 *** eval
-- write it
-**** kernel repl
+- remove nativef, instead unbox values in the functions themselves
+*** Kernel repl
 - need keyboard driver
 - write kernel env
 *** env
+- remove nativef
+- assign =Sym= values at startup
 - add types, side effect inference
 - hashmap for faster lookup
-**** kernel env
+**** Kernel env
 - useful low level functions
 - peek/poke, inb/outb, direct memory access (unsafe!)
 - kernel print
-*** parser
+*** Parser;
+- add (x . y) syntax
 - add correct checks for valid symbols, literals, mismatched parens
-- add literal type
-** interrupts
+** Interrupts
 - write assembly macro for generic interrupt handler
 - tell the PIC that we're handling interrupts now
 - write keeb handler
-** multitasking
-** userspace
-** gui
+** Multitasking
+** Userspace
+** GUI
