@@ -11,3 +11,4 @@
 #define k_print_hex(hex_int) printf("%x", (hex_int))
 
 #define strcopy(x, y) strcpy((y), (x))
+#define streq(a,b) (strcmp((a),(b))==0)

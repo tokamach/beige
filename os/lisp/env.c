@@ -1,9 +1,19 @@
 #include "env.h"
 
 #include "types.h"
+#include "defun.h"
 
-#include "../kernel/kstd.h"
+#ifdef LISP_TEST
+//testin
+#include <stdio.h>
+#include "../tests/kernel_mappings.h"
+#else
+//real world
 #include "../kernel/kmalloc.h"
+#include "../kernel/kterm.h"
+#include "../kernel/kstd.h"
+#endif
+
 #include "../kernel/kassert.h"
 
 /*
@@ -55,39 +65,12 @@ void add_env_entry_cons(env_t* env, env_entry_type type, char* sym, cons_t* val)
     env->entry_count++;
 }
 
-void add_env_entry_native(env_t* env, env_entry_type type, char* sym, void* fun)
+void add_env_entry_native(env_t* env, char* sym, void* fun)
 {
     env_entry_t* ret = &env->entries[env->entry_count];
-    ret->type = type;
+    ret->type = nativef;
     ret->sym = add_symbol(sym);
-
-    switch(type)
-    {
-    case nativef1:
-	ret->nativef1 = fun;
-	break;
-
-    case nativef2:
-	ret->nativef2 = fun;
-	break;
-
-    case nativef3:
-	ret->nativef3 = fun;
-	break;
-
-    case nativef4:
-	ret->nativef4 = fun;
-	break;
-
-    case nativef5:
-	ret->nativef5 = fun;
-	break;
-
-    default:
-	break;
-    }
-
-    env->entry_count++;
+    ret->nativef = fun;
 }
 
 env_entry_t* get_env_entry(env_t* env, char* sym)
@@ -130,13 +113,13 @@ env_t* make_env(env_t* outer)
 /*
  * Lisp fundamentals
  */
-cons_t* car_func(cons_t* list)
+cons_t* car_func(env_t* env, cons_t* list)
 {
     assert(list->type == Cons);
     return list->car;
 }
 
-cons_t* cdr_func(cons_t* list)
+cons_t* cdr_func(env_t* env, cons_t* list)
 {
     assert(list->type == Cons);
     return list->cdr;
@@ -145,11 +128,17 @@ cons_t* cdr_func(cons_t* list)
 /*
  * Maths
  */
-cons_t* add(size_t a, size_t b)
+DEFUN(add, env, args)
 {
-    return num(a + b);
+    size_t total = 0;
+    LITER(args, i)
+    {
+	//total += nth(args, i)->car->numl;
+    }
+	
+    return num(total);
 }
-
+/*
 cons_t* sub(size_t a, size_t b)
 {
     return num(a - b);
@@ -169,7 +158,7 @@ cons_t* quote(cons_t* exp)
 {
     return cons(sym("quote"), exp);
 }
-
+*/
 env_t* make_base_env()
 {
     //TODO: add defun, let, etc to env
@@ -177,15 +166,15 @@ env_t* make_base_env()
     env_t* env = make_env(NULL);
 
     /* Lisp Fundamentals */
-    add_env_entry_native(env, nativef1, "car", &car_func);
-    add_env_entry_native(env, nativef1, "cdr", &cdr_func);
+    add_env_entry_native(env, "car", &car_func);
+    add_env_entry_native(env, "cdr", &cdr_func);
 
     /* Mathematics operators */
-    add_env_entry_native(env, nativef2, "add", &add);
-    add_env_entry_native(env, nativef2, "sub", &sub);
-    add_env_entry_native(env, nativef2, "mul", &mul);
-    add_env_entry_native(env, nativef2, "div", &div);
-    add_env_entry_native(env, nativef1, "quote", &quote);
+    add_env_entry_native(env, "add", &add);
+    /*add_env_entry_native(env, nativef, "sub", &sub);
+    add_env_entry_native(env, nativef, "mul", &mul);
+    add_env_entry_native(env, nativef, "div", &div);
+    add_env_entry_native(env, nativef, "quote", &quote);*/
     
     return make_env(NULL);
 }

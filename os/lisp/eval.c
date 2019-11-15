@@ -19,6 +19,8 @@ cons_t* apply(env_t* env, cons_t* fun, cons_t* args)
 
     //TODO: type (signature) check
 
+    //TODO: eval args
+
     /*
      * Before we can call fun, we need to eval our arguments
      * If they're just literals or vars, then that's cool, but
@@ -35,29 +37,19 @@ cons_t* apply(env_t* env, cons_t* fun, cons_t* args)
     case lispf:
     {
 	cons_t* func = funentry->lispf;
+	//TODO: check argc
 	//TODO: eval each earg, create subenv, call func
 	break;
     }
-    case nativef1:
-    {
-	assert(argc == 1);
-
-	cons_t* arg = eval(env, args->car);
-	if(arg->type == Sym)
-	    return (*funentry->nativef1) \
-		(arg->val); //evaluate single argument
-	else if(arg->type == Num)
-	    return (*funentry->nativef1) \
-		((size_t) arg->numl);
+    case nativef:
+	return (*funentry->nativef)(env, args);
 	break;
-    }
-    case nativef2:
-    {
-	assert(argc == 2);
-	return (*funentry->nativef2)((int) eval(env, args->car)->numl),	\
-	    (int) eval(env, args->cdr)->numl);
+    case syml:
+	/* ERROR. Attempted to call symbol 'x' as a function */
 	break;
-    }
+    case numl:
+	/* ERROR. Attempted to call Num 'x' as a function */
+	break;
     case empty:
 	// Blank entry has been called like a fun, /should/ never happen
 	// TODO: notify that something has gone wrong

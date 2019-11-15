@@ -19,29 +19,19 @@ char* lookup_id(uint8_t i);
 
 typedef enum e_env_entry_type {
     empty,
-    nativef1, //native function 1 args
-    nativef2, //native function 2 args...
-    nativef3,
-    nativef4,
-    nativef5,
-    
+    nativef,  //native function (function pointer (env_t*, cons_t*))
     lispf,    //lisp function (pointer to lisp sexp)
     syml,     //sym num
     numl      //numeric num
 } env_entry_type;
 
+typedef struct env env_t;
 typedef struct env_entry {
     env_entry_type type;
     uint8_t sym;
     union {
 	//TODO: macroize this
-	cons_t* (*nativef1)(const void* arg1);
-	cons_t* (*nativef2)(const void* arg1, const void* arg2);
-	cons_t* (*nativef3)(const void* arg1, const void* arg2, const void* arg3);
-	cons_t* (*nativef4)(const void* arg1, const void* arg2, const void* arg3,
-			    const void* arg4);
-	cons_t* (*nativef5)(const void* arg1, const void* arg2, const void* arg3,
-			    const void* arg4, const void* arg5);
+	cons_t* (*nativef)(env_t* env, cons_t* args);
 	cons_t* lispf;
 	cons_t* symbol;
 	size_t  numl;
@@ -57,7 +47,7 @@ typedef struct env {
 } env_t;
 
 void add_env_entry_cons(env_t* env, env_entry_type type, char *sym, cons_t* val);
-void add_env_entry_native(env_t* env, env_entry_type type, char *sym, void* fun);
+void add_env_entry_native(env_t* env, char *sym, void* fun);
 env_entry_t* get_env_entry(env_t* env, char* sym);
 
 env_t* make_env(env_t* outer);
