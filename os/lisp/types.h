@@ -30,7 +30,7 @@ typedef struct cons {
 	};
 	// sym
 	struct {
-	    //TODO: symbol_t and symbol table with lookup
+	    //TODO: symbol val, symbol lookup
 	    char* val;
 	};
 	int numl;

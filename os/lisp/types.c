@@ -30,6 +30,7 @@ cons_t* sym(char* str)
 
 cons_t* num(int val)
 {
+    k_print("aga");
     cons_t* tmp = kmalloc(sizeof(cons_t));
     tmp->type = Num;
     tmp->numl = val;
