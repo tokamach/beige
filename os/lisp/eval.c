@@ -30,9 +30,11 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 
     //TODO: type (signature) check
 
-    lobj_t* eval_args = cons(NULL, NULL);
-
     //TODO: eval args
+    /*
+     * If args are not nil, we create a new env, mapping the
+     * function specified args to our supplied args
+     */
 
     /*
      * Before we can call fun, we need to eval our arguments

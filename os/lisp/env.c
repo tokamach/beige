@@ -23,14 +23,18 @@ uint16_t symbol_count = 0;
 
 symbol_id add_symbol(char* symbol)
 {
-    //TODO: sanity check, does symbol already exist check
+    //TODO: fix hacky code here
+    symbol_id preexisting_sym = lookup_symbol(symbol);
+    if(preexisting_sym != 65535)
+      return preexisting_sym;
+	
     symbol_table[symbol_count] = (symbol_t){symbol_count, symbol};
     return symbol_count++;
 }
 
 symbol_id lookup_symbol(char *symbol)
 {
-    for(int i = 0; i < MAX_SYMBOLS; i++)
+    for(int i = 0; i < symbol_count; i++)
 	if(streq(symbol_table[i].symbol, symbol))
 	    return i;
 
