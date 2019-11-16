@@ -114,13 +114,13 @@ env_t* make_env(env_t* outer)
 /*
  * Lisp fundamentals
  */
-lobj_t* car_func(env_t* env, lobj_t* list)
+lobj_t* fn_car(env_t* env, lobj_t* list)
 {
     assert(list->type == Cons, "can't car of non cons type");
     return list->car;
 }
 
-lobj_t* cdr_func(env_t* env, lobj_t* list)
+lobj_t* fn_cdr(env_t* env, lobj_t* list)
 {
     assert(list->type == Cons, "can't cdr of non cons type");
     return list->cdr;
@@ -167,8 +167,8 @@ env_t* make_base_env()
     env_t* env = make_env(NULL);
 
     /* Lisp Fundamentals */
-    add_env_entry_native(env, add_symbol("car"), &car_func);
-    add_env_entry_native(env, add_symbol("cdr"), &cdr_func);
+    add_env_entry_native(env, add_symbol("car"), &fn_car);
+    add_env_entry_native(env, add_symbol("cdr"), &fn_cdr);
 
     /* Mathematics operators */
     add_env_entry_native(env, add_symbol("add"), &add);

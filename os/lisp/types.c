@@ -81,5 +81,5 @@ inline lobj_t* nth(lobj_t* list, size_t n)
     for(size_t i = 0; i < n; i++)
 	list = list->cdr;
 
-    return list->car;
+    return list;
 }
