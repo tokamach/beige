@@ -98,10 +98,10 @@ int valid_sym(char* str)
     return ret;
 }
 
-cons_t* parse_sym(reader_t* r)
+lobj_t* parse_sym(reader_t* r)
 {
     char* str = tokenize_one(r);
-    cons_t* newsym = NULL;
+    lobj_t* newsym = NULL;
 	    
     if (valid_sym(str))
     {
@@ -117,7 +117,7 @@ cons_t* parse_sym(reader_t* r)
     return newsym;	
 }
 
-cons_t* parse_list(reader_t* r)
+lobj_t* parse_list(reader_t* r)
 {
     /*
       c = '(': car = recurse
@@ -129,14 +129,14 @@ cons_t* parse_list(reader_t* r)
     */
 
     char c;
-    cons_t* ret = NULL; //maintains pointer to root
+    lobj_t* ret = NULL; //maintains pointer to root
     
     while((c = reader_next(r)) &&
 	   c != ')')
     {
 	if(c == '(')
 	{
-	    cons_t* newcons = cons(parse_list(r), NULL);
+	    lobj_t* newcons = cons(parse_list(r), NULL);
 	    if(ret == NULL)
 		ret = newcons;
 	    else
@@ -161,7 +161,7 @@ cons_t* parse_list(reader_t* r)
     return ret;
 }
 
-cons_t* parse_exp(reader_t* r)
+lobj_t* parse_exp(reader_t* r)
 {
     char c = reader_cur(r);    
     if(c == '(')
@@ -170,7 +170,7 @@ cons_t* parse_exp(reader_t* r)
 	return parse_sym(r);
 }
 
-cons_t* lisp_read(char* str)
+lobj_t* lisp_read(char* str)
 {	
     reader_t* r = make_reader(str);
     //r->offset; //TODO: fix this dumb hack
@@ -185,9 +185,9 @@ void pad_print(int padding, char* str)
     k_print(str);
 }
 
-void print_cons_iter(cons_t* root, int depth, int debug)
+void print_cons_iter(lobj_t* root, int depth, int debug)
 {
-    cons_t* elem = root;
+    lobj_t* elem = root;
     
     if(elem == NULL)
     {
@@ -253,21 +253,21 @@ void print_cons_iter(cons_t* root, int depth, int debug)
     }
 }
 
-void print_cons(cons_t* root)
+void print_cons(lobj_t* root)
 {
     print_cons_iter(root, 0, 0);
     k_print("\n");
 }
 
-void print_cons_debug(cons_t* root)
+void print_cons_debug(lobj_t* root)
 {
     print_cons_iter(root, 0, 1);
     k_print("\n");
 }
 
-void print_sexp_iter(cons_t* root, int depth, int debug)
+void print_sexp_iter(lobj_t* root, int depth, int debug)
 {
-    cons_t* elem = root;
+    lobj_t* elem = root;
 
     /*
      * each elem->car.type =
@@ -353,12 +353,12 @@ void print_sexp_iter(cons_t* root, int depth, int debug)
     k_print(")");
 }
 
-void print_sexp(cons_t* root)
+void print_sexp(lobj_t* root)
 {
     print_sexp_iter(root, 0, 0);
 }
 
-void print_sexp_debug(cons_t* root)
+void print_sexp_debug(lobj_t* root)
 {
     print_sexp_iter(root, 0, 1);
 }

@@ -12,7 +12,7 @@
  * fun: symbol containing the name of the function to call
  * args: list of arguments
  */
-cons_t* apply(env_t* env, cons_t* fun, cons_t* args)
+lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 {
     env_entry_t* funentry = get_env_entry(env, fun->val);
     uint8_t argc = length(args);
@@ -36,7 +36,7 @@ cons_t* apply(env_t* env, cons_t* fun, cons_t* args)
 	 */
     case lispf:
     {
-	cons_t* func = funentry->lispf;
+	lobj_t* func = funentry->lispf;
 	//TODO: check argc
 	//TODO: eval each earg, create subenv, call func
 	break;
@@ -57,7 +57,7 @@ cons_t* apply(env_t* env, cons_t* fun, cons_t* args)
     }
 }
 
-cons_t* eval(env_t* env, cons_t* exp)
+lobj_t* eval(env_t* env, lobj_t* exp)
 {
     /* eval nil, return nil */
     if(exp == NULL)
@@ -74,10 +74,10 @@ cons_t* eval(env_t* env, cons_t* exp)
      * Since we're not a Sym or Num, we know that we're a function
      * 
      */
-    cons_t* func = car(exp);
-    cons_t* args = cdr(exp);
+    lobj_t* func = car(exp);
+    lobj_t* args = cdr(exp);
 
-    cons_t* result = apply(env, func, args);
+    lobj_t* result = apply(env, func, args);
 
     return result;
 }

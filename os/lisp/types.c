@@ -10,39 +10,38 @@
 #include "../kernel/kterm.h"
 #endif
 
-cons_t* cons(cons_t* car, cons_t* cdr)
+lobj_t* cons(lobj_t* car, lobj_t* cdr)
 {
-    cons_t* tmp = kmalloc(sizeof(cons_t));
+    lobj_t* tmp = kmalloc(sizeof(lobj_t));
     tmp->type = Cons;
     tmp->car = car;
     tmp->cdr = cdr;
     return tmp;
 }
 
-cons_t* sym(char* str)
+lobj_t* sym(char* str)
 {
-    cons_t* tmp = kmalloc(sizeof(cons_t));
+    lobj_t* tmp = kmalloc(sizeof(lobj_t));
     tmp->type = Sym;
     tmp->val = kmalloc(sizeof(char) * strlen(str));
     strcopy(str, tmp->val);
     return tmp;
 }
 
-cons_t* num(int val)
+lobj_t* num(int val)
 {
-    k_print("aga");
-    cons_t* tmp = kmalloc(sizeof(cons_t));
+    lobj_t* tmp = kmalloc(sizeof(lobj_t));
     tmp->type = Num;
     tmp->numl = val;
     return tmp;    
 }
 
-void free_cons(cons_t* elem)
+void free_lobj(lobj_t* elem)
 {
     if(elem->type == Cons)
     {
-	free_cons(elem->car);
-	free_cons(elem->cdr);
+	free_lobj(elem->car);
+	free_lobj(elem->cdr);
     }
     else if(elem->type == Sym)
 	kfree(elem->val);
@@ -52,7 +51,7 @@ void free_cons(cons_t* elem)
     kfree(elem);
 }
 
-void append(cons_t* list, cons_t* elem)
+inline void append(lobj_t* list, lobj_t* elem)
 {
     if(list->type == Sym)
 	return; //ERROR: can't access cdr of sym
@@ -63,7 +62,7 @@ void append(cons_t* list, cons_t* elem)
     list->cdr = elem;
 }
 
-inline size_t length(cons_t* list)
+inline size_t length(lobj_t* list)
 {
     //TODO: assert
     //we can't find the length of a list with no cdr
@@ -77,7 +76,7 @@ inline size_t length(cons_t* list)
     return len;
 }
 
-inline cons_t* nth(cons_t* list, size_t n)
+inline lobj_t* nth(lobj_t* list, size_t n)
 {
     for(size_t i = 0; i < n; i++)
 	list = list->cdr;

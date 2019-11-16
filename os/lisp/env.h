@@ -19,7 +19,7 @@ char* lookup_id(uint8_t i);
 
 typedef enum e_env_entry_type {
     empty,
-    nativef,  //native function (function pointer (env_t*, cons_t*))
+    nativef,  //native function (function pointer (env_t*, lobj_t*))
     lispf,    //lisp function (pointer to lisp sexp)
     syml,     //sym num
     numl      //numeric num
@@ -31,9 +31,9 @@ typedef struct env_entry {
     uint8_t sym;
     union {
 	//TODO: macroize this
-	cons_t* (*nativef)(env_t* env, cons_t* args);
-	cons_t* lispf;
-	cons_t* symbol;
+	lobj_t* (*nativef)(env_t* env, lobj_t* args);
+	lobj_t* lispf;
+	lobj_t* symbol;
 	size_t  numl;
     };
 } env_entry_t;
@@ -46,7 +46,7 @@ typedef struct env {
     uint8_t entry_count;
 } env_t;
 
-void add_env_entry_cons(env_t* env, env_entry_type type, char *sym, cons_t* val);
+void add_env_entry_lobj(env_t* env, env_entry_type type, char *sym, lobj_t* val);
 void add_env_entry_native(env_t* env, char *sym, void* fun);
 env_entry_t* get_env_entry(env_t* env, char* sym);
 

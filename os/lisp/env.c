@@ -47,7 +47,7 @@ char* lookup_id(uint8_t i)
 /*
  * Env Stuff
  */
-void add_env_entry_cons(env_t* env, env_entry_type type, char* sym, cons_t* val)
+void add_env_entry_cons(env_t* env, env_entry_type type, char* sym, lobj_t* val)
 {
     env_entry_t* ret = &env->entries[env->entry_count];
     ret->type = type;
@@ -113,13 +113,13 @@ env_t* make_env(env_t* outer)
 /*
  * Lisp fundamentals
  */
-cons_t* car_func(env_t* env, cons_t* list)
+lobj_t* car_func(env_t* env, lobj_t* list)
 {
     assert(list->type == Cons);
     return list->car;
 }
 
-cons_t* cdr_func(env_t* env, cons_t* list)
+lobj_t* cdr_func(env_t* env, lobj_t* list)
 {
     assert(list->type == Cons);
     return list->cdr;
@@ -131,7 +131,7 @@ cons_t* cdr_func(env_t* env, cons_t* list)
 DEFUN(add, env, args)
 {
     size_t total = 0;
-    LITER(args, i)
+    LIST_ITER(args, i)
     {
 	//total += nth(args, i)->car->numl;
     }
@@ -139,22 +139,22 @@ DEFUN(add, env, args)
     return num(total);
 }
 /*
-cons_t* sub(size_t a, size_t b)
+lobj_t* sub(size_t a, size_t b)
 {
     return num(a - b);
 }
 
-cons_t* mul(size_t a, size_t b)
+lobj_t* mul(size_t a, size_t b)
 {
     return num(a * b);
 }
 
-cons_t* div(size_t a, size_t b)
+lobj_t* div(size_t a, size_t b)
 {
     return num(a / b);
 }
 
-cons_t* quote(cons_t* exp)
+qlobj_t* quote(lobj_t* exp)
 {
     return cons(sym("quote"), exp);
 }
