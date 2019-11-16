@@ -19,16 +19,16 @@
 /*
  * Symbol stuff
  */
-uint8_t symbol_count = 0;
+uint16_t symbol_count = 0;
 
-uint8_t add_symbol(char* symbol)
+symbol_id add_symbol(char* symbol)
 {
-    //TODO: sanity check
+    //TODO: sanity check, does symbol already exist check
     symbol_table[symbol_count] = (symbol_t){symbol_count, symbol};
     return symbol_count++;
 }
 
-uint8_t lookup_symbol(char *symbol)
+symbol_id lookup_symbol(char *symbol)
 {
     for(int i = 0; i < MAX_SYMBOLS; i++)
 	if(streq(symbol_table[i].symbol, symbol))
@@ -38,7 +38,7 @@ uint8_t lookup_symbol(char *symbol)
     return -1;
 }
 
-char* lookup_id(uint8_t i)
+char* lookup_id(symbol_id i)
 {
     return symbol_table[i].symbol;
 }
@@ -47,11 +47,11 @@ char* lookup_id(uint8_t i)
 /*
  * Env Stuff
  */
-void add_env_entry_cons(env_t* env, env_entry_type type, char* sym, lobj_t* val)
+void add_env_entry_cons(env_t* env, env_entry_type type, symbol_id sym, lobj_t* val)
 {
     env_entry_t* ret = &env->entries[env->entry_count];
     ret->type = type;
-    ret->sym = add_symbol(sym);
+    ret->sym = sym;
 
     if(type == lispf)
     {
@@ -65,12 +65,13 @@ void add_env_entry_cons(env_t* env, env_entry_type type, char* sym, lobj_t* val)
     env->entry_count++;
 }
 
-void add_env_entry_native(env_t* env, char* sym, void* fun)
+void add_env_entry_native(env_t* env, symbol_id sym, void* fun)
 {
     env_entry_t* ret = &env->entries[env->entry_count];
     ret->type = nativef;
-    ret->sym = add_symbol(sym);
+    ret->sym = sym;
     ret->nativef = fun;
+    env->entry_count++;
 }
 
 env_entry_t* get_env_entry(env_t* env, char* sym)
@@ -80,7 +81,7 @@ env_entry_t* get_env_entry(env_t* env, char* sym)
     for(int i = 0; i < env->entry_count; i++)
     {
 	if(env->entries[i].sym == symid)
-	    return &env->entries[i];
+	    return &(env->entries[i]);
     }
 
     //not in current env, look in outer
@@ -115,25 +116,25 @@ env_t* make_env(env_t* outer)
  */
 lobj_t* car_func(env_t* env, lobj_t* list)
 {
-    assert(list->type == Cons);
+    assert(list->type == Cons, "can't car of non cons type");
     return list->car;
 }
 
 lobj_t* cdr_func(env_t* env, lobj_t* list)
 {
-    assert(list->type == Cons);
+    assert(list->type == Cons, "can't cdr of non cons type");
     return list->cdr;
 }
 
 /*
  * Maths
  */
-DEFUN(add, env, args)
+lobj_t* add(env_t* env, lobj_t* args)
 {
     size_t total = 0;
     LIST_ITER(args, i)
     {
-	//total += nth(args, i)->car->numl;
+	total += nth(args, i)->car->numl;
     }
 	
     return num(total);
@@ -166,17 +167,17 @@ env_t* make_base_env()
     env_t* env = make_env(NULL);
 
     /* Lisp Fundamentals */
-    add_env_entry_native(env, "car", &car_func);
-    add_env_entry_native(env, "cdr", &cdr_func);
+    add_env_entry_native(env, add_symbol("car"), &car_func);
+    add_env_entry_native(env, add_symbol("cdr"), &cdr_func);
 
     /* Mathematics operators */
-    add_env_entry_native(env, "add", &add);
+    add_env_entry_native(env, add_symbol("add"), &add);
     /*add_env_entry_native(env, nativef, "sub", &sub);
     add_env_entry_native(env, nativef, "mul", &mul);
     add_env_entry_native(env, nativef, "div", &div);
     add_env_entry_native(env, nativef, "quote", &quote);*/
     
-    return make_env(NULL);
+    return env;
 }
 
 /*
@@ -188,7 +189,5 @@ env_t* make_kernel_env()
 {
     env_t* env = make_env(make_base_env());
     
-
-    //k_print_hex(get_env_entry(env, "add")->nativef2);
     return env;
 }

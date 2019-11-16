@@ -9,17 +9,22 @@ typedef struct {
     uint8_t id;
     char* symbol;
 } symbol_t;
-    
-symbol_t symbol_table[MAX_SYMBOLS];
-uint8_t symbol_count;
 
-uint8_t add_symbol(char* symbol);
-uint8_t lookup_symbol(char* symbol);
-char* lookup_id(uint8_t i);
+typedef uint16_t symbol_id;
+
+symbol_t symbol_table[MAX_SYMBOLS];
+uint16_t symbol_count;
+
+symbol_id add_symbol(char* symbol);
+symbol_id lookup_symbol(char* symbol);
+char* lookup_id(symbol_id i);
 
 typedef enum e_env_entry_type {
     empty,
     nativef,  //native function (function pointer (env_t*, lobj_t*))
+    nativef1,
+    nativef2,
+    nativef3,
     lispf,    //lisp function (pointer to lisp sexp)
     syml,     //sym num
     numl      //numeric num
@@ -28,10 +33,15 @@ typedef enum e_env_entry_type {
 typedef struct env env_t;
 typedef struct env_entry {
     env_entry_type type;
-    uint8_t sym;
+    symbol_id sym;
     union {
-	//TODO: macroize this
 	lobj_t* (*nativef)(env_t* env, lobj_t* args);
+	lobj_t* (*nativef1)(env_t* env, lobj_t* args);
+	lobj_t* (*nativef2)(env_t* env, lobj_t* arg1, lobj_t* arg2);
+	lobj_t* (*nativef3)(env_t* env,
+			    lobj_t* arg1,
+			    lobj_t* arg2,
+			    lobj_t* arg3);
 	lobj_t* lispf;
 	lobj_t* symbol;
 	size_t  numl;
@@ -46,8 +56,8 @@ typedef struct env {
     uint8_t entry_count;
 } env_t;
 
-void add_env_entry_lobj(env_t* env, env_entry_type type, char *sym, lobj_t* val);
-void add_env_entry_native(env_t* env, char *sym, void* fun);
+void add_env_entry_lobj(env_t* env, env_entry_type type, symbol_id sym, lobj_t* val);
+void add_env_entry_native(env_t* env, symbol_id sym, void* fun);
 env_entry_t* get_env_entry(env_t* env, char* sym);
 
 env_t* make_env(env_t* outer);
