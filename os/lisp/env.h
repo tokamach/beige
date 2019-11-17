@@ -25,9 +25,12 @@ typedef enum e_env_entry_type {
     nativef1,
     nativef2,
     nativef3,
+    lobj
+    /*
     lispf,    //lisp function (pointer to lisp sexp)
     syml,     //sym num
     numl      //numeric num
+    */
 } env_entry_type;
 
 typedef struct env env_t;
@@ -42,9 +45,9 @@ typedef struct env_entry {
 			    lobj_t* arg1,
 			    lobj_t* arg2,
 			    lobj_t* arg3);
-	lobj_t* lispf;
-	lobj_t* symbol;
-	size_t  numl;
+	lobj_t* lobj;
+	/*symbol_id syml;
+	  size_t  numl;*/
     };
 } env_entry_t;
 
@@ -56,10 +59,12 @@ typedef struct env {
     uint8_t entry_count;
 } env_t;
 
-void add_env_entry_lobj(env_t* env, env_entry_type type, symbol_id sym, lobj_t* val);
-void add_env_entry_native(env_t* env, symbol_id sym, void* fun);
+void add_env_entry_lobj(env_t* env, symbol_id sym, lobj_t* val);
+void add_env_entry_native(env_t* env, env_entry_type type, symbol_id sym, void* fun);
 env_entry_t* get_env_entry(env_t* env, char* sym);
 
 env_t* make_env(env_t* outer);
+void free_env(env_t* env);
+
 env_t* make_base_env();
 env_t* make_kernel_env();

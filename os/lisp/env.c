@@ -51,28 +51,32 @@ char* lookup_id(symbol_id i)
 /*
  * Env Stuff
  */
-void add_env_entry_cons(env_t* env, env_entry_type type, symbol_id sym, lobj_t* val)
+void add_env_entry_lobj(env_t* env, symbol_id sym, lobj_t* val)
 {
     env_entry_t* ret = &env->entries[env->entry_count];
-    ret->type = type;
+    ret->type = lobj;
     ret->sym = sym;
+    env->entry_count++;
 
-    if(type == lispf)
+    /*if(type == lispf)
     {
 	ret->lispf = val;
     }
     else if(type == syml)
     {
-	ret->sym = val;
+	ret->syml = val->syml;
     }
-
-    env->entry_count++;
+    else if(type == numl)
+    {
+	ret->sym = numl;
+	}*/
 }
 
-void add_env_entry_native(env_t* env, symbol_id sym, void* fun)
+void add_env_entry_native(env_t* env, env_entry_type type, symbol_id sym, void* fun)
 {
+    //TODO: check type = nativef-nativef5
     env_entry_t* ret = &env->entries[env->entry_count];
-    ret->type = nativef;
+    ret->type = type;
     ret->sym = sym;
     ret->nativef = fun;
     env->entry_count++;
@@ -95,12 +99,6 @@ env_entry_t* get_env_entry(env_t* env, char* sym)
 	return NULL;
 }
 
-/*
- * Initalizing the defualt lisp environment
- * this contains the basic lisp functions
- * which others can be built upon
- */
-
 env_t* make_env(env_t* outer)
 {
     env_t* ret = kmalloc(sizeof(env_t));
@@ -113,6 +111,13 @@ env_t* make_env(env_t* outer)
 	ret->outer = NULL;
     
     return ret;
+}
+
+void free_env(env_t* env)
+{
+    /* env_t has no pointers to children, so we don't need to 
+     * free anything else */
+    kfree(env);
 }
 
 /*
@@ -164,6 +169,12 @@ qlobj_t* quote(lobj_t* exp)
     return cons(sym("quote"), exp);
 }
 */
+
+/*
+ * Initalizing the defualt lisp environment
+ * this contains the basic lisp functions
+ * which others can be built upon
+ */
 env_t* make_base_env()
 {
     //TODO: add defun, let, etc to env
@@ -171,11 +182,11 @@ env_t* make_base_env()
     env_t* env = make_env(NULL);
 
     /* Lisp Fundamentals */
-    add_env_entry_native(env, add_symbol("car"), &fn_car);
-    add_env_entry_native(env, add_symbol("cdr"), &fn_cdr);
+    add_env_entry_native(env, nativef1, add_symbol("car"), &fn_car);
+    add_env_entry_native(env, nativef1, add_symbol("cdr"), &fn_cdr);
 
     /* Mathematics operators */
-    add_env_entry_native(env, add_symbol("add"), &add);
+    add_env_entry_native(env, nativef, add_symbol("add"), &add);
     /*add_env_entry_native(env, nativef, "sub", &sub);
     add_env_entry_native(env, nativef, "mul", &mul);
     add_env_entry_native(env, nativef, "div", &div);

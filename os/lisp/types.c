@@ -53,6 +53,10 @@ void free_lobj(lobj_t* elem)
 
 inline void append(lobj_t* list, lobj_t* elem)
 {
+    // emtpy list
+    if(list == NULL)
+	*list = *elem;
+    
     if(list->type == Sym)
 	return; //ERROR: can't access cdr of sym
 	

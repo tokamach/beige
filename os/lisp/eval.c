@@ -28,59 +28,85 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
     env_entry_t* funentry = get_env_entry(env, fun->car->val);
     uint8_t argc = length(args);
 
+    //TODO: check that funentry isn't NULL
     //TODO: type (signature) check
 
-    //TODO: eval args
     /*
-     * If args are not nil, we create a new env, mapping the
-     * function specified args to our supplied args
-     */
-
-    /*
-     * Before we can call fun, we need to eval our arguments
-     * If they're just literals or vars, then that's cool, but
+     * Before we can call fun, we need to eval our arguments,
+     * and add them to a new env, the scope of the new function.
+     * If the args are just literals or vars, then that's cool, but
      * they often need evaluating themselves i.e. (+ (* 2 5) 1)
      *
-     * Calling eval(arg) guarantees arg is in the form of
-     * a Sym or Num.
+     * It can be said that calling eval(arg) provides us with a
+     * guarantee that arg is in the form of a Sym or Num.
      */
+
+    //TODO: make append return only (no side effects) and fix this hack
+    lobj_t* evald_args = cons(NULL, NULL);
+    LIST_ITER(args, i)
+    {
+	append(evald_args, eval(env, nth(args, i)));
+    }
+    evald_args = cdr(evald_args);
+
+    // The value returned by this apply() call. Defaults to nil
+    lobj_t* retval = NULL;
     switch(funentry->type)
     {
 	/*
 	 * A function implemented in Lisp.
 	 */
-    case lispf:
+    case lobj:
     {
-	lobj_t* func = funentry->lispf;
-	//TODO: check argc
-	//TODO: eval each earg, create subenv, call func
+	//TODO: check if entry isn't a function, error (can't call function of var)
+	// Make a new env, inner to the current env.
+	env_t* func_env = make_env(env);
+
+	/* For each arg, evaluate it and add the result to the new env
+	   with the name of the relative argname in the function definition */
+	LIST_ITER(args, i)
+	{
+	    lobj_t* arg = nth(evald_args, i);
+	    symbol_id argnm = lookup_symbol(nth(car(cdr(args)), i)->car->val);
+	    add_env_entry_lobj(func_env, argnm, arg);
+	}
+
+	lobj_t* func = funentry->lobj;
+
+	/* functions follow the format: 
+	 * (lamdba fname (args) (<function>))
+	 * now that */
+	retval = eval(func_env, nth(func, 3));
 	break;
     }
+    
     /*
      * nativef means all args are passed to native function
      * nativef1-fn mean each arg is passed in its relative pos
      * to function
      */
     case nativef:
-	return (*funentry->nativef)(env, args);
+	retval = (*funentry->nativef)(env, evald_args);
 	break;
+	
     case nativef1:
 	assert(argc == 1, "argc didn't match 1");
-	return (*funentry->nativef)(env, nth(args, 0));
+	retval = (*funentry->nativef)(env, nth(evald_args, 0));
+	break;
+	
     case nativef2:
 	assert(argc == 2, "argc didn't match 2");
-	return (*funentry->nativef2)(env, nth(args, 0), nth(args, 1));
-    case syml:
-	/* ERROR. Attempted to call symbol 'x' as a function */
+	retval = (*funentry->nativef2)(env, nth(evald_args, 0), nth(evald_args, 1));
 	break;
-    case numl:
-	/* ERROR. Attempted to call Num 'x' as a function */
-	break;
+	
     case empty:
 	// Blank entry has been called like a fun, /should/ never happen
 	// TODO: notify that something has gone wrong
 	break;
     }
+
+    free_env(env);
+    return retval;
 }
 
 lobj_t* eval(env_t* env, lobj_t* exp)
@@ -92,6 +118,10 @@ lobj_t* eval(env_t* env, lobj_t* exp)
     /* Sym and Num evaluate to themselves */
     if(exp->type == Num ||
        exp->type == Sym)
+	return exp;
+
+    /* how to explain this... */
+    if(exp->car->type == Num)
 	return exp;
 
     //TODO: handle quoted list
