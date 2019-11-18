@@ -61,7 +61,7 @@ lobj_t* num(int num);
 lobj_t* func(lobj_t* args, lobj_t* body);
 void free_lobj(lobj_t* elem);
 
-void append(lobj_t* list, lobj_t* elem);
+lobj_t* append(lobj_t* list, lobj_t* elem);
 size_t length(lobj_t* list);
 lobj_t* nth(lobj_t* list, size_t n);
 

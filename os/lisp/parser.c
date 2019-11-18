@@ -140,7 +140,7 @@ lobj_t* parse_list(reader_t* r)
 	    if(ret == NULL)
 		ret = newcons;
 	    else
-		append(ret, newcons);
+		ret = append(ret, newcons);
 	}
 	else if(c == ' ' || c == '\n' || c == ' ') //TODO: is_blank
 	{
@@ -150,11 +150,12 @@ lobj_t* parse_list(reader_t* r)
 	{
 	    //TODO: check if c = sym
 	    //TODO: check if c = int
-	    
+
+	    //TODO: with new cons is this too much work
 	    if(ret == NULL)
 		ret = cons(parse_sym(r), NULL);
 	    else
-		append(ret, cons(parse_sym(r), NULL));
+		ret = append(ret, cons(parse_sym(r), NULL));
 	}
     }
 

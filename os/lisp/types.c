@@ -59,23 +59,50 @@ void free_lobj(lobj_t* elem)
     kfree(elem);
 }
 
-inline void append(lobj_t* list, lobj_t* elem)
+lobj_t* append(lobj_t* list, lobj_t* elem)
 {
     // emtpy list
     if(list == NULL)
-	*list = *elem;
+	return elem;
     
-    if(list->type == Sym)
-	return; //ERROR: can't access cdr of sym
-	
-    while(list->cdr != NULL)
-	list = list->cdr;
-
-    if(elem->type == Sym ||
-       elem->type == Num)
-	list->cdr = cons(elem, NULL);
+    /* Are we even adding to a list? */
+    if(list->type != Cons)
+    {
+	/* are we adding a list to our not list */
+	if(elem->type == Cons)
+	{
+	    return cons(list, elem);
+	}
+	else
+	{
+	    /* 
+	     * We actually have two elements, no matter
+	     * we can just put them in a list!
+	     */
+	    return cons(list, cons(elem, NULL));	    
+	}
+    }
     else
-	list->cdr = elem;
+    {
+	//TODO: if possible make this no sideeffect
+	/* list is a list, we should seek to the end */
+	lobj_t* end = list;
+	while(end->cdr != NULL)
+	    end = end->cdr;
+
+	if(elem->type == Cons)
+	{
+	    end->cdr = elem;
+	    return list;
+	}
+	else
+	{
+	    end->cdr = cons(elem, NULL);
+	    return list;
+	}
+    }
+
+    //return error(-1, "append broke");
 }
 
 inline size_t length(lobj_t* list)

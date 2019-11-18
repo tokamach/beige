@@ -94,7 +94,7 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 		/*if(evald_args == NULL)
 		    evald_args = eval(env, nth(args, i));
 		    else*/
-		    append(evald_args, eval(env, nth(args, i)));
+		    evald_args = append(evald_args, eval(env, nth(args, i)));
 	    }
 	}
     }
