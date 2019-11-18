@@ -16,7 +16,8 @@ typedef enum e_lobj_type {
     Cons, // a cons cell (car, cdr), use to make lists 
     Sym,  // a symbol (word), should/could be stored as symbol id
     Num,  // a literal number. stored as uint32_t
-    Func  // a function. stored as args list and body
+    Func, // a function. stored as args list and body
+    Err   // an error. Somewhere in the eval or 
 } lobj_type;
 
 // cons cell, the core of any lisp
@@ -44,6 +45,12 @@ typedef struct lobj {
 	struct {
 	    struct lobj* args;
 	    struct lobj* body;
+	};
+
+	// Error
+	struct {
+	    uint8_t code;
+	    char* msg;
 	};
     };
 } lobj_t;

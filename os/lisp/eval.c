@@ -15,45 +15,114 @@
 /*
  * Apply the arglist in args to the function fun.
  * env: the environment/ns to eval in
- * fun: symbol containing the name of the function to call
+ * fun: symbol containing function or name of the function to call
  * args: list of arguments
  */
 lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 {
     /*
-     * TODO: check if fun is symbol pointing to function
-     * or a function itself
+     * The entry in the env containing our function. We need
+     * to keep this around in case we're calling a nativef,
+     * of which funentry will have a pointer to, and arg info
      */
+    env_entry_t* funentry = NULL;
     
-    env_entry_t* funentry = get_env_entry(env, fun->car->val);
-    uint8_t argc = length(args);
+    // This is the value we will return. By default it's nil.
+    lobj_t* retval = NULL;
 
-    //TODO: check that funentry isn't NULL
-    //TODO: type (signature) check
+    // Number of args
+    uint8_t argc = length(args);    
 
     /*
-     * Before we can call fun, we need to eval our arguments,
-     * and add them to a new env, the scope of the new function.
-     * If the args are just literals or vars, then that's cool, but
-     * they often need evaluating themselves i.e. (+ (* 2 5) 1)
-     *
-     * It can be said that calling eval(arg) provides us with a
-     * guarantee that arg is in the form of a Sym or Num.
-     */
-
-    //TODO: decide how to handle the arg list
-    //right now append will put stuff in a cons if its a Num or Val
-    lobj_t* evald_args = cons(num(1), NULL);
-    LIST_ITER(args, i)
+     * As we're a Lisp, we don't any side effects. If we eval
+     * args, we don't want to modify them in place. We'll put
+     * them here instead.
+     */ 
+    lobj_t* evald_args = NULL;
+    
+    if(fun->type == Sym)
     {
-	append(evald_args, eval(env, nth(args, i)->car));
-    }
-    evald_args = cdr(evald_args);
+	/*
+	 * fun is a symbol referencing a function in the env.
+	 * we can lookup the function in the env:
+	 */
+	funentry = get_env_entry(env, fun->val);
 
-    // The value returned by this apply() call. Defaults to nil
-    lobj_t* retval = NULL;
+	// The requested function doesn't exist in the env. Uh oh.
+	if(funentry == NULL)
+	{
+	    //TODO: handle errors nicely, I think add an lobj type Err
+	    return NULL;
+	}
+
+	// funentry is a /special form/. It may do macro like things
+	if(funentry->type == special)
+	{
+	    /*
+	     * Special forms go here. define, defun, etc.
+	     * These function similarly to macros, where we don't want
+	     * the args to be eval'd before execution. We'll let the
+	     * functions themselves handle their arguments, (for now...)
+	     * so we'll just pass them the args list wholesale.
+	     */
+
+	    // if we need to figure stuff out, do it here
+	}
+	else
+	{
+	    /* 
+	     * Whatever funentry is, these types want the args to be eval'd.
+	     * Before we switch on them, we'll eval the args
+	     *
+	     * We should only reach this point if we're sure we're working
+	     * with a function, and not a special form or macro. As such we
+	     * can safely eval all our args, without fear they aren't defined
+	     * as in the case of (define x 10), where x is undefined, but
+	     * attempting to eval it will just cause problems.
+	     *
+	     * Before we can call fun, we need to eval our arguments,
+	     * and add them to a new env, the scope of the new function.
+	     * If the args are just literals or vars, then that's cool, but
+	     * they often need evaluating themselves i.e. (+ (* 2 5) 1)
+	     *
+	     * It can be said that calling eval(arg) provides us with a
+	     * guarantee that arg is in the form of a Sym or Num.
+	     */
+    
+	    for(int i = 0; i < argc; i++)
+	    {
+		/*if(evald_args == NULL)
+		    evald_args = eval(env, nth(args, i));
+		    else*/
+		    append(evald_args, eval(env, nth(args, i)));
+	    }
+	}
+    }
+    else if(fun->type == Func)
+    {
+	/*
+	 * fun is a lambda. instead of retreiving the function
+	 * from funentry, we already have it in fun
+	 */
+
+	//TODO: figure out how to do this
+    }
+
     switch(funentry->type)
     {
+    case empty:
+	// Blank entry has been called like a fun, /should/ never happen
+	// TODO: notify that something has gone wrong
+	//return error(1, "Attempted to call empty");
+	break;
+
+	/*
+	 * A special form like
+	 */
+    case special:
+	retval = (*funentry->special)(env, args);
+	break;
+
 	/*
 	 * A function implemented in Lisp. It should be of type Func
 	 */
@@ -70,7 +139,7 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 	LIST_ITER(args, i)
 	{
 	    lobj_t* arg = nth(evald_args, i);
-	    symbol_id argnm = lookup_symbol(nth(func->args, i)->car->val);
+	    symbol_id argnm = lookup_symbol(nth(func->args, i)->val);
 	    add_env_entry_lobj(func_env, argnm, arg);
 	}
 
@@ -78,6 +147,9 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 	 * (lamdba fname (args) (<function>))
 	 * now that */
 	retval = eval(func_env, func->body);
+
+	// we've now exited the function, and will no longer need this env
+	free_env(func_env);
 	break;
     }
     
@@ -99,14 +171,17 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 	assert(argc == 2, "argc didn't match 2");
 	retval = (*funentry->nativef2)(env, nth(evald_args, 0), nth(evald_args, 1));
 	break;
+
+    case nativef3:
+	assert(argc == 3, "argc didn't match 3");
+	retval = (*funentry->nativef3)(env,
+				       nth(evald_args, 0),
+				       nth(evald_args, 1),
+				       nth(evald_args, 2));
+
 	
-    case empty:
-	// Blank entry has been called like a fun, /should/ never happen
-	// TODO: notify that something has gone wrong
-	break;
     }
 
-    //free_env(env);
     return retval;
 }
 
@@ -127,10 +202,14 @@ lobj_t* eval(env_t* env, lobj_t* exp)
     if(exp == NULL)
 	return NULL;
 
-    /* Sym and Num evaluate to themselves */
-    if(exp->type == Num ||
-       exp->type == Sym)
+    /* Num evaluate to itself */
+    if(exp->type == Num)
 	return exp;
+
+    /* unqoted Sym evaluates to it's value */
+    //TODO: check value isn't null
+    if(exp->type == Sym)
+	return get_env_entry(env, exp->val)->lobj;
 
     //TODO: handle quoted list
 
@@ -138,7 +217,7 @@ lobj_t* eval(env_t* env, lobj_t* exp)
      * Since we're not a Sym or Num, we know that we're a function
      * 
      */
-    lobj_t* func = exp;
+    lobj_t* func = car(exp);
     lobj_t* args = cdr(exp);
 
     lobj_t* result = apply(env, func, args);

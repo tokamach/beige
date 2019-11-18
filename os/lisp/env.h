@@ -34,6 +34,10 @@ typedef struct env_entry {
     env_entry_type type;
     symbol_id sym;
     union {
+	/* A special form (e.g. define) */
+	lobj_t* (*special)(env_t* env, lobj_t* args);
+
+	/* Native functions, variadic and fixed args */
 	lobj_t* (*nativef)(env_t* env, lobj_t* args);
 	lobj_t* (*nativef1)(env_t* env, lobj_t* args);
 	lobj_t* (*nativef2)(env_t* env, lobj_t* arg1, lobj_t* arg2);
@@ -41,9 +45,9 @@ typedef struct env_entry {
 			    lobj_t* arg1,
 			    lobj_t* arg2,
 			    lobj_t* arg3);
+
+	/* a Lisp object. Can be anything */
 	lobj_t* lobj;
-	/*symbol_id syml;
-	  size_t  numl;*/
     };
 } env_entry_t;
 

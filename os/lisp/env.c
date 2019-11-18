@@ -56,20 +56,8 @@ void add_env_entry_lobj(env_t* env, symbol_id sym, lobj_t* val)
     env_entry_t* ret = &env->entries[env->entry_count];
     ret->type = lobj;
     ret->sym = sym;
+    ret->lobj = val;
     env->entry_count++;
-
-    /*if(type == lispf)
-    {
-	ret->lispf = val;
-    }
-    else if(type == syml)
-    {
-	ret->syml = val->syml;
-    }
-    else if(type == numl)
-    {
-	ret->sym = numl;
-	}*/
 }
 
 void add_env_entry_native(env_t* env, env_entry_type type, symbol_id sym, void* fun)
@@ -137,13 +125,13 @@ lobj_t* fn_cdr(env_t* env, lobj_t* list)
     return list->cdr;
 }
 
-lobj_t* fn_quote(env_t* env, lobj_t* args)
+lobj_t* sp_quote(env_t* env, lobj_t* args)
 {
     //TODO: if length(args) = 1, return args->car
     return args;
 }
 
-lobj_t* fn_lambda(env_t* env, lobj_t* args, lobj_t* body)
+lobj_t* sp_lambda(env_t* env, lobj_t* args, lobj_t* body)
 {
     assert(args->type == Cons, "Must pass list of args to lambda");
 
@@ -152,11 +140,14 @@ lobj_t* fn_lambda(env_t* env, lobj_t* args, lobj_t* body)
     return func(args, body);
 }
 
-lobj_t* fn_define(env_t* env, lobj_t* name, lobj_t* body)
+lobj_t* sp_define(env_t* env, lobj_t* args)
 {
-    //TOD: should be special
+    lobj_t* name = car(args);
+    lobj_t* body = car(cdr(args)); //extract value from list
+    
     assert(name->type == Sym, "tried to define with non sym as name");
     add_env_entry_lobj(env, add_symbol(name->val), body);
+    
     return body;
 }
 
@@ -210,8 +201,8 @@ env_t* make_base_env()
     /* Lisp Fundamentals */
     add_env_entry_native(env, nativef1, add_symbol("car"), &fn_car);
     add_env_entry_native(env, nativef1, add_symbol("cdr"), &fn_cdr);
-    add_env_entry_native(env, nativef, add_symbol("quote"), &fn_quote);
-    add_env_entry_native(env, nativef2, add_symbol("define"), &fn_define);
+    add_env_entry_native(env, special, add_symbol("quote"), &sp_quote);
+    add_env_entry_native(env, special, add_symbol("define"), &sp_define);
 
     /* Mathematics operators */
     add_env_entry_native(env, nativef, add_symbol("add"), &fn_add);
