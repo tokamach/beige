@@ -42,10 +42,10 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
      */
 
     //TODO: make append return only (no side effects) and fix this hack
-    lobj_t* evald_args = cons(NULL, NULL);
+    lobj_t* evald_args = cons(num(1), NULL);
     LIST_ITER(args, i)
     {
-	append(evald_args, eval(env, nth(args, i)));
+	append(evald_args, eval(env, nth(args, i)->car));
     }
     evald_args = cdr(evald_args);
 
@@ -105,10 +105,21 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 	break;
     }
 
-    free_env(env);
+    //free_env(env);
     return retval;
 }
 
+/*
+ * Things you /can/ pass to eval:
+ * (add 1 2)
+ * 1
+ * add
+ * (lambda (a) (ptr_dref (ptr a))
+ *
+ * Things you /can't/ pass to eval (so stop trying to)
+ * (1 2 3)
+ * Cons((add 1 2), nil)
+ */
 lobj_t* eval(env_t* env, lobj_t* exp)
 {
     /* eval nil, return nil */
@@ -118,10 +129,6 @@ lobj_t* eval(env_t* env, lobj_t* exp)
     /* Sym and Num evaluate to themselves */
     if(exp->type == Num ||
        exp->type == Sym)
-	return exp;
-
-    /* how to explain this... */
-    if(exp->car->type == Num)
 	return exp;
 
     //TODO: handle quoted list

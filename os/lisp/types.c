@@ -63,7 +63,11 @@ inline void append(lobj_t* list, lobj_t* elem)
     while(list->cdr != NULL)
 	list = list->cdr;
 
-    list->cdr = elem;
+    if(elem->type == Sym ||
+       elem->type == Num)
+	list->cdr = cons(elem, NULL);
+    else
+	list->cdr = elem;
 }
 
 inline size_t length(lobj_t* list)
