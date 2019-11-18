@@ -41,7 +41,8 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
      * guarantee that arg is in the form of a Sym or Num.
      */
 
-    //TODO: make append return only (no side effects) and fix this hack
+    //TODO: decide how to handle the arg list
+    //right now append will put stuff in a cons if its a Num or Val
     lobj_t* evald_args = cons(num(1), NULL);
     LIST_ITER(args, i)
     {
@@ -54,11 +55,13 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
     switch(funentry->type)
     {
 	/*
-	 * A function implemented in Lisp.
+	 * A function implemented in Lisp. It should be of type Func
 	 */
     case lobj:
     {
-	//TODO: check if entry isn't a function, error (can't call function of var)
+	lobj_t* func = funentry->lobj;
+	assert(func->type == Func, "Attempted to call non Func as function");
+	
 	// Make a new env, inner to the current env.
 	env_t* func_env = make_env(env);
 
@@ -67,16 +70,14 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 	LIST_ITER(args, i)
 	{
 	    lobj_t* arg = nth(evald_args, i);
-	    symbol_id argnm = lookup_symbol(nth(car(cdr(args)), i)->car->val);
+	    symbol_id argnm = lookup_symbol(nth(func->args, i)->car->val);
 	    add_env_entry_lobj(func_env, argnm, arg);
 	}
-
-	lobj_t* func = funentry->lobj;
 
 	/* functions follow the format: 
 	 * (lamdba fname (args) (<function>))
 	 * now that */
-	retval = eval(func_env, nth(func, 3));
+	retval = eval(func_env, func->body);
 	break;
     }
     

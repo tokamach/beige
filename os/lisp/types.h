@@ -13,9 +13,10 @@
  * Cons struct and cons type enum
  */
 typedef enum e_lobj_type {
-    Cons,
-    Sym,
-    Num
+    Cons, // a cons cell (car, cdr), use to make lists 
+    Sym,  // a symbol (word), should/could be stored as symbol id
+    Num,  // a literal number. stored as uint32_t
+    Func  // a function. stored as args list and body
 } lobj_type;
 
 // cons cell, the core of any lisp
@@ -23,23 +24,34 @@ typedef enum e_lobj_type {
 typedef struct lobj {
     lobj_type type;
     union {
-	// normal cons cell
+	// Cons
 	struct {
 	    struct lobj* car;
 	    struct lobj* cdr;
 	};
-	// sym
+	
+	// Sym
 	struct {
 	    //TODO: symbol val, symbol lookup
 	    char* val;
 	};
+	
+	// Num
 	uint32_t numl;
+
+	// Func
+	//TODO: instead just use Cons?
+	struct {
+	    struct lobj* args;
+	    struct lobj* body;
+	};
     };
 } lobj_t;
 
 lobj_t* cons(lobj_t* car, lobj_t* cdr);
 lobj_t* sym(char* str);
 lobj_t* num(int num);
+lobj_t* func(lobj_t* args, lobj_t* body);
 void free_lobj(lobj_t* elem);
 
 void append(lobj_t* list, lobj_t* elem);

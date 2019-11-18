@@ -36,6 +36,14 @@ lobj_t* num(int val)
     return tmp;    
 }
 
+lobj_t* func(lobj_t* args, lobj_t* body)
+{
+    lobj_t* tmp = kmalloc(sizeof(lobj_t));
+    tmp->args = args;
+    tmp->body = body;
+    return tmp;
+}
+
 void free_lobj(lobj_t* elem)
 {
     if(elem->type == Cons)

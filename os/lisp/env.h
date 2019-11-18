@@ -21,16 +21,12 @@ char* lookup_id(symbol_id i);
 
 typedef enum e_env_entry_type {
     empty,
-    nativef,  //native function (function pointer (env_t*, lobj_t*))
+    special, //special form, to be handled in eval rather than calling function
+    nativef, //native function (function pointer (env_t*, lobj_t*))
     nativef1,
     nativef2,
     nativef3,
-    lobj
-    /*
-    lispf,    //lisp function (pointer to lisp sexp)
-    syml,     //sym num
-    numl      //numeric num
-    */
+    lobj //can be a Cons, Sym, Num, or Func
 } env_entry_type;
 
 typedef struct env env_t;

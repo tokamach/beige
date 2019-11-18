@@ -82,8 +82,10 @@ void add_env_entry_native(env_t* env, env_entry_type type, symbol_id sym, void* 
     env->entry_count++;
 }
 
+//TODO rename env_lookup
 env_entry_t* get_env_entry(env_t* env, char* sym)
 {
+    // TODO: stop having to do this, encode symid inline
     uint8_t symid = lookup_symbol(sym);
     
     for(int i = 0; i < env->entry_count; i++)
@@ -135,10 +137,33 @@ lobj_t* fn_cdr(env_t* env, lobj_t* list)
     return list->cdr;
 }
 
+lobj_t* fn_quote(env_t* env, lobj_t* args)
+{
+    //TODO: if length(args) = 1, return args->car
+    return args;
+}
+
+lobj_t* fn_lambda(env_t* env, lobj_t* args, lobj_t* body)
+{
+    assert(args->type == Cons, "Must pass list of args to lambda");
+
+    //TODO: this a special form and should be handled in eval...
+    //TODO: make a func lobj_t (just using env to label functions isn't enough)
+    return func(args, body);
+}
+
+lobj_t* fn_define(env_t* env, lobj_t* name, lobj_t* body)
+{
+    //TOD: should be special
+    assert(name->type == Sym, "tried to define with non sym as name");
+    add_env_entry_lobj(env, add_symbol(name->val), body);
+    return body;
+}
+
 /*
  * Maths
  */
-lobj_t* add(env_t* env, lobj_t* args)
+lobj_t* fn_add(env_t* env, lobj_t* args)
 {
     size_t total = 0;
     LIST_ITER(args, i)
@@ -148,6 +173,7 @@ lobj_t* add(env_t* env, lobj_t* args)
 	
     return num(total);
 }
+
 /*
 lobj_t* sub(size_t a, size_t b)
 {
@@ -184,13 +210,11 @@ env_t* make_base_env()
     /* Lisp Fundamentals */
     add_env_entry_native(env, nativef1, add_symbol("car"), &fn_car);
     add_env_entry_native(env, nativef1, add_symbol("cdr"), &fn_cdr);
+    add_env_entry_native(env, nativef, add_symbol("quote"), &fn_quote);
+    add_env_entry_native(env, nativef2, add_symbol("define"), &fn_define);
 
     /* Mathematics operators */
-    add_env_entry_native(env, nativef, add_symbol("add"), &add);
-    /*add_env_entry_native(env, nativef, "sub", &sub);
-    add_env_entry_native(env, nativef, "mul", &mul);
-    add_env_entry_native(env, nativef, "div", &div);
-    add_env_entry_native(env, nativef, "quote", &quote);*/
+    add_env_entry_native(env, nativef, add_symbol("add"), &fn_add);
     
     return env;
 }
