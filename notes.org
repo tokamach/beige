@@ -165,6 +165,7 @@
 - return: out_ast
 *** env
 - =Sym='s should be stored in AST simply as an ID, which is looked up in the symbol table, an $O(1)$ operation. Symbol allocation is $O(n)$. Right now they're stored as a string and looked up each call (bad).
+- use a trie (?) for symbol lookup
 *** types
 - atom, list
 ** Compiler
@@ -192,6 +193,9 @@
 - store references across generations
 - .NET uses 3 generations
 
+*** Cons Pool
+- use a 'pool' of cons cells. each time a cons is freed it gets added to the pool
+- before kmalloc'ing a new cell, check the pool for frees
 * Tasks
 ** General
 - switch to NASM?

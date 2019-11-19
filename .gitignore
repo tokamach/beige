@@ -8,8 +8,13 @@ toolchain/lib
 toolchain/libexec
 toolchain/share
 
+grub/grub
+grub/objconv
+grub/build
+
 *.o
 *.bin
+*.iso
 ref/*
 os/isodir/*
 *.png
