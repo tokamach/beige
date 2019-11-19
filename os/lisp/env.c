@@ -2,6 +2,7 @@
 
 #include "types.h"
 #include "defun.h"
+#include "eval.h"
 
 #ifdef LISP_TEST
 //testin
@@ -131,19 +132,20 @@ lobj_t* sp_quote(env_t* env, lobj_t* args)
     return args;
 }
 
-lobj_t* sp_lambda(env_t* env, lobj_t* args, lobj_t* body)
+lobj_t* sp_lambda(env_t* env, lobj_t* args)
 {
     assert(args->type == Cons, "Must pass list of args to lambda");
-
-    //TODO: this a special form and should be handled in eval...
-    //TODO: make a func lobj_t (just using env to label functions isn't enough)
-    return func(args, body);
+    
+    lobj_t* funargs = car(args);
+    lobj_t* funbody = car(cdr(args));
+    
+    return func(funargs, funbody);
 }
 
 lobj_t* sp_define(env_t* env, lobj_t* args)
 {
     lobj_t* name = car(args);
-    lobj_t* body = car(cdr(args)); //extract value from list
+    lobj_t* body = eval(env, car(cdr(args))); //extract value from list
     
     assert(name->type == Sym, "tried to define with non sym as name");
     add_env_entry_lobj(env, add_symbol(name->val), body);
@@ -159,7 +161,7 @@ lobj_t* fn_add(env_t* env, lobj_t* args)
     size_t total = 0;
     LIST_ITER(args, i)
     {
-	total += nth(args, i)->car->numl;
+	total += nth(args, i)->numl;
     }
 	
     return num(total);
@@ -181,7 +183,7 @@ lobj_t* div(size_t a, size_t b)
     return num(a / b);
 }
 
-qlobj_t* quote(lobj_t* exp)
+lobj_t* quote(lobj_t* exp)
 {
     return cons(sym("quote"), exp);
 }
@@ -202,6 +204,7 @@ env_t* make_base_env()
     add_env_entry_native(env, nativef1, add_symbol("car"), &fn_car);
     add_env_entry_native(env, nativef1, add_symbol("cdr"), &fn_cdr);
     add_env_entry_native(env, special, add_symbol("quote"), &sp_quote);
+    add_env_entry_native(env, special, add_symbol("lambda"), &sp_lambda);
     add_env_entry_native(env, special, add_symbol("define"), &sp_define);
 
     /* Mathematics operators */

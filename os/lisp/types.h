@@ -49,8 +49,8 @@ typedef struct lobj {
 
 	// Error
 	struct {
-	    uint8_t code;
-	    char* msg;
+	    uint8_t errcode;
+	    const char* errmsg;
 	};
     };
 } lobj_t;
@@ -59,6 +59,7 @@ lobj_t* cons(lobj_t* car, lobj_t* cdr);
 lobj_t* sym(char* str);
 lobj_t* num(int num);
 lobj_t* func(lobj_t* args, lobj_t* body);
+lobj_t* error(uint8_t code, const char *msg);
 void free_lobj(lobj_t* elem);
 
 lobj_t* append(lobj_t* list, lobj_t* elem);

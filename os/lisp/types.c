@@ -39,8 +39,18 @@ lobj_t* num(int val)
 lobj_t* func(lobj_t* args, lobj_t* body)
 {
     lobj_t* tmp = kmalloc(sizeof(lobj_t));
+    tmp->type = Func;
     tmp->args = args;
     tmp->body = body;
+    return tmp;
+}
+
+lobj_t* error(uint8_t code, const char* msg)
+{
+    lobj_t* tmp = kmalloc(sizeof(lobj_t));
+    tmp->type = Err;
+    tmp->errcode = code;
+    tmp->errmsg = msg;
     return tmp;
 }
 
@@ -63,10 +73,23 @@ lobj_t* append(lobj_t* list, lobj_t* elem)
 {
     // emtpy list
     if(list == NULL)
-	return elem;
-    
+    {
+	if(elem == NULL)
+	{
+	    return NULL;
+	}
+	/*if(elem->type == Cons)
+	{
+	    return elem;
+	    }*/
+	else
+	{
+	    /* make a list with 1 element */
+	    return cons(elem, NULL);
+	}
+    }
     /* Are we even adding to a list? */
-    if(list->type != Cons)
+    else if(list->type != Cons)
     {
 	/* are we adding a list to our not list */
 	if(elem->type == Cons)
@@ -102,7 +125,7 @@ lobj_t* append(lobj_t* list, lobj_t* elem)
 	}
     }
 
-    //return error(-1, "append broke");
+    return error(1, "append broke");
 }
 
 inline size_t length(lobj_t* list)

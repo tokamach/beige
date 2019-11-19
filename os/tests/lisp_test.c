@@ -8,8 +8,6 @@
 int main()
 {
     env_t* env = make_base_env();
-    lobj_t* ast1 = lisp_read("(define x 10)");
-    lobj_t* ast2 = lisp_read("(add x x)");
+    lobj_t* ast1 = lisp_read("(car (cdr (quote 2 3 4)))");
     print_sexp(eval(env, ast1));
-    print_sexp(eval(env, ast2));
 }

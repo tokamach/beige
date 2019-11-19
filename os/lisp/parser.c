@@ -245,13 +245,36 @@ void print_cons_iter(lobj_t* root, int depth, int debug)
 
 	//its list
 	k_print("\n");
-	pad_print(depth + 1, "|-");
-	print_cons_iter(elem->car, depth + 2, debug);
+	pad_print(depth + 2, "|-");
+	print_cons_iter(elem->car, depth + 3, debug);
 
 	k_print("\n");
-	pad_print(depth + 1, "\\-");
-	print_cons_iter(elem->cdr, depth + 2, debug);
+	pad_print(depth + 2, "\\-");
+	print_cons_iter(elem->cdr, depth + 3, debug);
     }
+    else if(elem->type == Func)
+    {
+	k_print("-\\ func");
+
+	//its list
+	k_print("\n");
+	pad_print(depth + 2, "|-");
+	print_cons_iter(elem->args, depth + 3, debug);
+
+	k_print("\n");
+	pad_print(depth + 2, "\\-");
+	print_cons_iter(elem->body, depth + 3, debug);
+
+    }
+    else if(elem->type == Err)
+    {
+	pad_print(depth + 2, " (Err ");
+	k_print_num(elem->errcode);
+	k_print(": ");
+	k_print(elem->errmsg);
+	k_println(")");
+    }
+
 }
 
 void print_cons(lobj_t* root)
@@ -346,6 +369,21 @@ void print_sexp_iter(lobj_t* root, int depth, int debug)
 		k_print("\n");
 		print_sexp_iter(elem->car, depth + 2, debug);
 	    }
+	}
+	else if(elem->type == Func)
+	{
+	    k_print("func");
+	    k_print("\n");
+	    print_sexp_iter(elem->args, depth + 2, debug);
+	    print_sexp_iter(elem->body, depth + 2, debug);
+	}
+	else if(elem->type == Err)
+	{
+	    k_print("[Err ");
+	    k_print_num(elem->errcode);
+	    k_print(": ");
+	    k_print(elem->errmsg);
+	    k_println("]");	    
 	}
 	
 	elem = elem->cdr;

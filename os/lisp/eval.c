@@ -91,10 +91,7 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
     
 	    for(int i = 0; i < argc; i++)
 	    {
-		/*if(evald_args == NULL)
-		    evald_args = eval(env, nth(args, i));
-		    else*/
-		    evald_args = append(evald_args, eval(env, nth(args, i)));
+		evald_args = append(evald_args, eval(env, nth(args, i)));
 	    }
 	}
     }
@@ -113,7 +110,7 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
     case empty:
 	// Blank entry has been called like a fun, /should/ never happen
 	// TODO: notify that something has gone wrong
-	//return error(1, "Attempted to call empty");
+	return error(1, "Attempted to call empty");
 	break;
 
 	/*
@@ -139,7 +136,7 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 	LIST_ITER(args, i)
 	{
 	    lobj_t* arg = nth(evald_args, i);
-	    symbol_id argnm = lookup_symbol(nth(func->args, i)->val);
+	    symbol_id argnm = add_symbol(nth(func->args, i)->val); //will return id if symbol already exists
 	    add_env_entry_lobj(func_env, argnm, arg);
 	}
 
