@@ -63,6 +63,7 @@ lobj_t* error(uint8_t code, const char *msg);
 void free_lobj(lobj_t* elem);
 
 lobj_t* append(lobj_t* list, lobj_t* elem);
+void append_inplace(lobj_t* list, lobj_t* elem);
 size_t length(lobj_t* list);
 lobj_t* nth(lobj_t* list, size_t n);
 

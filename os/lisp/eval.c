@@ -88,10 +88,12 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 	     * It can be said that calling eval(arg) provides us with a
 	     * guarantee that arg is in the form of a Sym or Num.
 	     */
-    
+
+	    // Empty list
+	    evald_args = cons(NULL, NULL);
 	    for(int i = 0; i < argc; i++)
 	    {
-		evald_args = append(evald_args, eval(env, nth(args, i)));
+		append_inplace(evald_args, eval(env, nth(args, i)));
 	    }
 	}
     }

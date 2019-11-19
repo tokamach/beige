@@ -69,6 +69,36 @@ void free_lobj(lobj_t* elem)
     kfree(elem);
 }
 
+void append_inplace(lobj_t* list, lobj_t* elem)
+{
+    if(list == NULL)
+    {
+	/* 
+	 * as we can't return a new value, we'll just do nothing 
+	 * this isn't good though. It shouldn't happen
+	 */
+	k_print("([ERR] cannot append to NULL)");
+	return;
+    }
+
+    if(list->car == NULL &&
+       list->cdr == NULL)
+    {
+	/* 
+	 * This list is empty.
+	 */
+
+	list->car = elem;
+    }
+
+
+    lobj_t* end = list;
+    while(end->cdr != NULL)
+	end = end->cdr;
+    
+    end->cdr = cons(elem, NULL);   
+}
+
 lobj_t* append(lobj_t* list, lobj_t* elem)
 {
     // emtpy list
