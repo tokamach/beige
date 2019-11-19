@@ -173,7 +173,7 @@ void k_term_update_statline()
     statline_add('[');
     char buf[21];
     
-    itoa(k_status.lisp_world_size, 10, buf);
+    itoa(*k_status.lisp_world_size, 10, buf);
     
     for(int i = 0; i < strlen(buf); i++)
     {

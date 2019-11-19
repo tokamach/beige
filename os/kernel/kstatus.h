@@ -18,9 +18,9 @@ typedef enum lisp_state {
 
 typedef struct k_status {
     lisp_state_e lisp_state;
-    size_t lisp_world_size;
-    uintptr_t bitmap_base;
-    uintptr_t arena_base;
+    size_t *lisp_world_size;
+    uintptr_t *bitmap_base;
+    uintptr_t *arena_base;
 } k_status_t;
 
 /*

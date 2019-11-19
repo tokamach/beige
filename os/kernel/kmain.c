@@ -26,16 +26,19 @@ void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
     k_pic_init();
     k_interrupt_init();
 
+    env_t* kenv = make_kernel_env();
+    kprinteq_lisp((define l (list 2 3 4)));
+    k_print("\n");
+    kprinteq_lisp((define cadr (lambda (list) (car (cdr list)))));
+    k_print("\n");
+    kprinteq_lisp((cadr l));
+/*
     k_status.lisp_state = Running;
-    k_status.lisp_world_size = (size_t)25;
+    k_status.lisp_world_size = &(kenv->entry_count);
     
     k_term_update_statline();
-
-    env_t* kenv = make_kernel_env();
-    lobj_t* aga = lisp_read("(add 2 2)");
-    print_cons(aga);
-    //kprinteq_lisp((add 2 3));
-
+*/
+    
     //enable memory, paging
     //start scheduler
     //start userspace, userspace processes (shell)
