@@ -1,2 +1,5 @@
-floppya: 1_44=os.bin, status=inserted
-boot: a
+display_library: sdl2
+romimage:        file=/usr/local/share/bochs/BIOS-bochs-latest
+vgaromimage:     file=/usr/local/share/bochs/VGABIOS-lgpl-latest
+ata0-slave: type=cdrom, path=os.iso, status=inserted
+boot: cdrom
