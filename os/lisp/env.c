@@ -128,6 +128,13 @@ lobj_t* fn_cdr(env_t* env, lobj_t* list)
 
 lobj_t* sp_quote(env_t* env, lobj_t* args)
 {
+    //argc should be 1
+    assert(length(args) == 1, "quote needs 1 arg");
+    return nth(args, 0);
+}
+
+lobj_t* sp_list(env_t* env, lobj_t* args)
+{
     //TODO: if length(args) = 1, return args->car
     return args;
 }
@@ -150,7 +157,7 @@ lobj_t* sp_define(env_t* env, lobj_t* args)
     assert(name->type == Sym, "tried to define with non sym as name");
     add_env_entry_lobj(env, add_symbol(name->val), body);
     
-    return body;
+    return name;
 }
 
 /*
@@ -167,27 +174,38 @@ lobj_t* fn_add(env_t* env, lobj_t* args)
     return num(total);
 }
 
-/*
-lobj_t* sub(size_t a, size_t b)
+lobj_t* fn_sub(env_t* env, lobj_t* args)
 {
-    return num(a - b);
+    size_t total = nth(args, 0);
+    for(int i = 1; i < length(args); i++)
+    {
+	total -= nth(args, i)->numl;
+    }
+	
+    return num(total);
 }
 
-lobj_t* mul(size_t a, size_t b)
+lobj_t* fn_mul(env_t* env, lobj_t* args)
 {
-    return num(a * b);
+    size_t total = nth(args, 0);
+    for(int i = 1; i < length(args); i++)
+    {
+	total *= nth(args, i)->numl;
+    }
+	
+    return num(total);
 }
 
-lobj_t* div(size_t a, size_t b)
+lobj_t* fn_div(env_t* env, lobj_t* args)
 {
-    return num(a / b);
+    size_t total = nth(args, 0);
+    for(int i = 1; i < length(args); i++)
+    {
+	total /= nth(args, i)->numl;
+    }
+	
+    return num(total);
 }
-
-lobj_t* quote(lobj_t* exp)
-{
-    return cons(sym("quote"), exp);
-}
-*/
 
 /*
  * Initalizing the defualt lisp environment
@@ -201,14 +219,18 @@ env_t* make_base_env()
     env_t* env = make_env(NULL);
 
     /* Lisp Fundamentals */
-    add_env_entry_native(env, nativef1, add_symbol("car"), &fn_car);
-    add_env_entry_native(env, nativef1, add_symbol("cdr"), &fn_cdr);
-    add_env_entry_native(env, special, add_symbol("quote"), &sp_quote);
-    add_env_entry_native(env, special, add_symbol("lambda"), &sp_lambda);
-    add_env_entry_native(env, special, add_symbol("define"), &sp_define);
+    add_env_entry_native(env, nativef1, add_symbol("car"),    &fn_car);
+    add_env_entry_native(env, nativef1, add_symbol("cdr"),    &fn_cdr);
+    add_env_entry_native(env, special,  add_symbol("quote"),  &sp_quote);
+    add_env_entry_native(env, special,  add_symbol("list"),   &sp_list);
+    add_env_entry_native(env, special,  add_symbol("lambda"), &sp_lambda);
+    add_env_entry_native(env, special,  add_symbol("define"), &sp_define);
 
     /* Mathematics operators */
     add_env_entry_native(env, nativef, add_symbol("add"), &fn_add);
+    add_env_entry_native(env, nativef, add_symbol("sub"), &fn_sub);
+    add_env_entry_native(env, nativef, add_symbol("mul"), &fn_mul);
+    add_env_entry_native(env, nativef, add_symbol("div"), &fn_div);
     
     return env;
 }
