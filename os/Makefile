@@ -1,5 +1,5 @@
-CC     := ../toolchain/bin/i686-elf-gcc
-AS     := ../toolchain/bin/i686-elf-as
+CC     := ../toolchain/gcc/bin/i686-elf-gcc
+AS     := ../toolchain/gcc/bin/i686-elf-as
 CFLAGS := -ffreestanding -nostdlib -Wall -Wextra -mgeneral-regs-only
 INCLD  := -Ikernel -Ilisp
 KOBJ   := $(shell find kernel -name '*.c' | sed -e "s/\\.c.*/\\.c.o/g")
@@ -27,11 +27,17 @@ test_lisp: INCLD := $(filter-out -Ikernel,$(INCLD))
 test_lisp: lisp tests/lisp_test.o
 	$(CC) -Itests -Ilisp -o test_lisp tests/lisp_test.o $(LOBJ) -g
 
-os.bin: lisp kernel
-	$(CC) -T linker.ld -o os.bin $(CFLAGS) $(KOBJ) $(ASMOBJ) $(LOBJ) -lgcc
+os.elf: lisp kernel
+	$(CC) -T linker.ld -o os.elf $(CFLAGS) $(KOBJ) $(ASMOBJ) $(LOBJ) -lgcc
+
+os.iso: os.elf
+	cp os.bin isodir/boot/
+	../toolchain/grub/build/grub-mkrescue -o os.iso isodir
 
 debug: CFLAGS += -DKDEBUG
-debug: os.bin
+debug: CFLAGS += -g
+debug: os.elf
+	../toolchain/gcc/bin/i686-elf-objcopy --only-keep-debug os.elf os.sym
 
 test: kernel $(TESTS)
 	./$(TESTS)
@@ -41,4 +47,6 @@ clean:
 	rm -f lisp/*.o
 	rm -f tests/*.o
 	rm -f test_lisp
-	rm -f os.bin
+	rm -f os.elf
+	rm -f os.iso
+	rm -f os.sym
