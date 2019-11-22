@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PREFIX="$HOME/os-project/toolchain"
+export PREFIX="$HOME/os-project/toolchain/gcc"
 export TARGET=i686-elf
 export PATH="$PREFIX/bin:$PATH"
 

@@ -1,16 +1,7 @@
 .DS_store
 
-toolchain/bin
-toolchain/src
-toolchain/i686-elf
-toolchain/include
-toolchain/lib
-toolchain/libexec
-toolchain/share
-
-grub/grub
-grub/objconv
-grub/build
+toolchain/gcc
+toolchain/grub
 
 *.o
 *.bin

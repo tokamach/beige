@@ -1,6 +1,6 @@
 #!/usr/local/bin/bash
 
-PREFIX="$HOME/os-project/toolchain"
+PREFIX="$HOME/os-project/toolchain/gcc"
 
 rm -rf $PREFIX/bin
 rm -rf $PREFIX/i686-elf
