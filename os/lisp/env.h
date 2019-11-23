@@ -26,6 +26,7 @@ typedef enum e_env_entry_type {
     nativef1,
     nativef2,
     nativef3,
+    constant, // Sym which evaluates to itself
     lobj //can be a Cons, Sym, Num, or Func
 } env_entry_type;
 

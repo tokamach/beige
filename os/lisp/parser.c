@@ -98,6 +98,7 @@ int valid_sym(char* str)
     return ret;
 }
 
+//TODO: put in main function, decide what type a tok is in there
 lobj_t* parse_sym(reader_t* r)
 {
     char* str = tokenize_one(r);
@@ -127,6 +128,8 @@ lobj_t* parse_list(reader_t* r)
       c = ')': cdr = nil
                return sexp
     */
+
+    //TODO: reader macros / synatactic sugar e.g. 'x = (quote x)
 
     char c;
     lobj_t* ret = NULL; //maintains pointer to root
@@ -299,6 +302,12 @@ void print_sexp_iter(lobj_t* root, int depth, int debug)
      *    cons: recur
      */
 
+    if(elem == NULL)
+    {
+	pad_print(depth, "nil");
+	return;
+    }
+	
     if(elem->type == Cons)
 	pad_print(depth, "(");
     

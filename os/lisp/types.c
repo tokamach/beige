@@ -89,6 +89,7 @@ void append_inplace(lobj_t* list, lobj_t* elem)
 	 */
 
 	list->car = elem;
+	return;
     }
 
 

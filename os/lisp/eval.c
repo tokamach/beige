@@ -138,7 +138,7 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 	LIST_ITER(args, i)
 	{
 	    lobj_t* arg = nth(evald_args, i);
-	    symbol_id argnm = add_symbol(nth(func->args, i)->val); //will return id if symbol already exists
+	    symbol_id argnm = add_symbol(nth(func->args, i)->val); //add_symbol will return id if symbol already exists
 	    add_env_entry_lobj(func_env, argnm, arg);
 	}
 
@@ -181,6 +181,7 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 	
     }
 
+    //TODO: trigger gc??
     return retval;
 }
 
@@ -208,7 +209,14 @@ lobj_t* eval(env_t* env, lobj_t* exp)
     /* unqoted Sym evaluates to it's value */
     //TODO: check value isn't null
     if(exp->type == Sym)
-	return get_env_entry(env, exp->val)->lobj;
+    {
+	lobj_t* entry = get_env_entry(env, exp->val)->lobj;
+	if(entry)
+	    return entry;
+	else
+	    return error(2, "Symbols value as variable is NULL");
+    }
+	
 
     //TODO: handle quoted list
 
