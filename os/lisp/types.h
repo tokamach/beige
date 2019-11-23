@@ -76,4 +76,4 @@ lobj_t* nth(lobj_t* list, size_t n);
 
 #define keval_lisp(x) eval(kenv, lisp_read(#x))
 #define kprint_lisp(x) print_sexp(eval(kenv, lisp_read(#x)))
-#define kprinteq_lisp(x) print_sexp(lisp_read(#x)); k_print("=>"); print_sexp(eval(kenv, lisp_read(#x)))
+#define kprinteq_lisp(x) print_sexp(lisp_read(#x)); k_print(" => "); print_sexp(eval(kenv, lisp_read(#x))); k_print("\n");

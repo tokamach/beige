@@ -213,6 +213,8 @@ lobj_t* eval(env_t* env, lobj_t* exp)
 	lobj_t* entry = get_env_entry(env, exp->val)->lobj;
 	if(entry)
 	    return entry;
+	else if(streq(exp->val, "nil"))
+	    return entry;
 	else
 	    return error(2, "Symbols value as variable is NULL");
     }

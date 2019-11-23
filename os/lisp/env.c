@@ -170,6 +170,11 @@ lobj_t* sp_define(env_t* env, lobj_t* args)
 /*
  * Builtin Functions
  */
+lobj_t* fn_cons(env_t* env, lobj_t* a, lobj_t* b)
+{
+    return cons(a, b);
+}
+
 lobj_t* fn_car(env_t* env, lobj_t* list)
 {
     assert(list->type == Cons, "can't car of non cons type");
@@ -269,9 +274,10 @@ env_t* make_base_env()
     add_env_entry_native(env, special, add_symbol("define"), &sp_define);
 
     // Functions
-    add_env_entry_native(env, nativef1, add_symbol("car"), &fn_car);
-    add_env_entry_native(env, nativef1, add_symbol("cdr"), &fn_cdr);
-    add_env_entry_native(env, nativef, add_symbol("list"), &fn_list);
+    add_env_entry_native(env, nativef2, add_symbol("cons"), &fn_cons);
+    add_env_entry_native(env, nativef1, add_symbol("car"),  &fn_car);
+    add_env_entry_native(env, nativef1, add_symbol("cdr"),  &fn_cdr);
+    add_env_entry_native(env, nativef, add_symbol("list"),  &fn_list);
 
     /* Mathematics operators */
     add_env_entry_native(env, nativef, add_symbol("add"), &fn_add);
