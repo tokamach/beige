@@ -2,6 +2,9 @@
 
 toolchain/gcc
 toolchain/grub
+toolchain/gdb
+
+os/.gdb_history
 
 *.o
 *.bin
@@ -17,7 +20,7 @@ os/isodir/*
 compile_commands.json
 
 os/lisptest
-os/test_lisp
+os/lisp_test
 
 proposal/*.aux
 proposal/*.bbl
