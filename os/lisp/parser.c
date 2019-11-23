@@ -310,6 +310,8 @@ void print_sexp_iter(lobj_t* root, int depth, int debug)
 	
     if(elem->type == Cons)
 	pad_print(depth, "(");
+
+    uint8_t first = 1;
     
     while(elem)
     {
@@ -344,19 +346,20 @@ void print_sexp_iter(lobj_t* root, int depth, int debug)
 
 	}
 
+	if(!first)
+	    k_print(" ");
+
 	if(elem == NULL)
 	{
 	    break;
 	}
 	else if(elem->type == Sym)
 	{
-	    k_print(" ");
 	    k_print(elem->val);
 	    return;
 	}
 	else if(elem->type == Num)
 	{
-	    k_print(" ");
 	    k_print_num(elem->numl);
 	    return;
 	}
@@ -364,12 +367,10 @@ void print_sexp_iter(lobj_t* root, int depth, int debug)
 	{
 	    if(elem->car->type == Sym)
 	    {
-		k_print(" ");
 		k_print(elem->car->val);
 	    }
 	    else if(elem->car->type == Num)
 	    {
-		k_print(" ");
 		k_print_num(elem->car->numl);
 	    }
 	    else if(elem->car->type == Cons)
@@ -394,7 +395,8 @@ void print_sexp_iter(lobj_t* root, int depth, int debug)
 	    k_print(elem->errmsg);
 	    k_println("]");	    
 	}
-	
+
+	first = 0;
 	elem = elem->cdr;
     }
 
