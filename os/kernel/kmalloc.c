@@ -8,6 +8,17 @@
 #include "kterm.h"
 #include "kstd.h"
 
+/*
+ * Don't ask (appeasing gdb)
+ */
+#ifdef KDEBUG
+__attribute__((optimize("O0")))
+void* malloc(size_t s)
+{
+    return kmalloc(s);
+}
+#endif
+
 //malloc data
 //uint8_t* bitmap;
 bitmap_status* bitmap; 
