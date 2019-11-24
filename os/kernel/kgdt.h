@@ -32,7 +32,7 @@ typedef struct gdt_ptr {
     uint32_t base;
 }__attribute__((packed)) gdt_ptr_t;
 
-#define GDT_ENTRIES 5
+#define GDT_ENTRIES 3
 static gdt_entry_t gdt[GDT_ENTRIES];
 
 void k_gdt_init();

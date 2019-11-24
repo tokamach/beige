@@ -30,6 +30,9 @@ common_interrupt_handler:
 	.globl enable_interrupts
 	.globl disable_interrupts
 
+	/* stack: 4(%esp) IDT target addr
+	            %esp return addr
+	*/
 load_idt:
 	mov 4(%esp), %eax
 	lidt (%eax)

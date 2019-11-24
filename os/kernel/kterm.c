@@ -5,6 +5,9 @@
 #include "kstd.h"
 #include "kstatus.h"
 
+// For Statline
+#include "../lisp/env.h"
+
 static const size_t VGA_HEIGHT = 25;
 static const size_t VGA_WIDTH  = 80;
 
@@ -173,7 +176,7 @@ void k_term_update_statline()
     statline_add('[');
     char buf[21];
     
-    itoa(*k_status.lisp_world_size, 10, buf);
+    itoa(count_env_size(k_status.lisp_world), 10, buf);
     
     for(int i = 0; i < strlen(buf); i++)
     {

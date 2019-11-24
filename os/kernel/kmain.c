@@ -26,27 +26,20 @@ void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
     k_mem_init(mbd);
     k_malloc_init(mbd);
     k_pic_init();
-    //k_interrupt_init();
-
-//    while(1){ asm("nop;");}
+    k_interrupt_init();
   
     env_t* kenv = make_kernel_env();
 
-    char *fib = "\
-(define countdown (lambda (start)\
-(if (eq start 1)\
-start\
-(list start (countdown (sub start 1))))))";
-    
-    lobj_t* fibast = lisp_read(fib);
-    print_sexp(fibast);
-    k_print("\n");
-    eval(kenv, fibast);
-    kprinteq_lisp((countdown 10));
+    kprinteq_lisp((define countdown (lambda (start)
+				     (if (eq start 1)
+					 (cons start nil)
+					 (cons start (countdown (sub start 1)))))));
+    kprinteq_lisp((define x 10));
+    kprinteq_lisp((countdown x));
 
 
     k_status.lisp_state = Running;
-    k_status.lisp_world_size = &(kenv->entry_count);
+    k_status.lisp_world = kenv;
     
     k_term_update_statline();
     

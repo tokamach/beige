@@ -14,7 +14,7 @@ typedef struct idt_entry {
 
 typedef struct idt_ptr {
     uint16_t limit;
-    uintptr_t base;
+    uint32_t base;
 }__attribute__((packed)) idt_ptr_t;
 
 static struct {
@@ -48,6 +48,6 @@ __attribute__((interrupt))
 void interrupt_handler(interrupt_frame_t* frame);
 
 //defined in kinterrupt.s
-void load_idt();
+void load_idt(idt_ptr_t *idt_addr);
 void enable_interrupts();
 void disable_interrupts();

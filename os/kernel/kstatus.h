@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "../lisp/env.h"
+
 /*
  * A struct that contains statuses for different parts of the 
  * kernel. Really only one would be instantiated, but I don't
@@ -18,7 +20,7 @@ typedef enum lisp_state {
 
 typedef struct k_status {
     lisp_state_e lisp_state;
-    size_t *lisp_world_size;
+    env_t* lisp_world;
     uintptr_t *bitmap_base;
     uintptr_t *arena_base;
 } k_status_t;
