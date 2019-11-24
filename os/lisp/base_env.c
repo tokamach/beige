@@ -28,10 +28,10 @@ lobj_t* sp_quote(env_t* env, lobj_t* args)
 lobj_t* sp_progn(env_t* env, lobj_t* args)
 {
     int argc = length(args);
-    for(int i = 0; i < argc; i++)
+    for(int i = 0; i < argc - 1; i++)
 	eval(env, nth(args, i));
 
-    return eval(env, args);
+    return eval(env, nth(args, argc - 1));
 }
 
 /*
