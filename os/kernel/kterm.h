@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+void k_term_clear();
 void k_term_init();
 
 /*

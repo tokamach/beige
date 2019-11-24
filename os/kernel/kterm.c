@@ -49,7 +49,7 @@ uint16_t vga_entry(unsigned char c, uint8_t color)
     return (uint16_t) c | (uint16_t) color << 8;
 }
 
-void k_term_init()
+void k_term_clear()
 {
     term_col = 0;
     term_row = 0;
@@ -62,7 +62,11 @@ void k_term_init()
 	    vga_buf[(i * TERM_WIDTH) + j] = vga_entry(' ', vga_color(VGA_FG, VGA_BG));
 	}
     }
+}
 
+void k_term_init()
+{
+    k_term_clear();
     k_println("term initialized");
 }
 
@@ -128,6 +132,7 @@ void k_term_print_char(const char c)
 	term_col = 0;
     }
 }
+
 
 /*
  * Statline printing functions
