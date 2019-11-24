@@ -9,6 +9,7 @@ os/.gdb_history
 *.o
 *.bin
 *.iso
+*.elf
 ref/*
 os/isodir/*
 *.png

@@ -63,9 +63,7 @@ typedef struct env {
 void add_env_entry_lobj(env_t* env, symbol_id sym, lobj_t* val);
 void add_env_entry_native(env_t* env, env_entry_type type, symbol_id sym, void* fun);
 env_entry_t* get_env_entry(env_t* env, char* sym);
+size_t count_env_size(env_t* env);
 
 env_t* make_env(env_t* outer);
 void free_env(env_t* env);
-
-env_t* make_base_env();
-env_t* make_kernel_env();
