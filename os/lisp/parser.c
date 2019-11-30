@@ -62,6 +62,16 @@ char* tokenize_one(reader_t* reader)
     return tok;
 }
 
+int valid_hex_num(char *str)
+{
+    // hex ints start with '0x'
+    // cheat lol
+    if(str[0] == '0' && str[1] == 'x')
+	return 1;
+    else
+	return 0;
+}
+
 int valid_dec_num(char* str)
 {
     int ret = 1;
@@ -106,6 +116,10 @@ lobj_t* parse_sym(reader_t* r)
     if (valid_dec_num(str))
     {
 	newsym = num(atoi(str));	    
+    }
+    else if (valid_hex_num(str))
+    {
+	newsym = num(atoi16(str));
     }
     else if(valid_sym(str))
     {

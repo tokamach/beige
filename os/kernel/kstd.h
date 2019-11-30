@@ -12,6 +12,7 @@ void strcopy(const char *str, char* new);
 int streq(const char *stra, const char* strb);
 int itoa(int num, int base, char* str);
 int atoi(char* str);
+int atoi16(char* str);
 
 //Bitwise
 size_t align(size_t n);

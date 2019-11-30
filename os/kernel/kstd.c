@@ -100,6 +100,23 @@ int atoi(char *str)
     return ret;
 }
 
+int atoi16(char *str)
+{
+    //TODO: hex check
+    int ret = 0;
+
+    for(int i = 0; str[i] != '\0'; ++i)
+    {
+	char n = str[i];
+	if(n >= 'a' && n <= 'f')
+	    ret = (str[i] - 'a' + 10) + (ret * 16);
+	else if(n >= '0' && n <= '9')
+	    ret = (str[i] - '0') + (ret * 16);
+    }
+
+    return ret;
+}
+
 /*
  * Bitwise utilities
  */
