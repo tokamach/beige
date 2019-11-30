@@ -23,7 +23,8 @@ lisp_test: CFLAGS += -Itests
 lisp_test: CFLAGS += -DLISP_TEST
 lisp_test: CFLAGS += -g
 lisp_test: CFLAGS := $(filter-out -ffreestanding,$(CFLAGS))
-lisp_test: INCLD := $(filter-out -Ikernel,$(INCLD))
+lisp_test: INCLD  := $(filter-out -Ikernel,$(INCLD))
+lisp_test: LOBJ   := $(filter-out kernel_env.o,$(LOBJ))
 lisp_test: lisp tests/lisp_test.o
 	$(CC) -Itests -Ilisp -o lisp_test tests/lisp_test.o $(LOBJ) -g
 
@@ -31,7 +32,7 @@ os.elf: lisp kernel
 	$(CC) -T linker.ld -o os.elf $(CFLAGS) $(KOBJ) $(ASMOBJ) $(LOBJ) -lgcc
 
 os.iso: os.elf
-	cp os.bin isodir/boot/
+	cp os.elf isodir/boot/
 	../toolchain/grub/build/grub-mkrescue -o os.iso isodir
 
 #debug: CFLAGS += -DKDEBUG
