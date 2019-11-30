@@ -85,10 +85,9 @@ int valid_sym(char* str)
     while(*str != '\0' &&
 	  ret)
     {
-	if((*str < 'a'  ||
-	    *str > 'z') &&
-	   (*str != '-' &&
-	    *str != '*'))
+	if((*str < 'a' || *str > 'z') &&
+	   (*str < '0' || *str > '9') &&
+	   (*str != '-'))
 	{
 	    ret = 0;
 	}
@@ -104,15 +103,15 @@ lobj_t* parse_sym(reader_t* r)
     char* str = tokenize_one(r);
     lobj_t* newsym = NULL;
 	    
-    if (valid_sym(str))
+    if (valid_dec_num(str))
     {
-	newsym = sym(str);	    
+	newsym = num(atoi(str));	    
     }
-    else if(valid_dec_num(str))
+    else if(valid_sym(str))
     {
-	newsym = num(atoi(str));
+	newsym = sym(str);
     }
-
+    
     kfree(str);
     
     return newsym;	

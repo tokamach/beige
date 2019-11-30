@@ -71,7 +71,7 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 	else
 	{
 	    /* 
-	     * Whatever funentry is, these types want the args to be eval'd.
+	     * Whatever funentry is, non specials want the args to be eval'd.
 	     * Before we switch on them, we'll eval the args
 	     *
 	     * We should only reach this point if we're sure we're working
