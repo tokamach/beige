@@ -28,12 +28,39 @@ lobj_t* sym(char* str)
     return tmp;
 }
 
-lobj_t* num(int val)
+lobj_t* num(int32_t val)
 {
     lobj_t* tmp = kmalloc(sizeof(lobj_t));
     tmp->type = Num;
     tmp->numl = val;
     return tmp;    
+}
+
+lobj_t* u8(uint8_t num)
+{
+    lobj_t* tmp = kmalloc(sizeof(lobj_t));
+    tmp->type = Num;
+    tmp->u8 = num;
+    return tmp;    
+  
+}
+
+lobj_t* u16(uint16_t num)
+{
+    lobj_t* tmp = kmalloc(sizeof(lobj_t));
+    tmp->type = Num;
+    tmp->u16 = num;
+    return tmp;    
+
+}
+
+lobj_t* u32(uint32_t num)
+{
+    lobj_t* tmp = kmalloc(sizeof(lobj_t));
+    tmp->type = Num;
+    tmp->u32 = num;
+    return tmp;    
+  
 }
 
 lobj_t* func(lobj_t* args, lobj_t* body)

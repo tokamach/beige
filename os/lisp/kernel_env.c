@@ -35,9 +35,9 @@ lobj_t* fn_outb(env_t* env, lobj_t* port, lobj_t* val)
     return NULL;
 }
 
-lobj_t* fn_ptr_dref_eq(env_t* env, lobj_t* ptr)
+lobj_t* fn_ptr_dref(env_t* env, lobj_t* ptr)
 {
-    
+
 }
 
 env_t* make_kernel_env()
