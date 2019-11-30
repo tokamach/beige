@@ -50,6 +50,7 @@ lobj_t* sp_if(env_t* env, lobj_t* args)
     }
 }
 
+// (lambda (x) body)
 lobj_t* sp_lambda(env_t* env, lobj_t* args)
 {
     assert(args->type == Cons, "Must pass list of args to lambda");
@@ -60,6 +61,8 @@ lobj_t* sp_lambda(env_t* env, lobj_t* args)
     return func(funargs, funbody);
 }
 
+// (define x 10)
+// (define )
 lobj_t* sp_define(env_t* env, lobj_t* args)
 {
     lobj_t* name = car(args);
@@ -96,6 +99,38 @@ lobj_t* fn_list(env_t* env, lobj_t* args)
     //TODO: if length(args) = 1, return args->car
     return args;
 }
+
+//Types
+lobj_t* fn_u8(env_t* env, lobj_t* num)
+{
+    assert(num->type == Num ||
+	   num->type == U8  ||
+	   num->type == U16 ||
+	   num->type == U32,
+	   "u8 needs numeric arg");
+    return u8(num->numl & 0xFF);
+}
+
+lobj_t* fn_u16(env_t* env, lobj_t* num)
+{
+    assert(num->type == Num ||
+	   num->type == U8  ||
+	   num->type == U16 ||
+	   num->type == U32,
+	   "u16 needs numeric arg");
+    return u16(num->numl & 0xFFFF);
+}
+
+lobj_t* fn_u32(env_t* env, lobj_t* num)
+{
+    assert(num->type == Num ||
+	   num->type == U8  ||
+	   num->type == U16 ||
+	   num->type == U32,
+	   "u32 needs numeric arg");
+    return u32(num->numl & 0xFFFFFFFF);
+}
+
 
 /*
  * Maths
@@ -177,12 +212,17 @@ env_t* make_base_env()
     add_env_entry_native(env, special, add_symbol("lambda"), &sp_lambda);
     add_env_entry_native(env, special, add_symbol("define"), &sp_define);
 
-    // Functions
+    // Fundamental Functions
     add_env_entry_native(env, nativef2, add_symbol("cons"), &fn_cons);
     add_env_entry_native(env, nativef1, add_symbol("car"),  &fn_car);
     add_env_entry_native(env, nativef1, add_symbol("cdr"),  &fn_cdr);
     add_env_entry_native(env, nativef, add_symbol("list"),  &fn_list);
 
+    // Data types
+    add_env_entry_native(env, nativef1, add_symbol("u8"),  &fn_u8);
+    add_env_entry_native(env, nativef1, add_symbol("u16"), &fn_u16);
+    add_env_entry_native(env, nativef1, add_symbol("u32"), &fn_u32);
+    
     /* Mathematics operators */
     add_env_entry_native(env, nativef, add_symbol("add"), &fn_add);
     add_env_entry_native(env, nativef, add_symbol("sub"), &fn_sub);
