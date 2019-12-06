@@ -97,7 +97,10 @@ int valid_sym(char* str)
     {
 	if((*str < 'a' || *str > 'z') &&
 	   (*str < '0' || *str > '9') &&
-	   (*str != '-'))
+	   (*str != '-' && *str != '+' &&
+	    *str != '*' && *str != '/' &&
+	    *str != '=' && *str != '_' &&
+	    *str != '<' && *str != '>'))
 	{
 	    ret = 0;
 	}
