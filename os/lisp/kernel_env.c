@@ -6,6 +6,11 @@
 #include "../kernel/kassert.h"
 #include "../kernel/kstd.h"
 
+#define assert_numeric(obj, msg) assert(car(obj)->type == Num ||	\
+					car(obj)->type == U8  ||	\
+					car(obj)->type == U16 ||	\
+					car(obj)->type == U32, #msg);
+
 /*
  * Kernel env stuff. here we define the functions that the kernel
  * will probably want to use, memory access, inb/outb
@@ -25,16 +30,58 @@ lobj_t* fn_outb(env_t* env, lobj_t* port, lobj_t* val)
     return NULL;
 }
 
+lobj_t* fn_ptr(env_t* env, lobj_t* addr, lobj_t* size)
+{
+    assert_numeric(addr, "cannot make pointer from non numeric address");
+    assert_numeric(size, "cannot make pointer from non numeric size");
+
+    return cons(addr, size);
+}
+
+lobj_t* fn_addr_of(env_t* env, lobj_t* obj)
+{
+    // return (address of obj . size of obj)
+    return cons(num((int)obj), sizeof(obj));
+}
+
 lobj_t* fn_ptr_dref(env_t* env, lobj_t* ptr)
 {
-    assert(ptr->type == Num ||
-	   ptr->type == U8  ||
-	   ptr->type == U16 ||
-	   ptr->type == U32, "cannot deref non numeric type");
+    assert(ptr->type == Cons, "must dref ptr of form (addr . size)");
+    assert_numeric(ptr, "cannot deref non numeric type");
     
-    //TODO: figure out ptr size e.g.:
-    // does (ptr_dref 0x6000) make a 32bit Num from 0x6000 to 0x6004?
-    // perhaps specify return type....
+    /*
+     * ptr is a pair of form: (addr . size) size in bytes
+     * so a pointer to a u8 at 0x5000 is (0x5000 . 1)
+     */
+
+    //return *(j);
+    return NULL;
+}
+
+lobj_t* fn_memset_u8(env_t* env, lobj_t* addr, lobj_t* val)
+{
+    assert_numeric(addr, "mem_set addr must be numeric");
+    assert(val->type == U8,  "mem_set val must be numeric");
+
+    *(uint8_t*)addr = val->u8;
+    return NULL;
+}
+
+lobj_t* fn_memset_u16(env_t* env, lobj_t* addr, lobj_t* val)
+{
+    assert_numeric(addr, "mem_set addr must be numeric");
+    assert(val->type == U16,  "mem_set val must be numeric");
+
+    *(uint8_t*)addr = val->u16;
+    return NULL;
+}
+
+lobj_t* fn_memset_u32(env_t* env, lobj_t* addr, lobj_t* val)
+{
+    assert_numeric(addr, "mem_set addr must be numeric");
+    assert(val->type == U32,  "mem_set val must be numeric");
+
+    *(uint8_t*)addr = val->u32;
     return NULL;
 }
 
@@ -100,8 +147,14 @@ env_t* make_kernel_env()
 
     add_env_entry_native(env, nativef1, add_symbol("inb"), &fn_inb);
     add_env_entry_native(env, nativef2, add_symbol("outb"), &fn_outb);
-    add_env_entry_native(env, nativef2, add_symbol("shl"), &fn_shl);
-    add_env_entry_native(env, nativef2, add_symbol("shr"), &fn_shr);
+    
+    add_env_entry_native(env, nativef1, add_symbol("addr-of"), &fn_addr_of);
+    add_env_entry_native(env, nativef2, add_symbol("memset-u8"), &fn_memset_u8);
+    add_env_entry_native(env, nativef2, add_symbol("memset-u16"), &fn_memset_u16);
+    add_env_entry_native(env, nativef2, add_symbol("memset-u32"), &fn_memset_u32);
+
+    add_env_entry_native(env, nativef2, add_symbol("<<"), &fn_shl);
+    add_env_entry_native(env, nativef2, add_symbol(">>"), &fn_shr);
     add_env_entry_native(env, nativef2, add_symbol("bor"), &fn_bor);
     add_env_entry_native(env, nativef2, add_symbol("band"), &fn_band);
     
