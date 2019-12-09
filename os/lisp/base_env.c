@@ -94,6 +94,32 @@ lobj_t* sp_define(env_t* env, lobj_t* args)
 }
 
 /*
+ *
+ *(let ((x 1)
+ *      (y 2))
+ *  (body)
+ */
+lobj_t* sp_let(env_t* env, lobj_t* args)
+{
+
+    lobj_t* bind_list = car(args);
+    lobj_t* body = cadr(args);
+	
+    // Make a new scope to execute the let in
+    env_t* local_env = make_env(env);
+
+    // Add bindings to the local env
+    for(size_t i = 0; i < length(bind_list); i++)
+    {
+	lobj_t* entry = nth(bind_list, i);
+	add_env_entry_lobj(local_env, add_symbol(car(entry)->val), eval(env, cdr(entry)));
+    }
+
+    return eval(local_env, body);
+}
+
+
+/*
  * Builtin Functions
  */
 lobj_t* fn_cons(env_t* env, lobj_t* a, lobj_t* b)
@@ -119,7 +145,10 @@ lobj_t* fn_list(env_t* env, lobj_t* args)
     return args;
 }
 
-//Types
+
+/*
+ * Types
+ */
 lobj_t* fn_u8(env_t* env, lobj_t* num)
 {
     assert(num->type == Num ||
@@ -198,11 +227,32 @@ lobj_t* fn_div(env_t* env, lobj_t* args)
     return num(total);
 }
 
-//TODO: make variadic?
+
+/*
+ * Comparison operators
+ */
 lobj_t* fn_eq(env_t* env, lobj_t* a, lobj_t* b)
 {
     //TODO: return another truthy value, e.g. t
     if(a->numl == b->numl)
+	return sym("t");
+    else
+	return NULL;
+}
+
+lobj_t* fn_greater_than(env_t* env, lobj_t* a, lobj_t* b)
+{
+    //TODO: return another truthy value, e.g. t
+    if(a->numl > b->numl)
+	return sym("t");
+    else
+	return NULL;
+}
+
+lobj_t* fn_less_than(env_t* env, lobj_t* a, lobj_t* b)
+{
+    //TODO: return another truthy value, e.g. t
+    if(a->numl < b->numl)
 	return sym("t");
     else
 	return NULL;
@@ -231,6 +281,7 @@ env_t* make_base_env()
     add_env_entry_native(env, special, add_symbol("if"),     &sp_if);
     add_env_entry_native(env, special, add_symbol("lambda"), &sp_lambda);
     add_env_entry_native(env, special, add_symbol("def"), &sp_define);
+    add_env_entry_native(env, special, add_symbol("let"), &sp_let);	
 
     // Fundamental Functions
     add_env_entry_native(env, nativef2, add_symbol("cons"), &fn_cons);
@@ -250,6 +301,9 @@ env_t* make_base_env()
     add_env_entry_native(env, nativef, add_symbol("/"), &fn_div); //"
 
     add_env_entry_native(env, nativef2, add_symbol("="), &fn_eq);
+    add_env_entry_native(env, nativef2, add_symbol(">"), &fn_greater_than);
+    add_env_entry_native(env, nativef2, add_symbol("<"), &fn_less_than);
+
     
     return env;
 }

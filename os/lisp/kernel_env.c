@@ -6,10 +6,10 @@
 #include "../kernel/kassert.h"
 #include "../kernel/kstd.h"
 
-#define assert_numeric(obj, msg) assert(car(obj)->type == Num ||	\
-					car(obj)->type == U8  ||	\
-					car(obj)->type == U16 ||	\
-					car(obj)->type == U32, #msg);
+#define assert_numeric(obj, msg) assert(obj->type == Num ||	\
+					obj->type == U8  ||	\
+					obj->type == U16 ||	\
+					obj->type == U32, msg);
 
 /*
  * Kernel env stuff. here we define the functions that the kernel
@@ -54,8 +54,7 @@ lobj_t* fn_ptr_dref(env_t* env, lobj_t* ptr)
      * so a pointer to a u8 at 0x5000 is (0x5000 . 1)
      */
 
-    //return *(j);
-    return NULL;
+    return num(*(uint32_t*)ptr->numl);
 }
 
 lobj_t* fn_memset_u8(env_t* env, lobj_t* addr, lobj_t* val)
@@ -63,25 +62,25 @@ lobj_t* fn_memset_u8(env_t* env, lobj_t* addr, lobj_t* val)
     assert_numeric(addr, "mem_set addr must be numeric");
     assert(val->type == U8,  "mem_set val must be numeric");
 
-    *(uint8_t*)addr = val->u8;
+    *(uint8_t*)addr->numl = val->u8;
     return NULL;
 }
 
 lobj_t* fn_memset_u16(env_t* env, lobj_t* addr, lobj_t* val)
 {
-    assert_numeric(addr, "mem_set addr must be numeric");
-    assert(val->type == U16,  "mem_set val must be numeric");
+    //assert_numeric(addr, "mem_set addr must be numeric");
+    //assert(val->type == U16, "mem_set val must be u16");
 
-    *(uint8_t*)addr = val->u16;
+    *(uint16_t*)addr->numl = val->u16;
     return NULL;
 }
 
 lobj_t* fn_memset_u32(env_t* env, lobj_t* addr, lobj_t* val)
 {
     assert_numeric(addr, "mem_set addr must be numeric");
-    assert(val->type == U32,  "mem_set val must be numeric");
+    assert(val->type == U32, "mem_set val must be numeric");
 
-    *(uint8_t*)addr = val->u32;
+    *(uint32_t*)addr->numl = val->u32;
     return NULL;
 }
 
@@ -115,6 +114,7 @@ lobj_t* fn_shr(env_t* env, lobj_t* value, lobj_t* amount)
 
 lobj_t* fn_bor(env_t* env, lobj_t* a, lobj_t* b)
 {
+    //TODO: take type of both (should be equal), result is that type
     assert(a->type == Num ||
 	   a->type == U8  ||
 	   a->type == U16 ||
