@@ -43,8 +43,8 @@ void k_gdt_init()
     gdt_add_entry(2, SEG_BASE, SEG_LIMIT, 0, DATA_TYPE);
 
     // User Code and Data
-//    gdt_add_entry(3, SEG_BASE, SEG_LIMIT, 3, CODE_TYPE);
-//    gdt_add_entry(4, SEG_BASE, SEG_LIMIT, 3, DATA_TYPE);
+    //gdt_add_entry(3, SEG_BASE, SEG_LIMIT, 3, CODE_TYPE);
+    //gdt_add_entry(4, SEG_BASE, SEG_LIMIT, 3, DATA_TYPE);
     //TODO: add TSS
     
     load_gdt((uint32_t)&gdt_ptr);

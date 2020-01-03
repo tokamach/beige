@@ -15,13 +15,14 @@
 #include "../lisp/parser.h"
 #include "../lisp/types.h"
 #include "../lisp/env.h"
+#include "../lisp/kernel_env.h"
 #include "../lisp/eval.h"
 
 // kernel entry point
 void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
 {
     k_term_init();
-    k_print("kernel init\n");
+    k_print("beige kernel init\n");
     k_gdt_init();
     k_mem_init(mbd);
     k_malloc_init(mbd);
@@ -30,18 +31,12 @@ void k_main(uint32_t multiboot_magic, multiboot_info_t* mbd)
   
     env_t* kenv = make_kernel_env();
 
-    kprinteq_lisp((define countdown (lambda (start)
-				     (if (eq start 1)
-					 (cons start nil)
-					 (cons start (countdown (sub start 1)))))));
-    kprinteq_lisp((define x 10));
-    kprinteq_lisp((countdown x));
-
-
     k_status.lisp_state = Running;
     k_status.lisp_world = kenv;
     
     k_term_update_statline();
+
+    //while(1){}
     
     //start scheduler
     //start lisp repl
