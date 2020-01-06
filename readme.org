@@ -1,2 +1,11 @@
 * Beige: Yet another Lisp OS
-  /Beige/ is a WIP Operating system, designed to run Lisp programs in userspace, with a C kernel to manage low level details and interpret Lisp code.
+  /Beige/ is a WIP Operating system, designed to run Lisp programs in userspace, with a C kernel to manage low level details and interpret Lisp code. 
+
+** Lisp
+   The Lisp dialect that /Beige/ implements is a single namespace (/Lisp-1/) scheme-like Lisp. All Lisp related code is inside the =lisp= directory. The parser and interpreter are still rather crude, but functional. The parser is a recursive descent parser, written in C. Contrary to /McCarthy 1960/, the Environment, or lexical scope, is implemented as a C struct rather than an associative list.
+
+*** Types
+    A few types exist to help interoperation between high level Lisp and machine code.
+    | u8            | u16            | u32            | Num          | Sym    | Fun      |
+    | 8bit unsigned | 16bit unsigned | 32bit unsigned | Numeric type | Symbol | Function |
+
