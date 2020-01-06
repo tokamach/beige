@@ -103,7 +103,7 @@ lobj_t* sp_let(env_t* env, lobj_t* args)
 {
 
     lobj_t* bind_list = car(args);
-    lobj_t* body = cadr(args);
+    lobj_t* body = cdar(args);
 	
     // Make a new scope to execute the let in
     env_t* local_env = make_env(env);
@@ -112,7 +112,7 @@ lobj_t* sp_let(env_t* env, lobj_t* args)
     for(size_t i = 0; i < length(bind_list); i++)
     {
 	lobj_t* entry = nth(bind_list, i);
-	add_env_entry_lobj(local_env, add_symbol(car(entry)->val), eval(env, cdr(entry)));
+	add_env_entry_lobj(local_env, add_symbol(car(entry)->val), eval(env, cdar(entry)));
     }
 
     return eval(local_env, body);
@@ -290,6 +290,7 @@ env_t* make_base_env()
     add_env_entry_native(env, nativef, add_symbol("list"),  &fn_list);
 
     // Data types
+    // TODO: add 'the' and 'coerce' operators instead
     add_env_entry_native(env, nativef1, add_symbol("u8"),  &fn_u8);
     add_env_entry_native(env, nativef1, add_symbol("u16"), &fn_u16);
     add_env_entry_native(env, nativef1, add_symbol("u32"), &fn_u32);
@@ -298,12 +299,11 @@ env_t* make_base_env()
     add_env_entry_native(env, nativef, add_symbol("+"), &fn_add);
     add_env_entry_native(env, nativef, add_symbol("-"), &fn_sub);
     add_env_entry_native(env, nativef, add_symbol("*"), &fn_mul);
-    add_env_entry_native(env, nativef, add_symbol("/"), &fn_div); //"
+    add_env_entry_native(env, nativef, add_symbol("/"), &fn_div);
 
     add_env_entry_native(env, nativef2, add_symbol("="), &fn_eq);
     add_env_entry_native(env, nativef2, add_symbol(">"), &fn_greater_than);
     add_env_entry_native(env, nativef2, add_symbol("<"), &fn_less_than);
-
     
     return env;
 }
