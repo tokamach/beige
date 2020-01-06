@@ -204,8 +204,7 @@
 ** Memory
 - use linked list to store mem map
 - optimize for cons allocation
-- 
-** TODO Segmentation
+** DONE Segmentation
 - get the fucking GDT installed so Bochs will quit whining
 - basic flat model
 ** Paging
@@ -234,7 +233,8 @@
 *** Parser;
 - add (x . y) syntax
 - add correct checks for valid symbols, literals, mismatched parens
-** Interrupts
+** TODO Interrupts
+- get the fucking IDT working so it'll stop crashing, and we can handle triple faults
 - write assembly macro for generic interrupt handler
 - tell the PIC that we're handling interrupts now
 - write keeb handler
