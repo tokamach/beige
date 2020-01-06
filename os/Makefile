@@ -18,14 +18,15 @@ kernel: $(KOBJ) $(shell find kernel -name '*.s' | sed -e "s/\\.s.*/\\.s.o/g")
 
 lisp: $(LOBJ)
 
-lisp_test: CC := gcc-9
-lisp_test: CFLAGS += -Itests
-lisp_test: CFLAGS += -DLISP_TEST
-lisp_test: CFLAGS += -g
-lisp_test: CFLAGS := $(filter-out -ffreestanding,$(CFLAGS))
-lisp_test: INCLD  := $(filter-out -Ikernel,$(INCLD))
-lisp_test: LOBJ   := $(filter-out kernel_env.o,$(LOBJ))
-lisp_test: lisp tests/lisp_test.o
+lisp-test: CC := gcc-9
+lisp-test: CFLAGS += -Itests
+lisp-test: CFLAGS += -DLISP_TEST
+lisp-test: CFLAGS += -g
+lisp-test: CFLAGS := $(filter-out -ffreestanding,$(CFLAGS))
+lisp-test: INCLD  := $(filter-out -Ikernel,$(INCLD))
+lisp-test: LOBJ   := $(filter-out lisp/kernel_env.c.o,$(LOBJ))
+lisp-test: lisp tests/lisp_test.o
+	echo $(LOBJ)
 	$(CC) -Itests -Ilisp -o lisp_test tests/lisp_test.o $(LOBJ) -g
 
 os.elf: lisp kernel
