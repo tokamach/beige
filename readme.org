@@ -1,0 +1,2 @@
+* Beige: Yet another Lisp OS
+  /Beige/ is a WIP Operating system, designed to run Lisp programs in userspace, with a C kernel to manage low level details and interpret Lisp code.
