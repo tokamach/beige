@@ -12,3 +12,5 @@
 
 #define strcopy(x, y) strcpy((y), (x))
 #define streq(a,b) (strcmp((a),(b))==0)
+
+#define atoi16(str) strtol(str, NULL, 16)
