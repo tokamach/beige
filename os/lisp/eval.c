@@ -180,9 +180,7 @@ lobj_t* apply(env_t* env, lobj_t* fun, lobj_t* args)
 	retval = (*funentry->nativef3)(env,
 				       nth(evald_args, 0),
 				       nth(evald_args, 1),
-				       nth(evald_args, 2));
-
-	
+				       nth(evald_args, 2));	
     }
 
     //TODO: trigger gc??

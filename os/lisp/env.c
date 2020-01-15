@@ -5,11 +5,9 @@
 #include "eval.h"
 
 #ifdef LISP_TEST
-//testin
 #include <stdio.h>
 #include "../tests/kernel_mappings.h"
 #else
-//real world
 #include "../kernel/kmalloc.h"
 #include "../kernel/kterm.h"
 #include "../kernel/kstd.h"
@@ -101,6 +99,7 @@ size_t count_env_size(env_t* env)
 env_t* make_env(env_t* outer)
 {
     env_t* ret = kmalloc(sizeof(env_t));
+
     for(int i = 0; i < ENV_SIZE; i++)
 	ret->entries[i] = (env_entry_t){empty, 0, {0}};
     
