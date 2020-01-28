@@ -23,11 +23,11 @@ compile_commands.json
 os/lisptest
 os/lisp_test
 
-proposal/*.aux
-proposal/*.bbl
-proposal/*.bcf
-proposal/*.blg
-proposal/*.log
-proposal/*.pdf
-proposal/*.xml
-proposal/auto
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.log
+*.pdf
+*.xml
+auto
