@@ -1,24 +1,91 @@
-\documentclass{article}
+\documentclass{report}
 
-% \usepackage[margin=1.4in]{geometry}
+%\usepackage[margin=1.4in]{geometry}
 
 \begin{document}
-\title{}
+\title{report}
 \author{Tom Hutchings}
 
 \maketitle
 
-\section{Abstract}
+\begin{abstract}
+  This report covers the design and implementation of an Operating System for the x86 processor platform. It will first give an overview of the broad concept of an Operating System and the tools and technologies that the Operating System will rely on. It will then give the design of a minimal Operating System tailored to provide means to host a high level Programming Language. This language is a custom dialect of Lisp, and is described in the design section.
 
-\section{Introduction}
+  Finally the paper will describe an implementation of the designed OS and Language.
+  
+\end{abstract}
 
-\section{Background}
+%\newpage
 
-\section{Design}
+\tableofcontents
 
-\section{Implementation}
+\newpage
 
-\section{Testing}
+\chapter{Introduction}
+At the core of almost every running computer exists an Operating System, the software which interfaces between running programs and the computer hardware. The primary purpose of an Operating System is to provide a platform for other computer programs to run on top of, by abstracting away hardware specific details such as memory management, and Input and Output to physical hardware.
 
-\section{Conclusion}
+The very first operating systems were created to allow  \cite{10.1145/1460764.1460786} 
+
+\section{Aims}
+The proposed Operating System must fit certain criteria to fulfill its goal.
+
+This paper aims to:
+\begin{itemize}
+\item Describe the features and functions of an Operating System;
+\item Provide the design for a minimal Operating System, fulfilling the criteria established previously;
+\item Establish the minimum interface needed for a high level language to sufficiently extend the OS functionality.
+\item Provide an implementation of the OS and Language Design.
+\end{itemize}
+
+
+\chapter{Background}
+
+
+\section{Platform}
+
+\subsection{x86}
+
+\subsection{C}
+
+
+\chapter{Design}
+
+\section{Kernel}
+
+\section{Language}
+As the OS is intended not only to host a high level language, but itself be expendable in that language, it was decided that the OS should manage the parsing and executing of the high level language. This approach allows for tighter integration between the language and the OS, and could potentially allow for optimization techniques not possible in a user environment. [TODO: cite some low level GC optimizations]
+\\
+Considering that any standard library functions must be implemented anew in the OS, access to parsing libraries will be limited due to the effort required to adapt any existing library to the OS standard library. This means that parsing of our language must be performed using only the string tools provided to us by C, and our own standard library. Writing a free-standing implementation of a Regular Expression library was considered out of the scope of this paper, complicating the process further.
+
+Without the help of tools such as regular expressions and string splitting, we will be limited to individual character comparison and string comparison, which is trivial to implement from the first. As such, any syntactic complexity in the language would drastically complicate implementation of the parser. [TODO: include example? or cite something about parsing complexity?]
+\\
+Considering the above requirements, it was decided to implement a dialect of Lisp as the high level language. With a sparse syntax, Lisp is exceptionally easy to parse. Syntactic symbols consist only of ``('', ``)'', and ``.'' characters, and a small, implementation specific set of built-in key words. [TODO: cite McCarthy 1961 or smith] Lisp family languages are also dynamically typed and garbage collected,
+
+\section{Tools}
+
+
+\chapter{Implementation}
+
+\section{Toolchain}
+
+\section{Kernel}
+\subsection{Memory Management}
+\subsection{Interrupts}
+
+
+\section{Language}
+\subsection{Parser}
+\subsection{Interpreter}
+\subsection{OS Integration}
+
+
+\chapter{Testing}
+
+
+\chapter{Conclusion}
+
+
+\bibliographystyle{ieeetr}
+\bibliography{bib/report}
+
 \end{document}
