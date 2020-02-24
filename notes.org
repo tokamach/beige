@@ -46,14 +46,23 @@
 ** Impl
 ** Work Plan
 ** Resources Required
-* TODO Report [0%]
-  - dear god come up with a title
+* TODO [#A] Report [0%]                                              :os:uni:
+DEADLINE: <2020-03-20 Fri>
+:LOGBOOK:
+CLOCK: [2020-02-24 Mon 11:45]--[2020-02-24 Mon 12:08] =>  0:23
+CLOCK: [2020-02-20 Thu 17:30]--[2020-02-20 Thu 22:42] =>  5:12
+CLOCK: [2020-02-18 Tue 15:40]--[2020-02-18 Tue 15:56] =>  0:16
+CLOCK: [2020-02-17 Mon 15:12]--[2020-02-17 Mon 15:41] =>  0:29
+CLOCK: [2020-02-17 Mon 13:21]--[2020-02-17 Mon 14:59] =>  1:38
+CLOCK: [2020-02-16 Sun 20:09]--[2020-02-16 Sun 22:00] =>
+CLOCK: [2020-02-10 Mon 22:40]--[2020-02-10 Mon 22:57] =>  0:17
+:END:    
 ** [ ] Abstract
    - use a few sentences to summarize the project
    - needs its own page
    - 200 words max
 ** [ ] Intro
-   - start with sentence of breif aims of project
+   - start with sentence of brief aims of project
    - aim of the project
    - what problem do we address
    - aims of project in bullet points
@@ -64,11 +73,46 @@
      + how does this improve on that
    - justify platform, solution, etc
      + don't stray too far into implementation or design, you do that later
-   - 
+   - Discuss Common Lisp
 ** [ ] Design
+   - more abstract, acamedic style
+   - justify choices (ideally with research to back it up)
 ** [ ] Implementation
+   - if it doesn't exactly match design that's ok
+     + more important justify why it doesn't match the design (e.g. for x86 doing x is faster than doing y)
 ** [ ] Testing
 ** [ ] Conclusion
+   - revisit objectives from introduction
+* Viva
+The Viva is a means to defend your report. Convince your markers that your project is worthwhile, and that your report does correpsond to your implementation.
+** Arrange Viva                                                     :os:uni:
+DEADLINE: <2020-05-01 Fri> SCHEDULED: <2020-04-27 Mon>
+Email supervisor and marker to arrange a date
+It must take place Week 25-26; no earlier or later.
+
+** Structure
+- 10-15 minute presentation and demo
+- 10-15 minute Q&A with second marker and supervisor (they will have read the report already)
+
+/- KNOW YOUR TOPIC/, you can't chat absolute shit at this stage.
+
+** Presentation
+- doesn't have to exactly conform to report, but should cover what was discussed
+- perhaps do the whole "modern OS based on old design, what if they weren't"
+- don't copy paste from report
+*** Include
+- Overview slide
+  + like an abstract (here's what I'm gonna do)
+- What is the project about?
+  + Introduction
+  + Problem descritpion supported by literature
+- What did you do and how?
+  + methodology
+  + implementation
+- What did you find?
+  + Analysis
+- Why does this Matter?
+  + The selling point. How did I contribute?
 
 * Links
 - https://wiki.osdev.org/Expanded_Main_Page
