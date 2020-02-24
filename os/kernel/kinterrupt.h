@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #define IDT_ENTRIES 256
+#define NUM_OF_INT_HANDLERS IDT_ENTRIES
 
 typedef struct idt_entry {
     uint16_t offset_low;
@@ -22,9 +23,7 @@ static struct {
     idt_ptr_t pointer;
 } idt;
 
-void k_interrupt_init();
-
-//asm link
+// New interrupt data structures
 typedef struct cpu_state {
   uint32_t ds;
   uint32_t edi;
@@ -37,15 +36,25 @@ typedef struct cpu_state {
   uint32_t eax;
 }__attribute__((packed)) cpu_state_t;
 
-typedef struct interrupt_frame {
-    uint32_t error_code;
+typedef struct stack_state {
     uint32_t eip;
     uint32_t cs;
     uint32_t eflags;
-}__attribute__((packed)) interrupt_frame_t;
+    uint32_t user_esp;
+    uint32_t user_ss;
+}__attribute__((packed)) stack_state_t;
 
-__attribute__((interrupt))
-void interrupt_handler(interrupt_frame_t* frame);
+typedef struct idt_info {
+    uint32_t idt_index;
+    uint32_t err_code;
+}__attribute__((packed)) idt_info_t;
+
+typedef void (*interrupt_handler_t)(cpu_state_t cpu_state, idt_info_t idt_info, stack_state_t stack_state);
+
+
+void k_interrupt_init();
+void k_register_interrupt_handler(uint32_t index, interrupt_handler_t handler);
+void forward_interrupt(cpu_state_t cpu_state, idt_info_t idt_info, stack_state_t stack_state);
 
 //defined in kinterrupt.s
 void load_idt(idt_ptr_t *idt_addr);

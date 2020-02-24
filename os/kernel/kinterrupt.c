@@ -7,6 +7,8 @@
 #include "kpic.h"
 #include "kgdt.h"
 
+static interrupt_handler_t registered_handlers[NUM_OF_INT_HANDLERS];
+
 /* Defined in interrupt.s */
 void interrupt_handler_0();
 void interrupt_handler_1();
@@ -29,6 +31,7 @@ void interrupt_handler_17();
 void interrupt_handler_18();
 void interrupt_handler_19();
 
+/* IRQs */
 void interrupt_handler_32();
 void interrupt_handler_33();
 void interrupt_handler_34();
@@ -46,17 +49,17 @@ void interrupt_handler_45();
 void interrupt_handler_46();
 void interrupt_handler_47();
 
-void k_add_interrupt(uint8_t  entry,
+void k_add_idt_entry(uint8_t  entry,
 		     uint32_t offset,
 		     uint8_t type,
 		     uint8_t  dpl,
 		     uint16_t size)
 {
     uint8_t flags = 0;
-    flags |= (1 << 7); //is present, set to 0 for unused interrupt
+    flags |= (1 << 7);            //is present, set to 0 for unused interrupt
     flags |= ((dpl & 0b11) << 5); //DPL, descriptor privelege level (0-3)
-    flags |= (size << 4); //size (set to 0 for interrupt and trap gates)
-    flags |= type; //gate type
+    flags |= (size << 4);         //size (set to 0 for interrupt and trap gates)
+    flags |= type;                //gate type
     
     idt.entries[entry].offset_low       = (uint16_t)offset & 0xffff;
     idt.entries[entry].offset_high      = (offset >> 16)   & 0xffff;
@@ -67,7 +70,13 @@ void k_add_interrupt(uint8_t  entry,
 }
 
 #define IDT_ADD_GATE(n) \
-    k_add_interrupt(n, (uintptr_t)&interrupt_handler_##n, 1, 0, 0);
+    k_add_idt_entry(n, (uintptr_t)&interrupt_handler_##n, 1, 0, 0);
+
+void k_register_interrupt_handler(uint32_t index, interrupt_handler_t handler)
+{
+    //TODO: bounds check
+    registered_handlers[index] = handler;
+}
 
 void k_interrupt_init()
 {
@@ -119,7 +128,7 @@ void k_interrupt_init()
     IDT_ADD_GATE(47);
     
     
-    //load IDT
+    // Load IDT
     load_idt(idt_ptr);
     
     enable_interrupts();
@@ -128,17 +137,26 @@ void k_interrupt_init()
 }
 
  
-__attribute__((interrupt))
-void interrupt_handler(interrupt_frame_t* frame)
+//__attribute__((interrupt))
+void forward_interrupt(cpu_state_t cpu_state, idt_info_t idt_info, stack_state_t stack_state)
 {
     k_print("Caught Interrupt: ");
-    k_print_hex(frame->error_code);
+    k_print_hex(idt_info.idt_index);
     k_print("\n");
-    //asm("hlt");
+
+    if(registered_handlers[idt_info.idt_index] == 0)
+    {
+	k_print("No handler for interrupt ");
+	k_print_num(idt_info.idt_index);
+	return;
+    }
     
     // call exception or software dependent on error
-    
-    k_pic_eoi(frame->error_code);
+    registered_handlers[idt_info.idt_index](cpu_state, idt_info, stack_state);
+
+    // Acknowoledge only IRQs
+    if(idt_info.idt_index >= 32)
+	k_pic_eoi(idt_info.idt_index);
 }
 
 //TODO: write exception handler (error code in args)

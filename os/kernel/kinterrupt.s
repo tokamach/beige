@@ -16,12 +16,26 @@ interrupt_handler_\num:
 	.endm
 	
 	/* the shared interrupt handler that deals with registers */
-	.extern interrupt_handler
+	.extern forward_interrupt
 common_interrupt_handler:
 	pushal
-	
-	call interrupt_handler
+ 	
+	mov %ds, %ax
+	pushl %eax
 
+	mov 0x10, %ax
+	mov %ax, %ds
+	mov %ax, %es
+	mov %ax, %fs
+	mov %ax, %gs
+	
+	call forward_interrupt
+	
+	mov %ax, %ds
+	mov %ax, %es
+	mov %ax, %fs
+	mov %ax, %gs
+	
 	popal
 	add 8, %esp
 	sti
