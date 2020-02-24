@@ -179,6 +179,11 @@ lobj_t* fn_u32(env_t* env, lobj_t* num)
     return u32(num->numl & 0xFFFFFFFF);
 }
 
+lobj_t* fn_coerce(env_t* env, lobj_t* symbol, lobj_t* type)
+{
+    // Convert symbol to type specified by type
+}
+
 
 /*
  * Maths

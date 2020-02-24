@@ -55,10 +55,10 @@ typedef struct lobj {
 	uint32_t u32;
 
 	// Func
-	//TODO: instead just use Cons?
 	struct {
 	    struct lobj* args;
 	    struct lobj* body;
+	    struct env_t* env; // Pointer to captured scope
 	};
 
 	// Error
