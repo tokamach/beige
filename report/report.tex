@@ -1,6 +1,15 @@
-\documentclass{report}
+\documentclass[11pt]{report}
 
-%\usepackage[margin=1.4in]{geometry}
+\usepackage{setspace}
+\doublespacing
+
+\usepackage{tikz}
+\usetikzlibrary{positioning, fit, matrix}
+
+\usepackage{backnaur}
+
+% For marking up drafts
+\usepackage[normalem]{ulem}
 
 \begin{document}
 \title{report}
@@ -11,73 +20,199 @@
 \begin{abstract}
   This report covers the design and implementation of an Operating System for the x86 processor platform. It will first give an overview of the broad concept of an Operating System and the tools and technologies that the Operating System will rely on. It will then give the design of a minimal Operating System tailored to provide means to host a high level Programming Language. This language is a custom dialect of Lisp, and is described in the design section.
 
-  Finally the paper will describe an implementation of the designed OS and Language.
+  Finally the paper will describe an implementation of the OS and Language detailed in the design section.
   
 \end{abstract}
 
-%\newpage
-
 \tableofcontents
-
 \newpage
 
 \chapter{Introduction}
-At the core of almost every running computer exists an Operating System, the software which interfaces between running programs and the computer hardware. The primary purpose of an Operating System is to provide a platform for other computer programs to run on top of, by abstracting away hardware specific details such as memory management, and Input and Output to physical hardware.
+At the core of almost every running computer exists an Operating System, the software which interfaces between running programs and the computer hardware. The primary purpose of an Operating System is to provide a platform for other computer programs to run on top of, by abstracting away hardware specific details such as memory management and Input and Output to physical hardware.
 
-The very first operating systems were created to allow  \cite{10.1145/1460764.1460786} 
+TODO: expand on native compiled OSs, and our interpreted approach
+
+This paper aims to investigate an approach to Operating System design whereby a high level language is executed by a minimal core OS, allowing the OS to be extended using that language. This ``hosted language'' would be interpreted at run time, rather than compiled ahead of time. Most contemporary Operating Systems are written in compiled languages, requiring restarting the computer they are running on to load any changes to the system. [CITE] By designing an Operating System which hosts an interpreted language, and can be extended in that language, we can evaluate the feasibility of runtime inspection and modification of Operating System code.
 
 \section{Aims}
-The proposed Operating System must fit certain criteria to fulfill its goal.
-
-This paper aims to:
 \begin{itemize}
 \item Describe the features and functions of an Operating System;
 \item Provide the design for a minimal Operating System, fulfilling the criteria established previously;
-\item Establish the minimum interface needed for a high level language to sufficiently extend the OS functionality.
-\item Provide an implementation of the OS and Language Design.
+\item Establish a design for a high level programming language, and the minimum interface needed for the language to sufficiently extend the OS functionality;
+\item Detail the implementation of the proposed OS and Programming Language.
 \end{itemize}
+
+\section{Chapter Overview}
+\begin{enumerate}
+\item Chapter 2: Background will examine the relevant existing material to the development of an Operating System, including CPU architectures and programming languages. Then it will look at use of a high level language in OS development, as relevant to our hosted language.
+\item Chapter 3: Design will provide a design for an OS, covering the main design and justifying key design decisions.
+\item Chapter 4: Implementation will describe key parts of an implementation of the OS designed, highlighting areas of interest with code listings.
+\item Chapter 5: Testing will demonstrate the implementation, and attempt to demonstrate how the implementation addresses the questions posed in the Introduction.
+\item Chapter 6: Conclusion will review the paper, and whether it met the stated Aims.
+\end{enumerate}
 
 
 \chapter{Background}
 
+Operating Systems have existed since the 1950s, [CITE] and so a sizable body of both research and implementations exist today. First this chapter will look at possible CPU Architectures to target, and programming languages to implement a kernel and interpreter in. The next section will discuss the hosted language, a dialect of Lisp, by looking at a history of Lisp in Operating Systems and compiled applications.
 
 \section{Platform}
+Choosing a platform to target was an important step, as the OS will have no levels of software abstractions to build upon, itself providing the lowest level of interface to platform specific functionality. Because of this, a not insignificant amount of OS code would not be easily portable to other CPU architectures.
+
+A programming language in which to implement the kernel also had to be chosen. The language must be capable of running in a free-standing environment, i.e. the produced machine code must not link to any external libraries, and must not use any OS facilities such as memory allocation. The language must also support calling code generated from assembly language, and be able to directly access memory locations. These are necessary depending on chosen architecture, as some architectures such as Intel's x86 family require initialization to be performed using special assembly instructions which would not normally be emitted by a compiler [CITE: Intel Sam] All these requirements are necessary for a language to be a candidate for implementing an Operating System. 
 
 \subsection{x86}
+Intel's x86 family of processor architectures originates in the 8086 CPU, first released in 1978\cite{intel-hall-of-fame}. Over time successive releases built on the previous architecture, maintaining a degree of backwards compatibility[CITE] but implementing a superset of the previous architecture and adding new extensions to the instruction set. Features such as hardware based Floating Point arithmetic, Single Instruction Multiple Data instructions allowing for parallel data operations, and support for hardware virtualization have been added to the architecture. This backwards compatible but incrementally improved development model has led to x86 being the primary architecture for personal desktop computers, being the only architecture targeted by the 3 most widely used consumer operating systems, Microsoft's Windows, Apple's macOS, and the free software Linux[CITE].
+
+x86 provides tools to assist in OS development such as segmentation, paging, and ring levels. Segmentation and paging are memory management and protection schemes, supported on the CPU by a Memory Management Unit (MMU), which helps manage memory via hardware, increasing speed and reducing the OS workload. Memory can be assigned \textit{ring levels} from 0 to 3, a privilege level which allows a structured system of permissions to be enforced. In most cases only levels 0 and 3 are used, with 0 reserved for the OS Kernel and level 3 provided for user programs, thus separating the privileged kernel from the securely isolated user programs.
+
+widespread \\
+powerful (SIMD) \\
+suited to OS dev (MMU, IO) \\
 
 \subsection{C}
+C is an imperative programming language, originally developed for the purpose of re-writing the Unix operating system. [CITE] C provides ``low level'' programming features such as direct access to memory locations, something which many languages abstract away for security reasons [CITE]. When using the GNU Compiler Collection's (GCC) C compiler, Assembly code for the target CPU Architecture can be inserted inline with C code. Finally, C will manage the allocation and deallocation of locally scoped variables automatically, but also allow the programmer to manually manage where variables are allocated in memory, via the aforementioned direct memory access. This would allow a kernel written in C to implement a memory allocation scheme which could be utilized both by other OS code and user programs.
 
+As C was first developed around 1972 [CITE], it has numerous compiler implementations, with many different CPU architectures targeted, and many implementations targeting multiple architectures. As of 2020, the GNU Compiler Collection supports emitting compiled code for 51 architectures [CITE https://gcc.gnu.org/backends.HTML], all of which can be targeted by the GCC C compiler.
+
+\section{Lisp}
+Lisp
+
+\subsection{Lisp Machines}
+lisp machines (os in lisp, but architecture supports it (we don't have that))
+
+\subsection{Common Lisp}
+common lisp (compilation and running on x86)
 
 \chapter{Design}
 
-\section{Kernel}
+TODO: diagram of system hierarchy, bottom up: kernel, SYSL eval, programs
 
-\section{Language}
-As the OS is intended not only to host a high level language, but itself be expendable in that language, it was decided that the OS should manage the parsing and executing of the high level language. This approach allows for tighter integration between the language and the OS, and could potentially allow for optimization techniques not possible in a user environment. [TODO: cite some low level GC optimizations]
-\\
-Considering that any standard library functions must be implemented anew in the OS, access to parsing libraries will be limited due to the effort required to adapt any existing library to the OS standard library. This means that parsing of our language must be performed using only the string tools provided to us by C, and our own standard library. Writing a free-standing implementation of a Regular Expression library was considered out of the scope of this paper, complicating the process further.
+\tikzset{
+  cell/.style={
+    rectangle, thick, draw,
+  }
+}
+\begin{tikzpicture}
+  [node distance = .8cm,
+  squarednode/.style={rectangle, draw=black, very thick, minimum size=5cm},]
+
+  \matrix[
+  matrix of nodes, nodes in empty cells,
+  minimum width = 2cm,
+  column sep = 4pt,
+  row sep = 10pt,
+  text height = 2ex, text depth = .25ex,
+  minimum height = 4ex]
+  (m) {
+    | [cell] | Process & | [cell] | Process & | [cell] | Process & \\
+    & & & \\
+    & & & \\
+  } ;
+
+  \node[cell, fit=(m-3-1)(m-3-3), label=center: Userspace]{};
+  \node[cell, fit=(m-2-1)(m-2-3), label=center: Interpreter]{};
+  \node[cell, fit=(m-1-1)(m-1-3), label=center: Kernel]{};
+\end{tikzpicture}
+
+\section{Kernel}
+The Kernel's role within the Operating System is acting as the interface between software and hardware. It must manage memory and I/O. The primary tasks for this OS's kernel are initializing the CPU into protected mode, and providing a memory allocation system for C code. These are the minimum requirements to allow the hosted language interpreter to run, which can then take over the rest of OS functionality in hosted code.
+
+\subsection{Memory Allocation}
+The memory allocator maintains two sequential areas of memory. The first is the \textit{Bitmap}, used to mark which areas of the second, the \textit{Arena}, are in use. The allocator uses a fixed size factor $F$ to map a single binary bit in the Bitmap to a region in the Arena of size $F$. We use a factor $F = 8$, effectively mapping a single bit in the bitmap to an 8 bit byte in the arena. On x86 all addressing is byte aligned [CITE sdm], meaning that a factor of 8 is the minimum value to ensure byte alignment, and that factor sizes must follow $F = 2^n$ where $n > 3 $.
+
+TODO: diagram demonstrating mapping of bitmap to arena \\
+TODO: deallocation
+
+\subsection{Segmentation}
+x86 Segmentation System \\
+Flat gdt, essentially no segmentation to allow for paging \\
+
+\subsection{Paging}
+x86 paging system \\
+how we can implement this with C structs and linked lists \\
+
+\subsection{Interrupts}
+IDT gates \\
+PIC, masking, and setup \\
+
+\section{Hosted Language: SYSLISP}
+TODO: move to background or rewrite to be more focused on design
+
+As the OS is intended not only to host a high level language, but itself be extendable in that language, it was necessary that the OS should manage the parsing and execution. This approach allows for tighter integration between the language and the OS, and could potentially allow for optimization techniques not possible in a user environment. [TODO: cite GC optimization papers from bib]
+
+Considering that any standard library functions must be implemented anew in the OS, access to parsing libraries will be limited due to the effort required to adapt any existing library to use the new OS standard library, instead of the standard library it was written for. This means that parsing of the language must be performed using only the string tools provided to by C, and the new Operating Systems own standard library.
 
 Without the help of tools such as regular expressions and string splitting, we will be limited to individual character comparison and string comparison, which is trivial to implement from the first. As such, any syntactic complexity in the language would drastically complicate implementation of the parser. [TODO: include example? or cite something about parsing complexity?]
-\\
-Considering the above requirements, it was decided to implement a dialect of Lisp as the high level language. With a sparse syntax, Lisp is exceptionally easy to parse. Syntactic symbols consist only of ``('', ``)'', and ``.'' characters, and a small, implementation specific set of built-in key words. [TODO: cite McCarthy 1961 or smith] Lisp family languages are also dynamically typed and garbage collected,
 
-\section{Tools}
+In line with the above requirements, it was decided to implement a dialect of Lisp as the high level language. With a sparse syntax, Lisp is exceptionally easy to parse. Syntactic symbols consist only of ``('', ``)'', and ``.'' characters, and a small, implementation specific set of built-in key words. [CITE: McCarthy 1960] Lisp is also dynamically typed and garbage collected, as opposed to the static typing and manual memory management of C [CITE].
 
+\subsection{Syntax}
+Being a dialect of Lisp, the Operating Systems hosted level language, referred to as System LISP, SYSLISP or SYSL for short, has a simple syntax. Lisp's strengths lie in operations on Linked List data structures, which is also the format that the language is written in. S-Expressions, a textual representation of a linked list, are used to express source code in Lisp, which is parsed into an in-memory list structure and then executed.
+
+SYSLISP syntax can be expressed in BNF notation like so:
+
+TODO: fix the broken bnf package \\
+%\begin{bnf*}
+%  \bnfprod{s_expression}{\bnfpn{atomic_expression} \bnfor \bnfpn{list}} \\
+%  \bnfprod{list}{\bnftd{rightparen} \bnfpn{s_expression} \bnftd{leftperen}}
+%\end{bnf*}
+
+\texttt{
+  <s_expression> ::= <atomic_expression> | <list>
+  <list> ::= ( <s_expression> ) | ( <list> <s_expression> )
+}
+
+\sout{The only non-identifier terminals in the SYSLISP grammar are ``('' and ``)''. The dot pair notation usually present in Lisp's is not used in present in SYSLISP. The dot pair notation usually is used for the creation of Cons cells, the elements that make up a Linked List. Removing the dot pair notation decreased parser} TODO: dot pair notation is being implemented now, add to BNF and rewrite this paragraph \\
+
+TODO: draw syntax - Box and Line notation - result \\
+
+car/cdr/cons explanation \\
+single namespace for variables and functions (lisp-1 (e.g. scheme, SYSL) vs lisp-2 (e.g. common lisp, emacs lisp))\\
+list and explain general and native interface datatypes \\
+
+\subsection{Interpreter}
+One approach to executing a programming language is using an interpreter, a program which parses language input, and directly executes it. An interpreter is able to parse and execute code at runtime, without any ahead of time preparation. This property allows, for example, code to be generated at runtime and executed, or for a user to input code to be executed one expression at a time, have the expression be evaluated and the result of the expression displayed in real time. This is commonly referred to as a Read Evaluate Print Loop, or \textit{``REPL''}. A REPL allows interaction with the program as it is running,  
+
+Eval/Apply \\
+Symbol Table \\
+Lisp Environments, env hierarchy (root node with null as parent), and symbol lookup \\
+Standard Env functions (defun, let, set, etc) \\
+
+\subsection{Native Interface}
+Kernel Env for \\
 
 \chapter{Implementation}
 
 \section{Toolchain}
+GCC, grub-mkrescue, my toolchain build scripts, C/assembly code makefile \\
+using macros to allow Lisp interpreter to be run in a normal unix environment for debugging \\
 
 \section{Kernel}
 \subsection{Memory Management}
-\subsection{Interrupts}
+memory allocator \\
+gdt code extracts \\
 
+\subsection{Interrupts}
+explain PIC (or do it in design?) \\
+PIC and IDT extracts \\
+calling between assembly and C, Interrupt call system and stack state \\
+OS interrupt registration system (and how it differs from simple IDT gates) \\
 
 \section{Language}
 \subsection{Parser}
-\subsection{Interpreter}
-\subsection{OS Integration}
+C implementation extracts \\
 
+\subsection{Interpreter}
+Eval/Apply implementation listings \\
+symbol table implementation \\
+Lisp Environment implementation (is in C struct rather than usual Lisp alist) \\
+nativef1-5 vs lispf calling types \\
+
+\subsection{OS Integration}
+show Kernel Env src and how it allows memory access and inb/outb calls \\
+datatype conversion, u8, u16, and u32 vs num type and ensuring memory access type safety \\
+ptr pointer type \\
 
 \chapter{Testing}
 
