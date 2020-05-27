@@ -5,13 +5,12 @@
 /*
  * Since we're going to be using paging instead, we'll set up
  * a flat segmentation model where each segment is 0-0xfffff
- * 
  */ 
 #define SEG_BASE 0x0
 #define SEG_LIMIT 0xFFFFF
 
 #define CODE_TYPE 0xA // (Executable, Grows down, Readable, Not accessed)
-#define DATA_TYPE 0x2 // (Non Executable, Grows down, Writeable, No accessed)
+#define DATA_TYPE 0x2 // (Non Executable, Grows down, Writeable, Not accessed)
 
 /*
  * An entry in the gdt, follows a very weird structure.
@@ -24,7 +23,6 @@ typedef struct gdt_entry {
     uint8_t  access;
     uint8_t  limit16_19_flags; //4 upper bits of limit + flags (horrible)
     uint8_t  base24_31;
-    
 }__attribute__((packed)) gdt_entry_t;
 
 typedef struct gdt_ptr {

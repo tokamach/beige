@@ -1,3 +1,10 @@
+* Beige
+#+BEGIN_QUOTE
+"careful! superstition is the kernel of heresy."
+#+END_QUOTE
+
+This is the Beige OS notes file. Plans, notes, schedules, frantic dissertation progress all live here.
+
 * DONE Project Planning
 ** DONE Which Architecture?
 - ARM
@@ -46,10 +53,10 @@
 ** Impl
 ** Work Plan
 ** Resources Required
-* TODO [#A] Report [0%]                                              :os:uni:
+* DONE [#A] Report [85%]                                             :os:uni:
 DEADLINE: <2020-03-20 Fri>
 :LOGBOOK:
-CLOCK: [2020-02-24 Mon 11:45]--[2020-02-24 Mon 12:08] =>  0:23
+CLOCK: [2020-02-24 Mon 11:45]--[2020-03-09 Mon 17:02] => 341:17
 CLOCK: [2020-02-20 Thu 17:30]--[2020-02-20 Thu 22:42] =>  5:12
 CLOCK: [2020-02-18 Tue 15:40]--[2020-02-18 Tue 15:56] =>  0:16
 CLOCK: [2020-02-17 Mon 15:12]--[2020-02-17 Mon 15:41] =>  0:29
@@ -57,39 +64,50 @@ CLOCK: [2020-02-17 Mon 13:21]--[2020-02-17 Mon 14:59] =>  1:38
 CLOCK: [2020-02-16 Sun 20:09]--[2020-02-16 Sun 22:00] =>
 CLOCK: [2020-02-10 Mon 22:40]--[2020-02-10 Mon 22:57] =>  0:17
 :END:    
-** [ ] Abstract
-   - use a few sentences to summarize the project
-   - needs its own page
-   - 200 words max
-** [ ] Intro
-   - start with sentence of brief aims of project
-   - aim of the project
-   - what problem do we address
-   - aims of project in bullet points
-   - finish with chapter by chapter overview of report
-** [ ] Background
-   - relevant research
-   - relevant work/existing systems
-     + how does this improve on that
-   - justify platform, solution, etc
-     + don't stray too far into implementation or design, you do that later
-   - Discuss Common Lisp
-** [ ] Design
-   - more abstract, acamedic style
-   - justify choices (ideally with research to back it up)
-** [ ] Implementation
+** Next steps
+*** first pages
+*** FINISH ALL TODO/CITE
+*** SUBMIT (appendix, correct naming, working docs)
+** DONE Abstract
+- use a few sentences to summarize the project
+- needs its own page
+- 200 words max
+** DONE Intro
+- start with sentence of brief aims of project
+- aim of the project
+- what problem do we address
+- aims of project in bullet points
+- finish with chapter by chapter overview of report
+** DONE Background
+- relevant research
+- relevant work/existing systems
+  + how does this improve on that
+- justify platform, solution, etc
+  + don't stray too far into implementation or design, you do that later
+- Discuss Common Lisp
+*** DONE OS
+*** TODO Lisp
+** DONE Design
+- more abstract, acamedic style
+- justify choices (ideally with research to back it up)
+*** TODO OS
+**** DONE Segmentation
+**** TODO Paging
+**** TODO Interrupts
+*** TODO Lisp
+** DONE Implementation
    - if it doesn't exactly match design that's ok
      + more important justify why it doesn't match the design (e.g. for x86 doing x is faster than doing y)
-** [ ] Testing
-** [ ] Conclusion
-   - revisit objectives from introduction
+*** TODO OS
+*** TODO Lisp
+** DONE Testing
+*** TODO OS
+*** TODO Lisp
+** TODO Conclusion
+- revisit objectives from introduction
+- future work
 * Viva
 The Viva is a means to defend your report. Convince your markers that your project is worthwhile, and that your report does correpsond to your implementation.
-** Arrange Viva                                                     :os:uni:
-DEADLINE: <2020-05-01 Fri> SCHEDULED: <2020-04-27 Mon>
-Email supervisor and marker to arrange a date
-It must take place Week 25-26; no earlier or later.
-
 ** Structure
 - 10-15 minute presentation and demo
 - 10-15 minute Q&A with second marker and supervisor (they will have read the report already)

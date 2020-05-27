@@ -5,6 +5,10 @@
 #define ENV_SIZE 256
 #define MAX_SYMBOLS 256
 
+//TODO: rename symbol to label
+/*
+ * Label stuff
+ */
 typedef struct {
     uint8_t id;
     char* symbol;
@@ -19,6 +23,9 @@ symbol_id add_symbol(char* symbol);
 symbol_id lookup_symbol(char* symbol);
 char* lookup_id(symbol_id i);
 
+/*
+ * Env stuff
+ */
 typedef enum e_env_entry_type {
     empty,
     special, //special form, to be handled in eval rather than calling function

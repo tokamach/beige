@@ -270,6 +270,8 @@ lobj_t* fn_less_than(env_t* env, lobj_t* a, lobj_t* b)
  */
 env_t* make_base_env()
 {
+    //TODO: add eval and apply
+    
     //make an empty env with no outer
     env_t* env = make_env(NULL);
 
@@ -278,15 +280,13 @@ env_t* make_base_env()
     add_env_entry_native(env, empty, add_symbol("nil"), NULL);
     add_env_entry_lobj  (env,        add_symbol("t"),   sym("t"));
 
-    //Eval and Apply
-    
     // Special Forms
     add_env_entry_native(env, special, add_symbol("quote"),  &sp_quote);
     add_env_entry_native(env, special, add_symbol("progn"),  &sp_progn);
     add_env_entry_native(env, special, add_symbol("if"),     &sp_if);
     add_env_entry_native(env, special, add_symbol("lambda"), &sp_lambda);
-    add_env_entry_native(env, special, add_symbol("def"), &sp_define);
-    add_env_entry_native(env, special, add_symbol("let"), &sp_let);	
+    add_env_entry_native(env, special, add_symbol("def"),    &sp_define);
+    add_env_entry_native(env, special, add_symbol("let"),    &sp_let);	
 
     // Fundamental Functions
     add_env_entry_native(env, nativef2, add_symbol("cons"), &fn_cons);

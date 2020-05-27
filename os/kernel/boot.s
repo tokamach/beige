@@ -31,7 +31,8 @@ _start:
 	/* setup multiboot info structure */
 	pushl %ebx
 	pushl %eax
-	/* TODO: initalize GDT, floating point, etc */
+	
+	/* any floating point initalizations etc could go here */
 
 	/* enter kernel */
 	call k_main

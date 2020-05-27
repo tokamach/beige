@@ -7,5 +7,7 @@
 int main()
 {
     env_t* env = make_base_env();
-    print_sexp(eval(env, lisp_read("(+ 1 10)")));
+    print_sexp(eval(env, lisp_read("(def f (quote (1 . 2)))")));
+    print_sexp(eval(env, lisp_read("f")));
+    
 }

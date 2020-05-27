@@ -1,4 +1,4 @@
-\documentclass[11pt]{report}
+\documentclass[10pt]{report}
 
 \usepackage{setspace}
 \doublespacing
@@ -8,20 +8,50 @@
 
 \usepackage{syntax}
 
+\usepackage{courier}
 \usepackage{listings}
+\lstset{basicstyle=\linespread{0.8}\small\ttfamily,
+  breaklines=true}
+
+\usepackage[english]{babel}
+
+\usepackage{graphicx}
+\graphicspath{{./images/}}
+
+\usepackage{ragged2e}
 
 % For marking up drafts
 \usepackage[normalem]{ulem}
 
 \begin{document}
-\title{report}
-\author{Tom Hutchings}
+\begin{titlepage}
+  \centering
+  {\LARGE Development of an x86 Lisp Operating System }
+  {\large Tom Hutchings}
+  
+\vfill            
+A thesis presented for the degree of\\
+BSc Computer Science (Hons)\\
 
-\maketitle
+\vspace{2cm}
+School of Computing and Communications \\
+University of Lancaster \\
+England \\
+March 200
+
+\end{titlepage}
+
+\newpage
+I certify that the material contained in this dissertation is my own work and does not contain unreferenced or unacknowledged material. I also warrant that the above statement applies to the implementation of the project and all associated documentation. Regarding the electronically submitted work, I consent to this being stored electronically and copied for assessment purposes, including the School’s use of plagiarism detection systems in order to check the integrity of assessed work.
+I agree to my dissertation being placed in the public domain, with my name explicitly included as the author of the work. \\
+Name: Tom Hutchings \\
+Date: 20th March 2020
+\newpage
 
 \begin{abstract}
-  This report covers the design and implementation of an Operating System for the x86 processor platform. It will first give an overview of the broad concept of an Operating System and the tools and technologies that the Operating System will rely on. Then it will discuss a history of the Lisp programming language family in OSs, and how  It will then give the design of a minimal Operating System tailored to provide means to host a high level Programming Language. This language is a custom dialect of Lisp, and is described in the design section along with an interpreter for that language.
-  Then the paper will describe an implementation of the OS and Language detailed in the design section, with extracts to demonstrate implementation specific details. Finally the paper will discuss the im TODO
+  This report covers the design and implementation of an Operating System for the x86 processor platform. It will first give an overview of the broad concept of an Operating System and the tools and technologies that the Operating System will rely on. Then it will discuss a history of the Lisp programming language family in OSs, and how 
+  It will then give the design of a minimal Operating System tailored to provide means to host a high level Programming Language. This language is a custom dialect of Lisp, and is described in the design section along with an interpreter for that language.
+  Then the paper will describe an implementation of the OS and Language detailed in the design section, with extracts to demonstrate implementation specific details. Finally the paper will conclude with a discussion of the original goals and whether they were met, and what future work could be explored.
   
 \end{abstract}
 
@@ -31,7 +61,7 @@
 \chapter{Introduction}
 At the core of almost every running computer exists an Operating System, the software which interfaces between running programs and the computer hardware. The primary purpose of an Operating System is to provide a platform for other computer programs to run on top of, by abstracting away hardware specific details such as memory management and Input and Output to physical hardware.
 
-This paper aims to investigate an approach to Operating System design whereby a high level language is executed by a minimal core OS, allowing the OS to be extended using that language. This ``hosted language'' would be interpreted at run time, rather than compiled ahead of time. Most contemporary Operating Systems are written in compiled languages, requiring restarting the computer they are running on to load any changes to the system. [CITE] By designing an Operating System which hosts an interpreted language, and can be extended in that language, we can evaluate the feasibility of runtime inspection and modification of Operating System code.
+This paper aims to investigate an approach to Operating System design whereby a high level language is executed by a minimal core OS, allowing the OS to be extended using that language. This ``hosted language'' would be interpreted at run time, rather than compiled ahead of time. Most contemporary Operating Systems are written in compiled languages, requiring restarting the computer they are running on to load any changes to the system. By designing an Operating System which hosts an interpreted language, and can be extended in that language, we can evaluate the feasibility of runtime inspection and modification of Operating System code.
 
 \section{Aims}
 \begin{itemize}
@@ -53,7 +83,7 @@ This paper aims to investigate an approach to Operating System design whereby a 
 
 \chapter{Background}
 
-Operating Systems have existed since the 1950s, [CITE] and so a sizable body of both research and implementations exist today, ranging from general purpose OS's to highly specific embedded real time OS's. First this chapter will evaluate what platform to build the OS upon, specifically the CPU architecture to target and the programming language to implement a kernel and interpreter in.
+Operating Systems have existed since the 1950s\cite{patrick1987general}, and so a sizable body of both research and implementations exist today, ranging from general purpose OS's to highly specific embedded real time OS's. First this chapter will evaluate what platform to build the OS upon, specifically the CPU architecture to target and the programming language to implement a kernel and interpreter in.
 
 The next section will look at a history of the Lisp programming language, and its use in Operating Systems and compiled applications through history, as it pertains to the development of the high level hosted language that our operating system will interpret.
 
@@ -62,51 +92,47 @@ Choosing a CPU Architecture to target was an important step, as the OS will have
 
 A programming language in which to implement the kernel also had to be chosen. The language must be capable of running in a free-standing environment, i.e. the produced machine code must not link to any external libraries, and must not use any OS facilities such as memory allocation.
 
-To ease development it would be beneficial for the language should to provide an easy mechanism for calling object code generated from external assembly language, as well as allowing for writing of assembly code inline in the language. The language must have a system for directly accessing specific memory locations, e.g. using an absolute address. These are necessary depending on chosen architecture, as some architectures such as Intel's x86 family require initialization to be performed using special assembly instructions which would not normally be emitted by a compiler [CITE: Intel sdm], and certain functions like accessing external hardware can only be used via assembly instructions. The architecture also requires certain data structures to be placed at specific points in memory for initialization, or specific areas of memory must be accessed directly to interface with external hardware.
+To ease development it would be beneficial for the language should to provide an easy mechanism for calling object code generated from external assembly language, as well as allowing for writing of assembly code inline in the language. The language must have a system for directly accessing specific memory locations, e.g. using an absolute address. These are necessary depending on chosen architecture, as some architectures such as Intel's x86 family require initialization to be performed using special assembly instructions which would not normally be emitted by a compiler \cite{guide2011intel}, and certain functions like accessing external hardware can only be used via assembly instructions. The architecture also requires certain data structures to be placed at specific points in memory for initialization, or specific areas of memory must be accessed directly to interface with external hardware.
 
 \subsection{x86}
-Intel's x86 family of processor architectures originates in the 8086 CPU, first released in 1978\cite{intel-hall-of-fame}. Over time successive releases built on the iteration, maintaining a degree of backwards compatibility[CITE] but implementing a superset of the previous architecture and adding new extensions to the instruction set. Features such as hardware based Floating Point arithmetic, Single Instruction Multiple Data instructions allowing for parallel data operations, and support for hardware virtualization have been added. This backwards compatible but incrementally improved development model has led to x86 being the primary architecture for personal desktop computers, being the only architecture targeted by all three of the most widely used consumer operating systems, Microsoft's Windows, Apple's macOS, and the free software GNU/Linux OS[CITE].
+Intel's x86 family of processor architectures originates in the 8086 CPU, first released in 1978\cite{intel-hall-of-fame}. Over time successive releases built on the iteration, maintaining a degree of backwards compatibility but implementing a superset of the previous architecture and adding new extensions to the instruction set. Features such as hardware based Floating Point arithmetic, Single Instruction Multiple Data instructions allowing for parallel data operations, and support for hardware virtualization have been added. This backwards compatible but incrementally improved development model has led to x86 being the primary architecture for personal desktop computers, being the only architecture targeted by all three of the most widely used consumer operating systems; Microsoft's Windows, Apple's macOS, and the free software GNU/Linux OS.
 
-x86 provides facilities to assist an OS by providing hardware systems to manage memory and access control such as segmentation, paging, and ring levels. Segmentation and paging are memory management and protection schemes, supported on the CPU by a Memory Management Unit (MMU), which helps manage memory via hardware, increasing speed and reducing the OS workload. Memory can be assigned \textit{ring levels} from zero to three, a privilege level which allows a structured system of permissions to be enforced. In most cases only levels zero and three are used, with zero reserved for the OS Kernel and level three provided for user programs, thus separating the privileged kernel from the securely isolated user programs [CITE ring level usage].
+x86 provides facilities to assist an OS by providing hardware systems to manage memory and access control such as segmentation, paging, and ring levels. Segmentation and paging are memory management and protection schemes, supported on the CPU by a Memory Management Unit (MMU), which helps manage memory via hardware, increasing speed and reducing the OS workload. Memory can be assigned \textit{ring levels} from zero to three, a privilege level which allows a structured system of permissions to be enforced. In most cases only levels zero and three are used, with zero reserved for the OS Kernel and level three provided for user programs, thus separating the privileged kernel from the securely isolated user programs.
 
-\subsubsection{Bootloader}
-Upon being powered up an x86 CPU will be in a operating mode called Real-address mode, abbreviated simply to Real mode, a legacy mode with limited memory access. The CPU usually operates in protected mode, and must be switched into this mode. Systems like Segmentation, Interrupts, and Paging are disabled in real mode, and require configuration to be used. [CITE intel sdm 1.3.1].
+\subsubsection{Bootloader} \label{sec:bootloader}
+Upon being powered up an x86 CPU will be in a operating mode called Real-address mode, abbreviated simply to Real mode, a legacy mode with limited memory access. The CPU usually operates in protected mode, and must be switched into this mode. Systems like Segmentation, Interrupts, and Paging are disabled in real mode, and require configuration to be used\cite{guide2011intel}.
 
-As the OS will be stored on a storage medium, it must be copied from the medium into working memory. Then the CPU must jump to the loaded OS code and begin execution there. This process of CPU initialisation and OS loading is referred to as Bootloading, and the program that performs this process a \textit{Bootloader}. As these steps are necessary for booting any OS, a common bootloader standard can be devised with which OSs can comply with, and bootloaders could implement. This is the goal of the \textit{Multiboot} specification[CITE multiboot doc], and is implemented by the GRUB2 bootloader[CITE].
+As the OS will be stored on a storage medium, it must be copied from the medium into working memory. Then the CPU must jump to the loaded OS code and begin execution there. This process of CPU initialisation and OS loading is referred to as Bootloading, and the program that performs this process a \textit{Bootloader}. As these steps are necessary for booting any OS, a common bootloader standard can be devised with which OSs can comply with, and bootloaders could implement. This is the goal of the \textit{Multiboot} specification\cite{multiboot-spec}, and is implemented by the GRUB2 bootloader\cite{grub2-manual}.
 
-Complying with the multiboot specification requires a header to be placed within the first 8192 bytes of the OS image[CITE multiboot doc]. This header exists not only to inform the bootloader that the image is a multiboot compatible OS image, but also to configure certain properties of the bootloader. The bootloader identifies the header by way of a ``magic'' binary value, inserted into the start of the header. As part of the multiboot specification the CPU must be configured to certain requirements after loading the OS. This includes certain register states, configuring the CPU to run in protected operation mode, and placing a structure in memory containing system information which the bootloader has gathered for the OS to use without having to query for itself.
+Complying with the multiboot specification requires a header to be placed within the first 8192 bytes of the OS image\cite{multiboot-spec}. This header exists not only to inform the bootloader that the image is a multiboot compatible OS image, but also to configure certain properties of the bootloader. The bootloader identifies the header by way of a ``magic'' binary value, inserted into the start of the header. As part of the multiboot specification the CPU must be configured to certain requirements after loading the OS. This includes certain register states, configuring the CPU to run in protected operation mode, and placing a structure in memory containing system information which the bootloader has gathered for the OS to use without having to query for itself.
 
 \subsection{C}
-C is an imperative programming language, designed from the start for developing Operating Systems, as it was originally developed for the purpose of re-writing the Unix operating system. [CITE] C provides ``low level'' programming features such as direct access to memory locations via the use of pointers, something which many languages abstract away for safety reasons [CITE]. When using the GNU Compiler Collection's (GCC) C compiler, Assembly code for the target CPU Architecture can be written inline with C code, without the need for linking separate files. Finally, C will manage the allocation and deallocation of locally scoped variables automatically, but also allow the programmer to manually manage where variables are allocated in memory, via the aforementioned pointer system. This would allow a kernel written in C to implement a memory allocation scheme which could be utilized both by other OS code and user programs.
+C is an imperative programming language with many features useful in developing Operating Systems, as one of it's first uses was re-writing the Unix operating system\cite{10.1145/154766.155580}. C provides ``low level'' programming features such as direct access to memory locations via the use of pointers. When using the GNU Compiler Collection's (GCC) C compiler, Assembly code for the target CPU Architecture can be written inline with C code, without the need for linking separate files. Finally, C will manage the allocation and deallocation of locally scoped variables automatically, but also allow the programmer to manually manage where variables are allocated in memory, via the aforementioned pointer system. This would allow a kernel written in C to implement a memory allocation scheme which could be utilized both by other OS code and user programs.
 
-As C was first developed around 1972 [CITE], it has numerous compiler implementations, with many different CPU architectures targeted, and many implementations targeting multiple architectures. As of 2020, the GNU Compiler Collection supports emitting compiled code for fifty one architectures [CITE https://gcc.gnu.org/backends.HTML], all of which can be targeted by the GCC C compiler.
+As C was first developed around 1972\cite{10.1145/154766.155580}, it has numerous compiler implementations, with many different CPU architectures targeted, and many implementations targeting multiple architectures. As of 2020, the GNU Compiler Collection supports emitting compiled code for fifty one architectures\cite{gcc-backends}, all of which can be targeted by the GCC C compiler.
 
 \section{Lisp}
-Lisp is a programming language family first described as a single programming language in a 1960 paper authored by John McCarthy, principally designed to operate on linked lists. Source code is written in a textual representation of a linked list called an S-Expression, which when evaluated into list form can be manipulated at run time or compile time as a data structure via the use of \textit{macros}[CITE macro stuff].
+Lisp is a programming language family first described as a single programming language in a 1960 paper authored by John McCarthy \cite{MccarthyJohn1960Rfos}, principally designed to operate on linked lists. Source code is written in a textual representation of a linked list called an S-Expression, which when evaluated into list form can be manipulated at run time or compile time as a data structure via the use of \textit{macro} functions.
 
-Implementations with varying execution strategies exist, including Ahead of Time compilation to native machine code [CITE SBCL], using an interpreter [CITE lisp interpreters], and Just in Time native compilation [CITE list jitter]. Since the original language emerged, many new dialects have been developed [CITE], leading to Lisp often being referred to as a language \textit{Family}, rather than a language in and of itself [CITE lisp family].
+Implementations with varying execution strategies exist, including Ahead of Time compilation to native machine code\cite{sbcl}, using an interpreter\cite{ecl}, and Just in Time  compilation\cite{pixie}. Since the original language emerged, many new dialects have been developed, leading to dialects of Lisp often being referred to as a belonging to the language \textit{Family} of Lisp, rather than Lisp itself as a language.
 
-Common to all these dialects is the S-Expression based syntax, and the ability to manipulate syntax as a data structure, a property called Homoiconicity [CITE homoiconicity]. This allows for the ``programs that write other programs'' paradigm that is commonly used in Lisp programming[CITE lisp metaprogramming], where Lisp \textit{macro} functions generate Lisp code, in the form of linked lists, which is then itself executed.
+Common to all these dialects is the S-Expression based syntax, and the ability to manipulate syntax as a data structure, a property called Homoiconicity\cite{kay-homoiconicity}. This allows for the ``programs that write other programs'' paradigm that is commonly used in Lisp programming, where Lisp \textit{macro} functions generate Lisp code in the form of linked lists, which is then itself executed.
 
-Lisp pioneered garbage collection[CITE lisp gc], a technique to automatically keep track of allocated objects, and deallocate them when they are no longer usable in the program. This type of automatic memory management lacks the fine grained control over allocation that manual memory management allows, but removes the impetus from the programmer to handle such tasks.
+Lisp pioneered garbage collection\cite{And83areal-time}, a technique to automatically keep track of allocated objects, and deallocate them when they are no longer usable in the program. This type of automatic memory management lacks the fine grained control over allocation that manual memory management allows, but removes the impetus from the programmer to handle such tasks.
 
-Although Lisp can be either ahead-of-time compiled or interpreted at runtime, development in Lisp is often characterized by an interactive method[CITE lisp interactive dev], where rather than an entire program being compiled and executed, indvidual functions are redefined and altered in the running program, without needing to stop the program and re-compile.
+Although Lisp can be either ahead-of-time compiled or interpreted at runtime, development in Lisp is often characterized by an interactive method, where rather than an entire program being compiled and executed, indvidual functions are redefined and altered in the running program, without needing to stop the program and re-compile.
 
 \subsection{Lisp Machines}
 Lisp machines are computers specifically designed to execute a Lisp programming language by using hardwarep optimized specifically for the task. These machines were developed during the 1970s due to inadequacies in memory capacity and processing speed of the then current computer systems for running Lisp\cite{knight-lisp}. The solution was to design a computer which was designed from the start specifically for execution of Lisp, with an instruction set that facilitated optimized execution of compiled Lisp code. 
 
-TODO: OS was in lisp
-
+These computers used an OS written in their own Lisp dialect. Even low level functionality such as memory management and hardware I/O was managed by the Lisp code. However as these machines were optimized specifically for the execution of Lisp, it is difficult to compare to other architectures, where Lisp does not match the native architecture as directly. 
 
 \subsection{Common Lisp}
-ANSI Common Lisp is a programming langauge standard devised to unify the variety of Lisp programming languages with a new standard taking elements from each[CITE cl hyperspec]. 
+ANSI Common Lisp is a programming language standard devised to unify the variety of Lisp programming languages with a new standard taking elements from each\cite{cl-hyperspec}. 
 
-The Common Lisp standard specifies an inteface for compilation of Lisp functions and files. The standard only defines a compiler as ``[a] utility that translates code into an implementation-dependent form that might be represented or executed efficiently'' [CITE http://www.lispworks.com/documentation/HyperSpec/Body/03_ba.htm], leaving the details of the compilation to individual implementations. We can look at how implementations approach compilation and performance on architectures such as x86 to gain insight on how a Lisp system can be optimized for non Lisp machine architectures.
+The Common Lisp standard specifies an interface for compilation of Lisp functions and files. The standard only defines a compiler as ``[a] utility that translates code into an implementation-dependent form that might be represented or executed efficiently''\cite{cl-hyperspec}, leaving the details of the compilation to individual implementations. We can look at how implementations approach compilation and performance on architectures such as x86 to gain insight on how a Lisp system can be optimized for non Lisp machine architectures.
 
-One such implementation of Common Lisp is Steel Bank Common Lisp, or SBCL, takes the approach of a fully compiled implementation [CITE http://www.sbcl.org/manual/index.html], where all code is compiled before being executed. SBCL descends from Carnegie Mellon University Common Lisp (CMUCL)[CITE sbcl docs], itelf a Common Lisp compiler capable of matching C in execution speed\cite{verna2006make}.
-
-SBCL can output compiled object code for a variety of architectures, including x86. 
-TODO: what optimisations does SBCL perform
+One such implementation of Common Lisp is Steel Bank Common Lisp, or SBCL, takes the approach of a fully compiled implementation\cite{sbcl-manual}, where all code is compiled before being executed. SBCL descends from Carnegie Mellon University Common Lisp (CMUCL)\cite{sbcl-manual}, itelf a Common Lisp compiler capable of matching C in execution speed\cite{verna2006make}.
 
 \chapter{Design}
 This chapter will describe the design of an Operating System's Kernel and Lisp interpreter in two sections. The design will avoid implementation specific details, instead providing a rigorous but general description of the system. In some cases the design will propose mutliple systems which could be used alternative to each other, any of which the implementation could choose to implement.
@@ -153,26 +179,22 @@ The next section describes a Lisp family language called SYSLISP, it's syntax an
 \section{Kernel}
 The Kernel's role within the Operating System is acting as the interface between software and hardware. It must manage memory and I/O. The primary tasks for this OS's kernel are initializing the CPU into protected mode, and providing a memory allocation and management system for other code. These are the minimum requirements to allow the hosted language interpreter to run, which can then take over the rest of OS functionality in hosted code.
 
-\subsection{Memory Allocation}
-The memory allocator maintains two sequential areas of memory. The first is the \textit{Bitmap}, used to mark which areas of the second, the \textit{Arena}, are in use. The allocator uses a fixed size factor $F$ to map a single binary bit in the Bitmap to a region in the Arena of size $F$. We use a factor $F = 8$, effectively mapping a single bit in the bitmap to an eight bit byte in the arena. On x86 all addressing is byte aligned [CITE sdm], meaning that a factor of eight is the minimum value to ensure byte alignment, and that factor sizes must follow $F = 2^n$ where $n > 3 $.
+\subsection{Memory Allocation} \label{sec:memalloc}
+The memory allocator maintains two sequential areas of memory. The first is the \textit{Bitmap}, used to mark which areas of the second, the \textit{Arena}, are in use. The allocator uses a fixed size factor $F$ to map a single binary bit in the Bitmap to a region in the Arena of size $F$. We use a factor $F = 8$, effectively mapping a single bit in the bitmap to an eight bit byte in the arena. On x86 all addressing is byte aligned \cite{guide2011intel}, meaning that a factor of eight is the minimum value to ensure byte alignment, and that factor sizes must follow $F = 2^n$ where $n > 3 $.
 
 The allocation process uses a \textit{first fit} method, seeking through the bitmap until it can find a free region large enough to accommodate the size requested. More formally: for an allocation request of size $r$ bits and factor $F$, the allocator must find a contiguous region of $b$ free blocks where $b \geq \frac{r}{F}$.
 
 Freeing a region involves performing the reverse steps, by finding the position in the bitmap to mark as free by taking the address to be freed and dividing it by the factor value, returning the index in the bitmap to be freed. Just like allocation, freeing requires a size argument, for which every bit from the found index to index plus the size is freed. E.g. for address $a = 0x1000$, size $s = 4$ bytes, and factor $F = 8$, we can mark every bit from index $\frac{a}{F}$ to $\frac{a + s}{F}$ as free.
 
 \subsection{Segmentation}
-One memory management system that x86 provides is segmentation, a system which allows regions of memory to be divided into segments with different access permissions [CITE intel sdm]. Access rights can be set to mark a segment as Executable or Non-Executable, for example to distinguish a segment containing executable code and a segment containing data. Segments can also be marked with different read and write permissions, forbidding them to be modified, such as in a code segment which shouldn't be altered at runtime.
+One memory management system that x86 provides is segmentation, a system which allows regions of memory to be divided into segments with different access permissions \cite{guide2011intel}. Access rights can be set to mark a segment as Executable or Non-Executable, for example to distinguish a segment containing executable code and a segment containing data. Segments can also be marked with different read and write permissions, forbidding them to be modified, such as in a code segment which shouldn't be altered at runtime.
 
-x86 manages these segments using a data structure called the \textit{Global Descriptor Table}, an in-memory table containing entries which inform the CPU about the segmentation model. Each entry is called a segment descriptor [CITE SDM] and contains four fields: the base address of the segment, the limit, or size of the segment, and the access and flag fields, within which individual bits must be set to enable and disable certain properties of the segment. These include the privilege level of the segment, i.e. what x86 ring levels can access it, whether it can be written to, and whether it can be executed as code or contains non-executable data.
+x86 manages these segments using a data structure called the \textit{Global Descriptor Table}, an in-memory table containing entries which inform the CPU about the segmentation model. Each entry is called a segment descriptor\cite{guide2011intel} and contains four fields: the base address of the segment, the limit, or size of the segment, and the access and flag fields, within which individual bits must be set to enable and disable certain properties of the segment. These include the privilege level of the segment, i.e. what x86 ring levels can access it, whether it can be written to, and whether it can be executed as code or contains non-executable data.
 
 \subsubsection{Flat Model}
-A kernel can use a \textit{Flat Model} of segmentation. This configuration essentially provides no memory protection through segmentation, used in configurations where Paging is used for memory protection. Unlike paging, segmentation cannot be disabled [CITE intel sdm], and so a GDT must be configured to satisfy the minimum requirements to configure segmentation correctly, but not enforce any memory protection rules.
+A kernel can use a \textit{Flat Model} of segmentation. This configuration essentially provides no memory protection through segmentation, used in configurations where Paging is used for memory protection. Unlike paging, segmentation cannot be disabled \cite{guide2011intel}, and so a GDT must be configured to satisfy the minimum requirements to configure segmentation correctly, but not enforce any memory protection rules.
 
-In order to do this, four standard segment descriptors must be made in the GDT, one pair for each of the ring levels that the OS will use, in this case ring level zero and ring level three. Each of the two descriptors in the pair have a base value of zero, and a limit value of \textit{0xFFFFF} hexadecimal, and differ only in that one is marked as an executable segment and the other as a writeable data only segment. This effectively removes any restrictions the segmentation system would place on memory sections, as the entire working region of memory is permitted to have any operation performed on it, with any access permissions.
-
-\subsection{Paging}
-TODO: x86 paging system \\
-how we can implement this with C structs and linked lists \\
+In order to do this, four standard segment descriptors must be made in the GDT, one pair for each of the ring levels that the OS will use, in this case ring level zero and ring level three. Each of the two descriptors in the pair have a base value of zero, and a limit value of \texttt{0xFFFFF} hexadecimal, and differ only in that one is marked as an executable segment and the other as a writeable data only segment. This effectively removes any restrictions the segmentation system would place on memory sections, as the entire working region of memory is permitted to have any operation performed on it, with any access permissions.
 
 \subsection{Interrupts}
 Due to the nature of external hardware, events may happen while the OS is not in a position to handle them, or more accurately is not actively polling for an event. A system is needed that allows the hardware to signal that an event has occurred, be handled by the OS, and not alter the state of the CPU. x86 solves this problem using \textit{interrupts}.
@@ -183,45 +205,35 @@ This allows for the main OS code to run as normal, and when an external hardware
 There are three key components to the x86 interrupt system, all of which must be handled by the kernel to use interrupts.
 
 \subsubsection{Programmable Interrupt Controller}
-The programmable interrupt controller (PIC) is a hardware device which manages the delivery of interrupts to the processor core [CITE intel sdm 3.10.0]. It receives interrupts from around the CPU and any number of external PICs which handle input and output, then signal that an interrupt has occurred and the IRQ number of the interrupt. The PIC can also receive messages via the system bus, for configuration such as PIC initialization and masking of certain IRQs, and for the processor to send the end of interrupt (EOI) signal to the APIC when it has finished processing an interrupt.
+The programmable interrupt controller (PIC) is a hardware device which manages the delivery of interrupts to the processor core\cite{guide2011intel}. It receives interrupts from around the CPU and any number of external PICs which handle input and output, then signal that an interrupt has occurred and the IRQ number of the interrupt. The PIC can also receive messages via the system bus, for configuration such as PIC initialization and masking of certain IRQs, and for the processor to send the end of interrupt (EOI) signal to the APIC when it has finished processing an interrupt.
 
-The multiboot standard specifies that the PIC must be left at the values configured by the CPU BIOS [CITE multiboot spec]. Most modern x86 CPUs actually have an Advanced PIC chip, which the CPU BIOS configures to emulate a legacy PIC.
+The multiboot standard specifies that the PIC must be left at the values configured by the CPU BIOS\cite{multiboot-spec}. Most modern x86 CPUs actually have an Advanced PIC chip, which the CPU BIOS configures to emulate a legacy PIC.
 
-TODO: condense remap and masking (its too much)
-These values are configured for a CPU operating in Real address mode, however our kernel will operate in Protected Mode. With these Real address mode settings the IRQ values zero to seven will conflict with the protected mode CPUs exception interrupt values. TODO this bit (remmapping)
+These values are configured for a CPU operating in Real address mode, however our kernel will operate in Protected Mode. With these Real address mode settings the IRQ values zero to seven will conflict with the protected mode CPUs exception interrupt values. As such the PIC must be instructed to \textit{remap} the values to higher interrupt vectors.
 
-As the PIC is a single point at which all interrupt signals must flow through, it's also easy to mask, or disable, certain interrupts from here. Any hardware interrupt from vector zero to two hundred and fifty five can be masked. Masking is achieved by altering the PICs Interrupt Mask Register, 
+As the PIC is a single point at which all interrupt signals must flow through, it's also easy to mask, or disable, certain interrupts from here. Masking is achieved by altering the PICs Interrupt Mask Register by setting individual bits for each IRQ vector. Whenever an IRQ is received by the PIC it will check if the corresponding bit in the IMR is set, and ignore the interrupt if so.
 
 
 \subsubsection{Interrupt Descriptor Table}
-TODO: IDT is a structure in mem with /gates/ pointing to ISR
-
-The Interrupt Descriptor Table is a data structure stored in memory, similar to the GDT, which contains entries storing the locations of ISRs, or interrupt handlers, in memory. The entries are referred to as \textit{gates}, and their position in the table corresponds to the interrupt vector that they represent.
+The Interrupt Descriptor Table is a data structure stored in memory, similar to the GDT, which contains entries storing the locations of ISRs, or interrupt handlers, in memory. The entries are referred to as \textit{gates}, and their position in the table corresponds to the interrupt vector that they represent. IDT entries follow a similar format to the GDT entries, containing an address of an ISR, a segment selector used when memory segmentation is in effect, and a flags entry for privilege settings, entry type, etc.
 
 \subsubsection{Interrupt Service Routines}
-function that handles interrupt, returns differently to regular one
-
-An Interrupt Service Routine is a procedure which can be called when an interrupt occurs. There are a few differences between a regular procedure call and an interrupt procedure call which the ISR must account for. The ISR must return using the IRET instruction [CITE sdm], instead of the usual RET instruction. IRET performs additional steps to restore processor state to before the interrupt was triggered, as well as returning from the current point of execution to where it was before the interrupt.
-TODO: finish
-
+An Interrupt Service Routine is a procedure which can be called when an interrupt occurs. There are a few differences between a regular procedure call and an interrupt procedure call which the ISR must account for. The ISR must return using the IRET instruction\cite{guide2011intel}, instead of the usual RET instruction. IRET performs additional steps to restore processor state to before the interrupt was triggered, as well as returning from the current point of execution to where it was before the interrupt.
 
 \section{Hosted Language: SYSLISP}
-As the OS is intended not only to host a high level language, but itself be extendable in that language, it was necessary that the OS should manage the parsing and execution. This approach allows for tighter integration between the language and the OS, and could potentially allow for optimization techniques not possible in a user environment. [TODO: cite GC optimization papers from bib]
+As the OS is intended not only to host a high level language, but itself be extendable in that language, it was necessary that the OS should manage the parsing and execution. This approach allows for tighter integration between the language and the OS, and could potentially allow for optimization techniques not possible in a user environment.
 
 Considering that any standard library functions must be implemented anew in the OS, access to parsing libraries will be limited due to the effort required to adapt any existing library to use the new OS standard library, instead of the standard library it was written for. This means that parsing of the language must be performed using only the string tools provided to by C, and the new Operating Systems own standard library.
 
-Without the help of tools such as regular expressions and string splitting, we will be limited to individual character comparison, and character string comparison which is trivial to implement from the first. As such, any syntactic complexity in the language would drastically complicate implementation of the parser. [TODO: include example? or cite something about parsing complexity?]
+Without the help of tools such as regular expressions and string splitting, we will be limited to individual character comparison, and character string comparison which is trivial to implement from the first. As such, any syntactic complexity in the language would drastically complicate implementation of the parser.
 
-In line with the above requirements, it was decided to implement a dialect of Lisp as the high level language. With a sparse syntax, Lisp is exceptionally easy to parse. Syntactic symbols consist only of three reserved characters and a small, implementation specific set of built-in reserved keywords. [CITE: McCarthy 1960]
-TODO: not sure about this line
-Lisp is also dynamically typed and garbage collected, as opposed to the static typing and manual memory management of C [CITE].
+In line with the above requirements, it was decided to implement a dialect of Lisp as the high level language. With a sparse syntax, Lisp is exceptionally easy to parse. Syntactic symbols consist only of three reserved characters and a small, implementation specific set of built-in reserved keywords\cite{MccarthyJohn1960Rfos}.
 
 \subsection{Syntax}
 Being a dialect of Lisp, the Operating Systems hosted level language, referred to as System LISP, SYSLISP or SYSL for short, has a simple syntax. Lisp's strengths lie in operations on Linked List data structures, which is also the format that the language is written in. S-Expressions, a textual representation of a linked list, are used to express source code in Lisp, which is parsed into an in-memory list structure and then executed.
 
 SYSLISP syntax can be expressed in BNF notation as shown in figure \ref{fig:bnf}.
 
-TODO: finish BNF grammar
 \begin{figure}[h!]
   \centering
   \begin{grammar}
@@ -233,21 +245,21 @@ TODO: finish BNF grammar
     
     <atomic_expression> ::= <symbol> | <numeric>
     
-    <symbol> ::= sumn
+    <symbol> ::= alphanumeric characters
     
-    <numeric> ::= number_or_sumn
+    <numeric> ::= decimal number | hexadecimal number
   \end{grammar}
-  \caption{A Backus-Naur Form represenation of the SYSLISP grammar}
+  \caption{A Backus-Naur Form representation of the SYSLISP grammar}
   \label{fig:bnf}
 \end{figure}
 
-Note that the only non-identifier terminals in the SYSLISP grammar are ``('', ``)'', and ``.''. Also advantageous of this grammar is it's simplicity and ease of parsing, as it is able to be parsed using an $LL(1)$ parser [CITE?], TODO: LL1 parser
-
 \newpage
+
+Note that the only non-identifier terminals in the SYSLISP grammar are ``('', ``)'', and ``.''. Also advantageous of this grammar is it's simplicity and ease of parsing, as it is able to be parsed using an $LL(1)$ parser.
 
 The S-Expression syntax forms a textual representation of a linked list, which 
 
-An S-Expression form \texttt{(A . B)} is referred to as a \textit{Cons Cell}, and consists of a pair of values, or pointers to values in memory. Typically in Lisp the first value is called the \textit{car} of the cell, and the second the \textit{car}. Figure \ref{fig:cons} demonstrates the ``box and line'' notation of diagrams representing cons cells.
+An S-Expression form \texttt{(A . B)} is referred to as a \textit{Cons Cell}, and consists of a pair of values, or pointers to values in memory. Typically in Lisp the first value is called the \textit{car} of the cell, and the second the \textit{cdr}. Figure \ref{fig:cons} demonstrates the ``box and line'' notation of diagrams representing cons cells.
 
 \begin{figure}[h]
   \centering
@@ -282,10 +294,7 @@ This linked list which is written as an S-Expression as in figure \ref{fig:consl
   \label{fig:conslist}
 \end{figure}
 
-TODO: LL(1) grammar writeup
-This syntax facilitates easy expression of lists in text.
-
-\subsection{Interpreter}
+\subsection{Interpreter} \label{sec:designinterpreter}
 One approach to executing a programming language is using an interpreter, a program which parses language input, and directly executes it. An interpreter is able to parse and execute code at runtime, without any ahead of time preparation. This property allows, for example, code to be generated at runtime and executed, or for a user to input code to be executed one expression at a time, have the expression be evaluated and the result of the expression displayed in real time. This is commonly referred to as a Read Evaluate Print Loop, or \textit{``REPL''}. A REPL allows interaction with the program as it is running,  
 
 Lisp interpeters are based around the Eval / Apply dichotomy. These are two functions which can be used together to evaluate any expression in Lisp. As specified in the BNF grammar, a Lisp S-Expression is either a singular \textit{Atomic Expression}, such as a symbol \texttt{x} or numeral type \texttt{52}, or a list written in the form \texttt{(a b c)}, representing a function, e.g. the expression \texttt{(f x y)} is a function application of the function $f$ to the values $x$ and $y$.
@@ -298,14 +307,12 @@ This Lisp expression represents the mathematical expression $x \times (y + z)$, 
 
 Thus any function expression can be recursively decomposed using the \textit{Eval} and \textit{Apply} pattern. When \textit{Eval} encounters a function expression it will defer to \textit{Apply}. Then, as demonstrated above, \textit{Apply} will defer evaluation of arguments to \textit{Eval}.
 
-TODO: what's a symbol, and how they eval to function and variable
-
 \subsubsection{Environment}
 The Lisp interpreter requires a further data structure than just the source program list to execute it. This is the \textit{Environment}, a structure mapping of symbols to values. The environment operates in a heirarchal structure, with each environment containing a reference to a parent environment, until a root environment is reached. This heirarchal structure allows the language to implicitly enforce lexical scoping, by only permitting access to variables defined in the current scope or it's parents.
 
 With the environment in mind, we can view the the Eval and Apply functions as taking two arguments: the source code, and an environment.
 
-When evaluating code symbols can be bound to values, and added to the current environemnt. Then, when evaluating the value of a symbol, the interpreter can follow a recursive procss:
+When evaluating code symbols can be bound to values, and added to the current environemnt. Then, when evaluating the value of a symbol, the interpreter can follow a recursive process:
 
 \begin{itemize}
 \item Lookup symbol $S$ in current environment. If it exists, return the value and finish.
@@ -316,9 +323,7 @@ When evaluating code symbols can be bound to values, and added to the current en
   \end{itemize}
 \end{itemize}
 
-TODO: diagram
-
-Some Lisp dialects split functions and variables into separate namespaces. Implementing this system would involve two seperate environment structures [TODO describe env as trees earlier], one for variables and one for functions. Calling a function and accessing a symbols value as a variable use distinct syntax. See fig \ref{fig:funcall}, where the symbol \texttt{f} must be a function as it is being applied to arguments. 
+Some Lisp dialects split functions and variables into separate namespaces. Implementing this system would involve two seperate environment structures, one for variables and one for functions. Calling a function and accessing a symbols value as a variable use distinct syntax. See fig \ref{fig:funcall}, where the symbol \texttt{f} must be a function as it is being applied to arguments. 
 
 \begin{figure}[hb]
   \centering
@@ -329,12 +334,11 @@ Some Lisp dialects split functions and variables into separate namespaces. Imple
 
 As variables and functions could be syntactically distinguished, in system with seperate function and variable namespaces, the interpreter would be able to unambigously look up the symbol name in the correct environment. In this system functions and variables can share the same name without collision issues, as they reside in different environments.
 
-TOOD: this
-The alternative is a single namespace shared by both functions and variables. This system disallows
+The alternative is a single namespace shared by both functions and variables. This system disallows for identically named functions and variables, e.g. the function \texttt{list} to create a list, and a variable \texttt{list} inside a function operating on a list would not be allowed to co-exist. In this system symbol type is determined when it is used, as the symbols value is looked up in the current environment and it's stored type is checked against how it is being used syntactically, e.g. attempting to call some variable \texttt{x} as a function in the expression \texttt{(x 5 10)} would cause an error, as the expression is attempting to use x as a function.
 
 The environment structure can be implemented in different ways. The only requirement is a system that allows matching keys to values, where keys must be in the form of a Lisp symbol, and values can be any Lisp expression, and for the system to keep a reference to a parent environment structure.
 
-Many Lisp implementations [CITE] use an associative list to implement the structure. An associative list is a list of the form demonstrated as an S-Expression in fig \ref{fig:alist}. This associative list represents a mapping of the symbols {a, b, c} to the values {1, 2, 3}. Other values can be used, such as other symbols, lists, or even Lisp functions. 
+Many Lisp implementations use an associative list to implement the structure. An associative list is a list of the form demonstrated as an S-Expression in fig \ref{fig:alist}. This associative list represents a mapping of the symbols {a, b, c} to the values {1, 2, 3}. Other values can be used, such as other symbols, lists, or even Lisp functions. 
 
 \begin{figure}[h]
   \centering
@@ -343,27 +347,55 @@ Many Lisp implementations [CITE] use an associative list to implement the struct
   \label{fig:alist}
 \end{figure}
 
-As lookup time for an associative list is $O(n)$, as an environment represented by an associative list grows then the worst case lookup time will grow with it. An alternative implementation to avoid this issue is the use of a simple table or array, which would provide $O(1)$ lookup times, but would either be a fixed size or require a dedicated system to reallocate the table to a larger size when it hits the size limit.
+As lookup time for an associative list is $O(n)$, as an environment represented by an associative list grows then the worst case lookup time will grow with it.
+
+An alternative implementation choice to avoid this issue is the use of a simple table or array, which would provide $O(1)$ lookup times, but would either be a fixed size or require a dedicated system to reallocate the table to a larger size when it grows past the its size limit.
 
 \subsubsection{Label Table}
 The Label table is a data structure which allows a symbols label, written as a string, to be replaced with a numeric id. When registering a new label, it will be allocated a slot in the table, represented by the index of that entry within the table. Instead of containing an array of characters, the symbol data structure can just contain the numeric label id. Label comparison operations only require comparing the label id's, rather than comparing each character of the label sequentially.
 
-Looking up the label value in the table is has $O(1)$ complexity, versus $O(n)$ for character array comparison. As the interpreter must look up symbol value at runtime using the label, this effectively moves computation time from symbol evaluation to symbol creation,
-TODO: whatever I was doing here
+Looking up the label value in the table is has $O(1)$ complexity, versus $O(n)$ for character array comparison. As the interpreter must look up symbol value at runtime using the label, this effectively moves computation time from symbol evaluation to symbol creation, which only occurs once, while lookups during evaluation can occur any number of times.
 
 \subsubsection{Standard Functions}
-Standard Env functions (defun, let, set, etc) \\
-TODO: define form
-
 Alongside the language syntax a set of core built-in forms must be defined. These forms are the building blocks of the language, providing variable and function definition, program flow control, and logical comparison operators. These forms naturally cannot be defined in the SYSLISP language as they make up the language itself, and so must be implemented in the interpreter.
 
-TODO: list basic forms
+The fundamental forms which must be implemented are as follows:
+\begin{itemize}
+\item \texttt{nil}: the null datatype
+\item \texttt{t}: the true value
+\item \texttt{quote}: forego evaluation, instead returning the literal arugment
+\item \texttt{progn}: evaluate each argument in turn, returning the value of the last argument
+\item \texttt{if}: if argument 1 evaluates to \texttt{t} then evaluate argument 2
+\item \texttt{lambda}: define a function, with the argument list specified in argument 1, and the function body specified in argument 2
+\item \texttt{def}: set argument 1 to value of argument 2
+\item \texttt{let}: use an associative list in argument 1 to bind forms to values in a new environment, and then evaluate argument 2 with that environment
+\end{itemize}
 
-Further language constructs can be defined in the language itself, by combining these forms to create new forms.
-TODO: e.g. greater than equal form definition example
+To allow for numeric operations, further forms can be defined for numeric comparison and equality, and arithmetic.
 
-\subsection{Native Interface}
-Kernel Env for \\
+New forms can be described in the language itself, rather than using C, such as a combination of the greater than \texttt{>} operator and the equality operator \texttt{=} as follows, using the boolean \texttt{or} operator:
+
+\begin{texttt}
+  (def >= (lambda (x y)
+            (or (> x y)
+                (= x y)))))
+\end{texttt}
+
+\subsection{Native Interface} \label{sec:kenv}
+The native interface, or kernel environment, provides forms which can be used to perform low level operations. These forms are defined in a seperate environment, which must inherit from the base environment, and can be used in the kernel.
+
+\begin{itemize}
+\item \texttt{inb}: x86 I/O input call, single byte
+\item \texttt{outb}: x86 I/O output call, single byte
+\item \texttt{addr-of}: return the address of a symbol
+\item \texttt{memset-u8}: set one byte of memory
+\item \texttt{memset-u16}: set a 16 bit word in memory
+\item \texttt{memset-u32}: set a 32 bit word in memory
+\item \texttt{<<}: binary shift right
+\item \texttt{>>}: binary shift left
+\item \texttt{bor}: binary or
+\item \texttt{band}: binary and
+\end{itemize}
 
 \chapter{Implementation}
 This section will demonstrate an implementation of the designed OS and Language. This implementation is written in C targeting the x86 CPU family. As compiling an OS requires a specialized cross compiler toolchain to be set up, the first part of this chapter will explain the tools used and the process of setting them up.
@@ -371,60 +403,314 @@ This section will demonstrate an implementation of the designed OS and Language.
 The next section will describe some key sections of the implementation, with code listings from the implementation used to demonstrate how functionality from the design was implemented.
 
 \section{Toolchain}
-GCC, grub-mkrescue, my toolchain build scripts, C/assembly code makefile \\
-using macros to allow Lisp interpreter to be run in a normal unix environment for debugging \\
-
 The build system for the OS consists of a cross compiler and a bootloader to build the OS image for booting. A compiler that is shipped as default with most OSs cannot compile an OS, as it requires a specific target architecture to be specified. Instead the approach taken was to build the compiler from the latest source code, configured specifically for the architecture needed.
 
 The compiler used is the GNU C Compiler, targeting \texttt{i686-elf}, Intel 686 family processors and the Executable and Linkable Format standard binary format. In order to ease compilation and updates, a Bash script was written to allow for automated builds. This script installs any system requirements needed to build the compiler via the system package manager, then downloads the a source code tar and performs the steps to build the compiler. Additionally the GNU binutils software, a collection of utilities for working with binary executable files, has to be built. The script also automates this, in a similar process to the cross compiler.
 
 % Is it too large?
-%\lstinputlisting[language=bash, caption=The build-gcc.sh script., basicstyle=\tiny]{../toolchain/build-gcc.sh}  
+\lstinputlisting[language=bash, caption=The build-gcc.sh script.]{../toolchain/build-gcc.sh}  
 
-Next is the bootloader. As GRUB2 is being used as our OSs bootloader, we must use the GRUB2 tools on our host computer so they can generate a bootable image from the OS binary. At the time of writing, no are-built binaries for GRUB2 existed on macOS, so the tools had to be compiled from scratch. As with the compiler, a build script was written to automate the process.
+Next is the bootloader. As GRUB2 is being used as our OSs bootloader, we must use the GRUB2 tools on our host computer so they can generate a boot able image from the OS binary. At the time of writing, no are-built binaries for GRUB2 existed on macOS, so the tools had to be compiled from scratch. As with the compiler, a build script was written to automate the process.
 
 Finally, with the build tools ready, the OS can be built. The implementation uses the GNU Make software to manage builds, where a configuration file called \texttt{Makefile} specifies how to perform the build.
 
-\lstinputlisting[language=make, caption=Makefile, basicstyle=\small]{../os/Makefile}
+\lstinputlisting[language=make, caption=Makefile]{../os/Makefile}
 
 \section{Kernel}
 \subsection{Booting}
 boot.S and multiboot header \\
-kernel init \\
-lisp entry \\
+In order for the OS to be loaded from a multiboot bootloader, a few criteria must be met as discussed in section \ref{sec:bootloader}. After booting, some additional set up is required before the CPU can execute code generated from C, so an assembly file has to be used as the entry point.
+
+\lstinputlisting[caption=boot.s file.]{../os/kernel/boot.s}
+
+The first directives of the assembly file are configuration for the bootloader, followed by the multiboot magic header specified earlier, to allow the bootloader to find the OS image. the following sections initialize the stack so that C code can be run, and then jumps in to the kernels C entry point \texttt{k_main}.
+
+Additionally the binary linker must be instructed how to link the OS files, using a linker script. This is a configuration file which allows for properties like alignment and structure of the output to be controlled.
+
+\lstinputlisting[caption=linker.ld file.]{../os/linker.ld}
+
+Now that the kernel is loaded into memory and execution has begun at the C entry point, the kernel will call the necessary initialization functions. 
+
+\lstinputlisting[language=C, caption=Kernel initialization functions, firstline=23, lastline=31]{../os/kernel/kmain.c}
+
+With the necessary components initialized the kernel creates a root Lisp environment from the kernel environment described in section \ref{sec:kenv}, and from here is ready to evaluate Lisp expressions. This listing uses the \texttt{kprinteq_lisp} macro, explained in section \ref{sec:interpreter}.
+
+\lstinputlisting[language=C, caption=Kernel initialization functions, firstline=34, lastline=43]{../os/kernel/kmain.c}
 
 \subsection{Memory Management}
-memory allocator \\
-gdt code extracts \\
+The kernels memory management consists of several components. The first that will be demonstrated is the memory allocator. As described in section \ref{sec:memalloc}, the memory allocator keeps a bitmap of marked and free memory regions, and the arena itself holds the memory values.
+
+\lstinputlisting[language=C, caption=kernel/kmalloc.c variables, linerange={22-28}, label=lst:vars]{../os/kernel/kmalloc.c}
+
+The variables that the allocator uses can be seen in listing \ref{lst:vars}. The \texttt{bitmap} and \texttt{arena} variables are pointers to the beginning of the respective bitmap and arena regions of memory. The values \texttt{total_blocks} and \texttt{max_blocks}, calculated during initialization using the maximum size of the heap, allow for bounds checking of the region to be performed. 
+
+\lstinputlisting[language=C, caption=kernel/kmalloc.c allocation function, linerange={58-82,90-97}]{../os/kernel/kmalloc.c}
+
+The allocator consists of an outer \texttt{for} loop, which seeks through the bitmap searching for free blocks. Upon finding a free block it increments the \texttt{accum} variable, a counter of how many adjacent free blocks have been found so far, and upon finding a marked block will reset the accumulator variable and \texttt{continue}, jumping back to the start of the loop and skipping the size check.
+
+
+Next is the code to initialize the GDT. \texttt{kernel/kgdt.h} defines constants, a GDT entry struct, and allocates the GDT itself. The \texttt{gdt} variable is an array of GDT entries, with a fixed size. As the flat memory model is used there is no need to for the GDT to be any larger than the size needed to fit the null entry and two or four entries for code and data, depending on whether segments for different ring levels are added or not. The \texttt{gdt_ptr} type also has to be defined for the \texttt{lgdt} operation, called in \texttt{kernel/lgdt.S}, which requires a specific format for the gdt pointer, consisting of a base and limit, or address and size.
+
+\lstinputlisting[language=C, caption=kernel/kgdt.h constants, linerange={9-34}]{../os/kernel/kgdt.h}
+
+The \texttt{kernel/kgdt.c} file defines an internal function to set entries in the gdt, and a function to initialize the gdt for the kernel, following the flat gdt structure.
+
+\lstinputlisting[language=C, caption=kernel/kgdt.c]{../os/kernel/kgdt.c}
+
+The \texttt{gdt_add_entry} function takes arguments of the values needed for the segment descriptor, and performs the necessary bitwise shifting and masking operations to compose the values into the complex structure of the gdt entry. Certain flags are hard coded and cannot be changed via arguments, as they are flags which are necessary regardless of whether the entry is a code or data segment, such as the \textit{present} flag, indicating that a segment entry is enabled, or present, in the table.
+
+The \texttt{k_gdt_init} function creates a gdt pointer form the address of the gdt. First it adds a \textit{null entry}, as is required\cite{guide2011intel}, and then the code and data entries for the flat memory model. Finally it calls the \texttt{load_gdt} function, an assembly procedure which simply calls the \texttt{lgdt} instruction with its argument.
 
 \subsection{Interrupts}
-PIC and IDT extracts \\
-calling between assembly and C, Interrupt call system and stack state \\
-OS interrupt registration system (and how it differs from simple IDT gates) \\
+Initialization of Interrupts requires two key parts, the PIC and the IDT. Setting up the PIC involves using the \texttt{inb} and \texttt{outb} functions, which are C wrappers around the assembly instructions used for I/O on x86. As the PIC system consists of two PICs, a master and a slave, and each PIC has both a master and a slave port, four constants must be created for the ports.
+
+\lstinputlisting[language=C, caption=kernel/kpic.h, linerange={5-9}]{../os/kernel/kpic.h}
+
+In \texttt{kernel/kpic.c} the \texttt{k_pic_init} function sends the initialization commands to the PICs. As the the commands that must be sent are denoted by a simple numeric IDs, they are represented here in hexadecimal, with comments explaining their purpose.
+
+\lstinputlisting[language=C, caption=kernel/kpic.c, linerange={6-42}]{../os/kernel/kpic.c}
+
+Additionally, the PIC must be sent an EOI (End of Interrupt) signal when an IRQ has finished handling an interrupt. IRQ vectors eight and above are handled by the slave PIC, with seven and below being handled by the master. The \texttt{kpic.c} file has a function \texttt{k_pic_eoi} which can be called to signal an EOI to the PIC when finishing handling an interrupt.
+
+\lstinputlisting[language=C, caption=k_pic_eoi, linerange={44-50}]{../os/kernel/kpic.c}
+
+Initializing the IDT is the next step, following a similar steps to the GDT mentioned previously. First the IDT pointer is created, pointing to the IDT. Then the IDT is iterated through and set to all zero values. 
+
+\lstinputlisting[language=C, caption=Initializing the IDT, linerange={83-88}]{../os/kernel/kinterrupt.c}
+
+After clearing the IDT individual entries can be set using the \texttt{k_add_idt_entry} function. Once the IDT is prepared, the \texttt{load_idt} function, an assembly procedure which consists of the \texttt{lidt} directive similarly to the gdt approach, is called, followed by enabling interrupts on the CPU with a function following a similar pattern, but wrapping the \texttt{sti} directive.
+
+\lstinputlisting[language=C, caption=Initializing the IDT, linerange={131-136}]{../os/kernel/kinterrupt.c}
 
 \section{Language}
 \subsection{Parser}
-C implementation extracts \\
+The language parser is a simple recursive descent parser. The entry point is a function called \texttt{lisp_read}, which takes a string, or in C a pointer to a character array, as an argument, and returns a pointer to a \textit{Lisp Object}. This is a C class representing any Lisp language object, explained further in section \ref{sec:interpreter}. The function simply creates a \texttt{reader_t}, a C struct consisting of a string and an index within the string, allowing for stateful reading, then calls \texttt{parse_exp}.
 
-\subsection{Interpreter}
-Eval/Apply implementation listings \\
-symbol table implementation \\
-Lisp Environment implementation (is in C struct rather than usual Lisp alist) \\
-nativef1-5 vs lispf calling types \\
+\begin{lstlisting}
+lobj_t* lisp_read(char* str)
+{	
+    reader_t* r = make_reader(str);
+    return parse_exp(r);
+}
+\end{lstlisting}
+
+\texttt{parse_exp} is a function which decides whether to treat the current S-expression as a list, or atomic value, then dispatches the reader object to the correct function.
+
+\begin{lstlisting}
+lobj_t* parse_exp(reader_t* r)
+{
+    char c = reader_cur(r);    
+    if(c == '(')
+	return parse_list(r);
+    else
+	return parse_sym(r);
+}
+\end{lstlisting}
+
+The \texttt{parse_list} uses a loop to iterate over S-Expression lists, delimited by ``('' and ``)''. Essentially the loop will check the current character, recursively calling itself upon finding a ``('', returning the current list upon ``)'', and parsing an atomic expression for any non whitespace characters. The \texttt{parse_sym} function tokenizes a single symbol token from the input, delimiting with spaces or any non alphanumeric token. 
+
+\begin{lstlisting}
+lobj_t* parse_list(reader_t* r)
+{
+    char c;
+    lobj_t* ret = NULL;
+    
+    while((c = reader_next(r)) &&
+	   c != ')')
+    {
+	if(c == '(')
+	{
+	    lobj_t* newcons = cons(parse_list(r), NULL);
+	    if(ret == NULL)
+		ret = newcons;
+	    else
+		ret = append(ret, newcons);
+	}
+	else if(c == ' ' || c == '\n' || c == ' ')
+	{
+	    continue;
+	}
+	else if(c == '.') // Dot pair notation
+	{
+            ret->cdr = parse_sym(r);
+	    return ret;
+	}
+	else
+	{
+	    if(ret == NULL)
+		ret = cons(parse_sym(r), NULL);
+	    else
+		ret = append(ret, cons(parse_sym(r), NULL));
+	}
+    }
+
+    return ret;
+}
+\end{lstlisting}
+
+\subsection{Interpreter} \label{sec:interpreter}
+The interpreter can be written as a function taking a Lisp object and an Environment as arguments, returning a new Lisp object and potentially modifying the Environment. As described in section \ref{sec:designinterpreter} we can create two functions \texttt{eval} and \texttt{apply}, to handle variables and functions respectively.
+
+Eval will take a single S-Expression, returning it's value as a variable or constant if the expression is an atomic value, or if the expression is a list format then eval will defer to \texttt{apply}, by passing the first element of the list as the function to execute and the rest of the list as the arguments to apply to the function.
+
+\begin{lstlisting}
+lobj_t* eval(env_t* env, lobj_t* exp)
+{
+    if(exp == NULL)
+	return NULL;
+
+    if(exp->type == Num)
+	return exp;
+
+    if(exp->type == Sym)
+    {
+	lobj_t* entry = get_env_entry(env, exp->val)->lobj;
+	if(entry)
+	    return entry;
+	else if(streq(exp->val, "nil"))
+	    return entry;
+	else
+	    return error(2, "Symbols value as variable is NULL");
+    }
+
+    lobj_t* func = car(exp);
+    lobj_t* args = cdr(exp);
+
+    lobj_t* result = apply(env, func, args);
+
+    return result;
+}
+\end{lstlisting}
+
+The apply function must decide how to execute the function passed to it, based on the function kind. Function kind is defined in \texttt{lisp/env.h} 
+
+\lstinputlisting[language=C, caption=Environment entry kinds., linerange={29-38}]{../os/lisp/env.h}
+
+Apply uses the env entry system when looking up functions. Functions with the type \texttt{special} are special forms, who's arguments are not evaluated automatically by apply so that they can be transformed by the function itself. The \texttt{nativef} and \texttt{nativefn} functions store a C function pointer. The \texttt{nativef} pointer takes an Environment and a Lisp list of arguments. \texttt{nativefn} entries contain a function pointer, taking an Environment and \textit{n} arguments in order. The \texttt{nativef} entries represent a regular function, where arguments are evaluated before being passed to the function.
+
+\lstinputlisting[language=C, caption=Evaluating arguments., linerange={96-100}]{../os/lisp/eval.c}
+
+The default Lisp environment contains the built in functions useful, or necessary, for programming in Lisp. It is defined in \texttt{lisp/base_env.c}, where all the Lisp functions have C function definitions, and are added to the env in function pointer form.
+
+\begin{lstlisting}
+/* Lisp Fundamentals */
+// nil and t
+add_entry(env, empty, add_symbol("nil"), NULL);
+add_entry(env,        add_symbol("t"),   sym("t"));
+
+// Special Forms
+add_entry(env, special, add_symbol("quote"),  &sp_quote);
+add_entry(env, special, add_symbol("progn"),  &sp_progn);
+add_entry(env, special, add_symbol("if"),     &sp_if);
+add_entry(env, special, add_symbol("lambda"), &sp_lambda);
+add_entry(env, special, add_symbol("def"),    &sp_define);
+add_entry(env, special, add_symbol("let"),    &sp_let);	
+
+// Fundamental Functions
+add_entry(env, nativef2, add_symbol("cons"), &fn_cons);
+add_entry(env, nativef1, add_symbol("car"),  &fn_car);
+add_entry(env, nativef1, add_symbol("cdr"),  &fn_cdr);
+add_entry(env, nativef, add_symbol("list"),  &fn_list);
+
+// Data types
+add_entry(env, nativef1, add_symbol("u8"),  &fn_u8);
+add_entry(env, nativef1, add_symbol("u16"), &fn_u16);
+add_entry(env, nativef1, add_symbol("u32"), &fn_u32);
+
+/* Mathematics operators */
+add_entry(env, nativef, add_symbol("+"), &fn_add);
+add_entry(env, nativef, add_symbol("-"), &fn_sub);
+add_entry(env, nativef, add_symbol("*"), &fn_mul);
+add_entry(env, nativef, add_symbol("/"), &fn_div);
+
+add_entry(env, nativef2, add_symbol("="), &fn_eq);
+add_entry(env, nativef2, add_symbol(">"), &fn_greater_than);
+add_entry(env, nativef2, add_symbol("<"), &fn_less_than);
+\end{lstlisting}
+
+\subsubsection{Lisp Execution}
+For the execution of Lisp from C, several macros are defined to wrap the \texttt{eval} function with a fixed environment argument value, \texttt{kenv}. This is the environment used at the root level of Lisp execution in the kernel.
+
+\lstinputlisting[language=C, caption=Convenience C macros., linerange={108-111}]{../os/lisp/types.h}
+
+\texttt{kprint_lisp} and \texttt{kprinteq_lisp} will automatically print the result of their evaluation, allowing for testing and debugging expressions. \texttt{kprinteq} will also print the expression itself, followed by a separator and then the result of evaluating that expression.
 
 \subsection{OS Integration}
-show Kernel Env src and how it allows memory access and inb/outb calls \\
-datatype conversion, u8, u16, and u32 vs num type and ensuring memory access type safety \\
-ptr pointer type \\
+The kernel environment defines some useful functions to facilitate Lisp performing kernel level tasks, such as modifying memory directly, or performing x86 I/O operations using \texttt{inb} and \texttt{outb}. Additionally, functions are provided for binary operations such as bit shifting and binary arithmetic.
 
+\begin{lstlisting}
+add_entry(env, nativef1, add_symbol("inb"), &fn_inb);
+add_entry(env, nativef2, add_symbol("outb"), &fn_outb);
 
-\chapter{Testing/Evaluation}
+add_entry(env, nativef1, add_symbol("addr-of"), &fn_addr_of);
+add_entry(env, nativef2, add_symbol("memset-u8"), &fn_memset_u8);
+add_entry(env, nativef2, add_symbol("memset-u16"), &fn_memset_u16);
+add_entry(env, nativef2, add_symbol("memset-u32"), &fn_memset_u32);
+
+add_entry(env, nativef2, add_symbol("<<"), &fn_shl);
+add_entry(env, nativef2, add_symbol(">>"), &fn_shr);
+add_entry(env, nativef2, add_symbol("bor"), &fn_bor);
+add_entry(env, nativef2, add_symbol("band"), &fn_band);
+\end{lstlisting}
+
+\chapter{Testing}
+In order to test whether the OS capabilities, we will attempt execution of Lisp expressions in the OS. Having created the OS image to be booted using our toolchain, we will use QEMU x86 emulator to demonstrate OS functionality.
+
+The first screenshot here demonstrates the OS having just booted, where it sits idle. Initialization has been performed, demonstrated by the printed messages.
+
+\includegraphics[width=\textwidth]{screenshot1}
+
+Next we can demonstrate the execution of Lisp expressions. The expression is executed using the \texttt{kenv} environment implicitly using the \texttt{kprinteq_lisp} macro.
+
+\includegraphics[width=\textwidth]{screenshot2}
+
+Changes to the environment are persistent, so using the \texttt{def} form to define a variable or function will persist between expressions, as showed here.
+
+\includegraphics[width=\textwidth]{screenshot3}
 
 \chapter{Conclusion}
+\section{Review of Aims}
+\begin{enumerate}
+\item Describe the features and functions of an Operating System;
+  
+  In this paper we summarize the features an OS can have, and the minimum features one must have to be sufficiently functioning as an OS. Given that our kernel was designed to host a high level language, we describe we describe memory allocation, memory management, and interrupts, defined as the minimum level of functionality required to host our language. As the topic of OS functionality and design is a broad one, the paper only defines features necessary for our languages requirements.
+  
+\item Provide the design for a minimal Operating System, fulfilling the criteria established previously;
+  
+  Section 3.1 provides a design for a Kernel which handles the necessary features so as to host a programming language. As described prior, topics such as memory allocation and management are covered, along with the interrupt system. The implementation section takes a broad approach, without specifying certain details which can vary between implementations, but which will still fulfill the minimum criteria to successfully host a language.
+  
+\item Establish a design for a high level programming language, and the minimum interface needed for the language to sufficiently extend the OS functionality;
+
+  Section 3.2 presents a design for a Lisp family language with dynamic types and automatic memory management. Constructs are provided with which the language can be used to modify OS functionality, by interfacing with low level x86 systems and kernel constructs.
+  
+\item Detail the implementation of the proposed OS and Programming Language.
+
+  Section 4 covers an example implementation of the OS and an interpreter for the designed programming language, using code listings to demonstrate implementation specific details.
+\end{enumerate}
+
 \section{Future Work}
+Due to the nebulous nature of OS development, many new avenues could be explored using the minimal implementation given here. Each section of the OS could be further improved, in functionality, or in optimization. The kernels memory management system can be iterated on by implementing x86s paging system, for a better system of memory management, and allowing for more advanced memory techniques such as swapping to disk.
 
+The allocator, although perfectly functional, could yet be further optimized specifically for the Lisp language, by optimizing for the allocation of Cons cells in block size, and assisting the Lisp language in garbage collection. It could also use a more efficient technique for tracking allocations, rather than the simply but crude bitmap system. Even within the bitmap system inefficiencies exist, such as the \texttt{first fit} method for finding adjacent free blocks, which requires searching iteratively through the bitmap for every allocation, which could lead to unnecessary slowdowns, especially when the bitmap is approaching full.
 
+The programming language itself can still be improved on greatly. Currently no garbage collection system exists, which would inevitably cause inflated memory usage over time, as cells will not be deallocated when they leave accessible scope. The language also lacks closures, and although a lambda function object can be returned from a function it will not capture variables which will not be otherwise accessible when using the lambda outside its original scope.
+
+Furthermore the language could adopt the compilation approach used by SBCL, directly compiling functions into assembly code. With the addition of some extra functionality, this could allow Lisp code to entirely replace C in the kernel.
+
+\section{Final Words}
+Having addressed our original aims, this paper is considered concluded. Although the original requirement was simply a ``Mini OS'', a hundred and more avenues of development presented themselves to me while planning this project, and restraining the urge to explore each one proved to be a useful skill. The goal of implementing a high level language alongside an Operating System seemed daunting, and was a test of my own planning and programming skill. The project taught me a great deal about programming, planning, designing, and most importantly poring over technical documentation. Undertaking a project of this caliber was a delight, and watching the interpreter execute expressions on top of the kernel for the first time was well worth the effort to implement it. In the short months I've had to implement this project I've amassed heaps of notes of ideas and new functionality I would like to explore for the project, and would like to develop it into something bigger.
+
+I have a greater appreciation for some of the intricacies and features of x86 assembly language and C, and intend to pursue the field further using the experience and knowledge I've gained from this project.
+
+\begingroup
+\sloppy
+\RaggedRight
 \bibliographystyle{ieeetr}
 \bibliography{bib/report}
+\endgroup
+
+\newpage
+\appendix
+\section{Appendix A: Proposal}
 
 \end{document}

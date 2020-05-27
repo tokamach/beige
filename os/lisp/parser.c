@@ -165,6 +165,13 @@ lobj_t* parse_list(reader_t* r)
 	{
 	    continue;
 	}
+/*	else if(c == '.') // Dot pair notation
+	{
+	    //TODO: check if we already have car
+
+	    ret->cdr = parse_sym(r);
+	    return ret;
+	    }*/
 	else// if (c != ' ') //TODO: is_alpha
 	{
 	    //TODO: check if c = sym
@@ -186,15 +193,14 @@ lobj_t* parse_exp(reader_t* r)
     char c = reader_cur(r);    
     if(c == '(')
 	return parse_list(r);
-    else //TODO: is_alpha
+    else
 	return parse_sym(r);
 }
 
 lobj_t* lisp_read(char* str)
 {	
     reader_t* r = make_reader(str);
-    //r->offset; //TODO: fix this dumb hack
-    return parse_exp(r); //TODO: fix this car thing
+    return parse_exp(r);
 }
 
 void pad_print(int padding, char* str)
@@ -409,11 +415,26 @@ void print_sexp_iter(lobj_t* root, int depth, int debug)
 	    k_print_num(elem->errcode);
 	    k_print(": ");
 	    k_print(elem->errmsg);
-	    k_println("]");	    
+	    k_println("]");
+	    return NULL;
 	}
 
+	// flag that we aren't the first in the list anymore
 	first = 0;
 	elem = elem->cdr;
+
+	// If the cdr is a cons, loop again. If not, we're a dot pair (a . b)
+	/*if(elem->cdr->type == Cons)
+	    elem = elem->cdr;
+	else
+	{
+	    //TODO: implement print lobj function (unwraps num, sym)
+	    k_print(" . ");
+
+	    //TODO URGENT: DON'T KEEP THIS WHAT IF A DOT PAIR IS A SYM
+	    k_print(elem->numl);
+	    break;
+	    }*/
     }
 
     k_print(")");

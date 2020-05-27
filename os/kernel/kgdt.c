@@ -25,7 +25,7 @@ void gdt_add_entry(uint16_t index, uint32_t base, uint32_t limit, uint8_t ring, 
 }
 
 /*
- * While we won't use actual segmentation for our memory management, we still
+ * While we won't use actual segmentation for memory protection, we still
  * need to initialize a flat gdt, otherwise we'll hit errors in Bochs. 
  * (and compliancy is good)
  */
@@ -45,6 +45,7 @@ void k_gdt_init()
     // User Code and Data
     //gdt_add_entry(3, SEG_BASE, SEG_LIMIT, 3, CODE_TYPE);
     //gdt_add_entry(4, SEG_BASE, SEG_LIMIT, 3, DATA_TYPE);
+
     //TODO: add TSS
     
     load_gdt((uint32_t)&gdt_ptr);
